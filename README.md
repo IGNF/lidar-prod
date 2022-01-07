@@ -91,7 +91,7 @@ To run the module on unseen data that went through rule-based semantic segmentat
 Then run:
 
 ```yaml
-python run.py --config-path /path/to/.hydra --config-name config.yaml task=predict hydra.run.dir=path/to/Segmentation-Validation-Model prediction.src_las=/path/to/input.las prediction.resume_from_checkpoint=/path/to/checkpoints.ckpt prediction.best_trial_pickle_path=/path/to/best_trial.pkl prediction.output_dir=/path/to/save/updated/las/ prediction.mts_auto_detected_code=CODE datamodule.batch_size=50
+python run.py --config-path [/path/to/.hydra] --config-name config.yaml task=predict hydra.run.dir=[path/to/Segmentation-Validation-Model] prediction.src_las=[/path/to/input.las] prediction.resume_from_checkpoint=[/path/to/checkpoints.ckpt] prediction.best_trial_pickle_path=[/path/to/best_trial.pkl] prediction.output_dir=[/path/to/save/updated/las/] prediction.mts_auto_detected_code=[CODE] datamodule.batch_size=50
 ```
 
 Please note that "hydra.run.dir" is the directory of the project, it's not a mistake (loading a different config from .hydra with "--config-path" may change that path, we currently need that step to put everything back).
