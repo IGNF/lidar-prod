@@ -10,12 +10,4 @@ jobs:
     steps: 
       — uses: actions/checkout@v2 
       — run: | 
-          cd my-express-app && pwd
-          npm i
-          export DB_HOST=${{ secrets.DB_HOST }} 
-          export DB_NAME=${{ secrets.DB_NAME }} 
-          export DB_USER=${{ secrets.DB_USER }} 
-          export DB_PASS=${{ secrets.DB_PASS }} 
-          export APP_PORT=${{ secrets.APP_PORT }} 
-          pm2 delete all — || : 
-          pm2 start index.js — name express-api -i 2
+          echo "Hello World"
