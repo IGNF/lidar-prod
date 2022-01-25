@@ -9,5 +9,4 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      run: |
-        echo "hello Word"
+      run: echo "hello Word"
