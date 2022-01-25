@@ -1,13 +1,13 @@
-name: My CI-CD 
+name: CI-CD test
+
 on:
-  push: 
+  push:
     branches: [test_ci]
-    
-jobs: 
-  build: 
+
+jobs:
+  test_push:
     runs-on: self-hosted
-   
-    steps: 
-      — uses: actions/checkout@v2 
-      — run: | 
-          echo "Hello World."
+
+    steps:
+      run: |
+        echo "hello Word"
