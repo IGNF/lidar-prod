@@ -1,4 +1,4 @@
-name: CI-CD test
+name: CICD_test
 
 on:
   push:
