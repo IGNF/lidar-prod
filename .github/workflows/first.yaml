@@ -1,7 +1,7 @@
 name: My CI-CD 
 on:
   push: 
-    branches: [master]
+    branches: [test_ci]
     
 jobs: 
   build: 
