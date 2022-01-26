@@ -9,4 +9,8 @@ jobs:
     runs-on: self-hosted
 
     steps:
+
+    - name: Checkout pull request branch       
+      uses: actions/checkout@v2
+
     - run: python /home/MDaab/code/Segmentation-Validation-Model/run.py --config-path logs/V3.0/.hydra --config-name config.yaml task=predict hydra.run.dir='/home/MDaab/code/Segmentation-Validation-Model' prediction.resume_from_checkpoint='logs/V3.0/checkpoints/epoch_013.ckpt' prediction.src_las='/home/MDaab/Data/dataSet/trainvaltest/922000_6307000.las' prediction.best_trial_pickle_path='/home/MDaab/code/Segmentation-Validation-Model/logs/V3.0/best_trial.pkl' prediction.output_dir='output_prediction' prediction.mts_auto_detected_code=6 datamodule.batch_size=50 trainer.gpus=0
