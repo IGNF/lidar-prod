@@ -42,5 +42,4 @@ def main(config: DictConfig):
 
 
 if __name__ == "__main__":
-    print("THIS IS THE BEGINNING")
     main()
