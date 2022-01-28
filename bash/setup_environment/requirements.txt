@@ -6,3 +6,5 @@ hydra-colorlog==1.1.0
 optuna>=2.5
 # --------- PDAL --------- #
 PDAL
+# ------- testing -------- #
+pytest
