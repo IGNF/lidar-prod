@@ -1,9 +1,8 @@
-name: validation_module
+name: lidar_prod
 channels:
   - conda-forge
   - anaconda
   - comet_ml
-  - pytorch
 dependencies:
   - python==3.9
   - pip
@@ -12,11 +11,8 @@ dependencies:
   # --------- geo --------- #
   - laspy
   - python-pdal
-  - pyshp
   - geopandas
   - pygeos
-  # --------- loggers --------- #
-  - comet_ml
   # --------- linters --------- #
   - pre-commit # hooks for applying linters on commit
   - black # code formatting
