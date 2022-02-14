@@ -1,8 +1,10 @@
 name: CICD
 
 on:
-  push:
-    branches: [test_ci]
+#  push:
+#    branches: [test_ci]
+  pull_request:
+    branches: [main]
 
 jobs:
   test_push:
