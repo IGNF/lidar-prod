@@ -23,5 +23,5 @@ conda install -y -c conda-forge pdal==2.3.0
 mamba install -y pytorch==1.8.1 -c pytorch -c conda-forge
 mamba install -y pyg==2.0.3 -c pytorch -c pyg -c conda-forge	# update cudatoolkit à 11.3.1 et pytorch à 1.10.2
 mamba install -y pytorch-lightning==1.5.8 -c conda-forge
-FORCE_CUDA=0 pip install torch-points-kernels --no-cache	# râle de l'absence de daal==2021.3.0, mais semble fonctionner quand même
+FORCE_CUDA=0 pip install torch-points-kernels --no-cache	# is angry because no daal==2021.3.0, but works nonetheless
 pip install torchmetrics==0.6.2

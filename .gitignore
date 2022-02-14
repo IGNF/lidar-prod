@@ -149,3 +149,6 @@ logs/
 wandb/
 .env
 .autoenv
+
+# .hydra
+.hydra/
