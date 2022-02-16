@@ -31,7 +31,7 @@ Components are:
 
 ### Process
     
-1) Prediction of point-level probabilities for a 1km*1km point cloud (see [this repo](https://github.com/IGNF/lidar-deep-segmentation)))
+1) Prediction of point-level probabilities for a 1km*1km point cloud. For this, you can leverage [this repository](https://github.com/IGNF/lidar-deep-segmentation)).
 2) Clustering of _candidate buildings points_ into connected components.
 3) Point-level decision
     1) Decision at the point-level based on probabilities : `confirmed` if p>=`C1` /  `refuted` if (1-p)>=`R1`
@@ -60,6 +60,7 @@ https://www.anaconda.com/products/individual
 # create conda environment (you may need to run lines manually as conda may not activate properly from bash script)
 source bash/setup_environment/setup_env.sh
 
+# install postgis to request building database
 sudo apt-get install postgis
 
 # activate using
@@ -88,19 +89,31 @@ Then run using
 python -m lidar_prod.application paths.src_las=[/path/to/file.las]
 ```
 
+### Use module directly from source
 
-### Optimization of decision thresholds
+Similar, but run from `run.py` entry point in local directory, without the need for a separate yaml configuration
+```bash
+# activate an env matching ./bash/setup_env.sh requirements.
+conda activate lidar_prod
+python -m run.py paths.src_las=[/path/to/file.las] paths.output_dir=[/path/to/output/dir/]
+```
+
+### Optimization and evaluation of decision thresholds
 
 Run a multi-objectives hyperparameters optimization of the decision thresholds, to maximize recall and precision directly while also maximizing automation. For this, you need a set of LAS with 1) a channel with predicted building probability, 2) a classification with labels that distinguish false positive, false negative, and true positive from a rules-based building classification.
 
-```yaml
+```bash
+conda activate lidar_prod
 python run.py task=optimize building_validation.optimization.todo='prepare+optimize+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/val/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] 
 ```
 
-Optimized decision threshold will be pickled inside the results directory. 
+Optimized decision threshold will be pickled inside the results directory.
 
 To evaluate the optimized module on a test set, change input las folder, and rerun. You need to specify that no optimization is required using the `todo` params. You also need to give the path to the pickled decision trheshold.
 
-```yaml
+```bash
+conda activate lidar_prod
 python run.py task=optimize building_validation.optimization.todo='prepare+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
 ```
+
+

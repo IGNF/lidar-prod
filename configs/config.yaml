@@ -1,7 +1,6 @@
 # @package _global_
 print_config: True
 ignore_warnings: True
-
 # specify here default training configuration
 defaults:
   - hydra: default.yaml
