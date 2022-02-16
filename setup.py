@@ -8,6 +8,6 @@ setup(
     author_email="charles.gaydon@gmail.com",
     # replace with your own github project link
     url="https://github.com/IGNF/lidar-prod-quality-control",
-    install_requires=["pytorch-lightning>=1.2.0", "hydra-core>=1.0.6"],
+    install_requires=[],  # env should match the one in bash/setup_environment/setup_env.sh
     packages=find_packages(),
 )
