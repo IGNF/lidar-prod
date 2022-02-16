@@ -26,7 +26,6 @@ labels_from_20211001_building_val:
     false_positives: 0.05 # <x% of confirmed points --> not a building
 
 
-
 study:
   _target_: optuna.create_study
   study_name: "auto_precision_recall"

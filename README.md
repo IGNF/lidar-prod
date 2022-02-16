@@ -44,7 +44,7 @@ Components are:
 
 Decision thresholds `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a multi-objective hyperparameter optimization that aims to maximize automation, precision, and recall of the decisions.
 
-## How to run
+## Usage
 
 ### Install dependencies
 
@@ -67,7 +67,7 @@ sudo apt-get install postgis
 conda activate lidar_prod
 ```
 
-### Use module from package
+### Use application as a package
 
 If you are interested in running the module from anywhere, you can install as a package in a your virtual environment.
 
@@ -86,8 +86,20 @@ To run the module as a package, you will need:
 - A yaml configuration specifying parameters. It is saved by hydra when running `python run.py`. You can edit `paths.output_dir` to customize where results will be saved.
 Then run using
 ```bash
-python -m lidar_prod.application paths.src_las=[/path/to/file.las]
+python -m lidar_prod.application --config-path [/path/to/.hydra] --config-name config.yaml paths.src_las=[/path/to/file.las]
 ```
+
+### Run sequentialy on multiple files
+
+Hydra supports running the python script with several different values for a parameter via a `--multiruns` flag and values separated by a comma.
+
+```bash
+python -m lidar_prod.application --multiruns --config-path [/path/to/.hydra] --config-name config.yaml paths.src_las=[file_1.las],[file_2.las],[file_3.las]
+```
+
+This is also supported when running from source (see below), with the limitation that code should not change between each run at the risk of breaking the loop (e.g. user should not move to git development branch when multiruning from source)
+
+## Development
 
 ### Use module directly from source
 
@@ -115,5 +127,3 @@ To evaluate the optimized module on a test set, change input las folder, and rer
 conda activate lidar_prod
 python run.py task=optimize building_validation.optimization.todo='prepare+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
 ```
-
-
