@@ -116,8 +116,9 @@ Run a multi-objectives hyperparameters optimization of the decision thresholds, 
 
 ```bash
 conda activate lidar_prod
-python run.py task=optimize building_validation.optimization.todo='prepare+optimize+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/val/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] 
+python run.py +task=optimize building_validation.optimization.todo='prepare+optimize+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/val/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] 
 ```
+Nota: to run on a single file during development, add a `+building_validation.optimization.debug=true` flag to the command line.
 
 Optimized decision threshold will be pickled inside the results directory.
 
@@ -125,5 +126,5 @@ To evaluate the optimized module on a test set, change input las folder, and rer
 
 ```bash
 conda activate lidar_prod
-python run.py task=optimize building_validation.optimization.todo='prepare+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
+python run.py +task=optimize building_validation.optimization.todo='prepare+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
 ```

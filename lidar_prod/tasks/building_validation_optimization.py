@@ -96,7 +96,7 @@ class BuildingValidationOptimizer:
             total=len(self.las_filepaths),
             unit="tiles",
         ):
-            self.bv.prepare(in_f, out_f)  # TODO: comment for debugging.
+            self.bv.prepare(in_f, out_f)
             clusters += self.__extract_clusters_from_las(out_f)
         self.__dump_clusters(clusters)
 

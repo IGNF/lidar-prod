@@ -1,5 +1,3 @@
-import logging
-import warnings
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
@@ -14,10 +12,7 @@ def main(config: DictConfig):
     from lidar_prod.application import apply
     from lidar_prod.optimization import optimize
 
-    log = logging.getLogger(__name__)
-    log.debug("Disabling python warnings! <config.ignore_warnings=True>")
-    warnings.filterwarnings("ignore")
-    utils.print_config(config, resolve=True)
+    utils.extras(config)
 
     if config.get("task") == "optimize":
         """Optimization of decision threshold applied to predictions of the NN."""

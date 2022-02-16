@@ -1,6 +1,4 @@
 import logging
-import os
-import os.path as osp
 import hydra
 from omegaconf import DictConfig
 from typing import Optional
@@ -15,6 +13,8 @@ log = logging.getLogger(__name__)
 
 @utils.eval_time
 def optimize(config: DictConfig) -> Optional[float]:
+    utils.extras(config)
+
     bv: BuildingValidationOptimizer = hydra.utils.instantiate(
         config.building_validation.optimization
     )

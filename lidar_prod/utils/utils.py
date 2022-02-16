@@ -1,4 +1,5 @@
 import logging
+import warnings
 import time
 from typing import List, Sequence
 
@@ -7,9 +8,24 @@ import rich.tree
 from omegaconf import DictConfig, OmegaConf
 
 
+def extras(config):
+    log = logging.getLogger(__name__)
+    if config.ignore_warnings:
+        log.debug("Disabling python warnings! <config.ignore_warnings=True>")
+        warnings.filterwarnings("ignore")
+    if config.print_config:
+        print_config(config, resolve=True)
+
+
 def print_config(
     config: DictConfig,
-    fields: Sequence[str] = ("hydra", "paths", "data_format", "building_validation"),
+    fields: Sequence[str] = (
+        "hydra",
+        "paths",
+        "data_format",
+        "building_validation",
+        "building_identification",
+    ),
     resolve: bool = True,
 ) -> None:
     """Prints content of DictConfig using Rich library and its tree structure.

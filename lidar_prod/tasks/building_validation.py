@@ -50,7 +50,11 @@ class BuildingValidator:
             self.set_rules_from_pickle(building_validation_thresholds_pickle)
             log.info(f"Using best trial from: {building_validation_thresholds_pickle}")
         else:
-            log.info(f"Using config decision thresholds")
+            log.warning(
+                f"Using config decision thresholds - specify "
+                "'building_validation.application.building_validation_thresholds_pickle' "
+                "to use optimized threshold"
+            )
 
         self.codes.detailed_to_final = {
             self.codes.detailed.unclustered: self.codes.final.not_building,
@@ -63,11 +67,27 @@ class BuildingValidator:
         }
 
     @tempdir()
+    def run(
+        self,
+        in_f: str,
+        out_f: str,
+        temporary_dir: str = "for_prepared_las_and_given_by_decorator",
+    ):
+        log.info(f"Applying Building Validation to file \n{in_f}")
+        log.info("Preparation - Clustering + Requesting Building database")
+        temp_f = osp.join(temporary_dir, osp.basename(in_f))
+        self.prepare(in_f, temp_f)
+        log.info("Using AI and Databases to update cloud Classification")
+        self.update(temp_f, out_f)
+        log.info(f"Saved to\n{out_f}")
+        return out_f
+
+    @tempdir()
     def prepare(
         self,
         input_filepath: str,
         output_filepath: str,
-        temporary_dir: str = "given_by_decorator",
+        temporary_dir: str = "for_shapefile_and_given_by_decorator",
     ):
         """
         Prepare las for later decision process.
