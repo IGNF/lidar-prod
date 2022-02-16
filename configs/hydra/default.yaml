@@ -1,12 +1,3 @@
-# output paths for hydra logs
-run:
-  dir: ${oc.env:LOGS_DIR}/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
-sweep:
-  dir: ${oc.env:LOGS_DIR}/multiruns/${now:%Y-%m-%d_%H-%M-%S}
-  subdir: ${hydra.job.num}
-
-# you can set here environment variables that are universal for all users
-# for system specific variables (like data paths) it's better to use .env file!
-job:
-  env_set:
-    EXAMPLE_VAR: "example_value"
+defaults:
+  - override hydra_logging: colorlog
+  - override job_logging: colorlog

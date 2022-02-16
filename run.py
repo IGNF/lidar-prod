@@ -1,11 +1,7 @@
-import comet_ml
-import dotenv
+import logging
+import warnings
 import hydra
-from omegaconf import DictConfig
-
-# load environment variables from `.env` file if it exists
-# recursively searches for `.env` in all folders starting from work dir
-dotenv.load_dotenv(override=True)
+from omegaconf import DictConfig, OmegaConf
 
 
 @hydra.main(config_path="configs/", config_name="config.yaml")
@@ -13,33 +9,24 @@ def main(config: DictConfig):
 
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934
-    from semantic_val.optimize import optimize
-    from semantic_val.utils import utils
-    from semantic_val.train import train
-    from semantic_val.predict import predict
+    # from lidar_prod.optimize import optimize
+    from lidar_prod.utils import utils
+    from lidar_prod.application import apply
+    from lidar_prod.optimization import optimize
 
-    # A couple of optional utilities:
-    # - disabling python warnings
-    # - easier access to debug mode
-    # - forcing debug friendly configuration
-    # You can safely get rid of this line if you don't want those
-    utils.extras(config)
+    log = logging.getLogger(__name__)
+    log.debug("Disabling python warnings! <config.ignore_warnings=True>")
+    warnings.filterwarnings("ignore")
+    utils.print_config(config, resolve=True)
 
-    # Pretty print config using Rich library
-    if config.get("print_config"):
-        utils.print_config(config, resolve=True)
-
-    # Train model
-    if config.get("task") == "train":
-        """Training, eval, and test of a neural network."""
-        return train(config)
-    elif config.get("task") == "optimize":
+    if config.get("task") == "optimize":
         """Optimization of decision threshold applied to predictions of the NN."""
         return optimize(config)
-    elif config.get("task") == "predict":
-        """Infer probabilities and automate semantic segmentation decisions on unseen data."""
-        return predict(config)
+    else:
+        """Automate semantic segmentation decisions"""
+        return apply(config)
 
 
 if __name__ == "__main__":
+    OmegaConf.register_new_resolver("get_method", hydra.utils.get_method)
     main()

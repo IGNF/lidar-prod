@@ -22,7 +22,7 @@ We develop a validation module based on a deep learning neural network and on a 
 - **Input**: point cloud that went through a first geometric algorithm that identified `candidates building points` based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.)
 - **Output**: the same point cloud with a majority of groups of `candidates building points` either `confirmed` or `refuted`. The remaining groups are are labeled `unsure` for further human inspection.
 
-![](img/LidarBati-IlluMotteBDProbaV2.1-ENGLISH.png)
+![](assets/img/LidarBati-IlluMotteBDProbaV2.1-ENGLISH.png)
 
 In this repository you will find three main components:
 
@@ -91,7 +91,7 @@ To run the module on unseen data that went through rule-based semantic segmentat
 Then run:
 
 ```yaml
-python run.py --config-path /path/to/.hydra --config-name config.yaml task=predict hydra.run.dir=path/to/Segmentation-Validation-Model prediction.src_las=/path/to/input.las prediction.resume_from_checkpoint=/path/to/checkpoints.ckpt prediction.best_trial_pickle_path=/path/to/best_trial.pkl prediction.output_dir=/path/to/save/updated/las/ prediction.mts_auto_detected_code=CODE datamodule.batch_size=50
+python run.py --config-path /path/to/.hydra --config-name config.yaml task=predict hydra.run.dir=path/to/Segmentation-Validation-Model prediction.src_las=/path/to/input.las prediction.resume_from_checkpoint=/path/to/checkpoints.ckpt prediction.building_validation_thresholds_pickle=/path/to/best_trial.pkl prediction.output_dir=/path/to/save/updated/las/ prediction.candidate_buildings_codes=CODE datamodule.batch_size=50
 ```
 
 Please note that "hydra.run.dir" is the directory of the project, it's not a mistake (loading a different config from .hydra with "--config-path" may change that path, we currently need that step to put everything back).
@@ -120,13 +120,13 @@ To evaluate on test data instead of val data, replace `experiment=evaluate_val_d
 Run a multi-objectives hyperparameters optimization of the decision thresholds, to maximize recall and precision directly while also maximizing automation. For that you will need inference results on the validation dataset.
 
 ```yaml
-python run.py -m task=optimize optimize.todo='prepare+optimize+evaluate+update' optimize.predicted_las_dirpath="/path/to/val/las/folder/" optimize.results_output_dir="/path/to/save/updated/val/las/"  optimize.best_trial_pickle_path="/path/to/best_trial.pkl"
+python run.py -m task=optimize optimize.todo='prepare+optimize+evaluate+update' optimize.input_las_dir="/path/to/val/las/folder/" optimize.results_output_dir="/path/to/save/updated/val/las/"  optimize.building_validation_thresholds_pickle="/path/to/best_trial.pkl"
 ```
 
 To evaluate the optimized module on the test set, simply change the input las folder and the results output folder, and remove the optimization from the `todo` argument. The path to the best trial stays the same: it contains the optimized decision thresholds.
 
 ```yaml
-python run.py task=optimize optimize.todo='prepare+evaluate+update' print_config=false optimize.predicted_las_dirpath="/path/to/test/las/folder/" optimize.results_output_dir="/path/to/save/updated/test/las/" optimize.best_trial_pickle_path="/path/to/best_trial.pkl"
+python run.py task=optimize optimize.todo='prepare+evaluate+update' print_config=false optimize.input_las_dir="/path/to/test/las/folder/" optimize.results_output_dir="/path/to/save/updated/test/las/" optimize.building_validation_thresholds_pickle="/path/to/best_trial.pkl"
 ```
 
 Additionally, if you want to update the las classification based on those decisions, add an `optimize.update_las=true` argument.
