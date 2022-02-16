@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - anaconda
 dependencies:
-  - python==3.9
+  - python==3.9.*
   - pip
   # --------- linters --------- #
   - pre-commit # hooks for applying linters on commit
@@ -11,22 +11,16 @@ dependencies:
   - isort # import sorting
   - flake8 # code analysis
   # --------- geo --------- #
-  - pdal
-  - python-pdal
-  - gdal
-  - entwine
-  - matplotlib
-  - numpy==1.20
+  - conda-forge:python-pdal
+  - conda-forge:laspy==2.1.*
+  - numpy
   - scikit-learn
-  - seaborn
   - geopandas
-  - laspy
   # --------- others --------- #
-  - rich # beautiful text formatting in terminal
-  - pytest # tests
-  - sh # for running bash commands in some tests
   - jupyterlab # better jupyter notebooks
   - pudb # debugger
+  - rich==11.2.*  # rich text formatting
+  - pytest==6.2.*  # tests
   # --------- torch --------- #
   - pip:
       - -r requirements.txt
