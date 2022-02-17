@@ -102,18 +102,18 @@ class BuildingValidationOptimizer:
 
     def optimize(self):
         clusters = self.__load_clusters()
-        objective = functools.partial(self.__objective, clusters=clusters)
+        objective = functools.partial(self._objective, clusters=clusters)
         self.study.optimize(objective, n_trials=self.design.n_trials)
-        best_rules = self.__select_best_rules(self.study)
+        best_rules = self._select_best_rules(self.study)
         log.info(f"Best_trial rules: \n{best_rules}")
         self.__dump_best_rules(best_rules)
 
     def evaluate(self):
         clusters = self.__load_clusters()
-        self.bv.set_rules_from_pickle(self.paths.building_validation_thresholds_pickle)
+        self.bv._set_rules_from_pickle(self.paths.building_validation_thresholds_pickle)
         decisions = np.array(
             [
-                self.bv.__make_group_decision(c.probabilities, c.overlays)
+                self.bv._make_group_decision(c.probabilities, c.overlays)
                 for c in clusters
             ]
         )
@@ -124,7 +124,7 @@ class BuildingValidationOptimizer:
 
     def update(self):
         log.info(f"Updated las will be saved in {self.paths.results_output_dir}")
-        self.bv.set_rules_from_pickle(self.paths.building_validation_thresholds_pickle)
+        self.bv._set_rules_from_pickle(self.paths.building_validation_thresholds_pickle)
         for prep_f, out_f in tqdm(
             zip(self.prepared_las_filepaths, self.out_las_filepaths),
             total=len(self.prepared_las_filepaths),
@@ -185,7 +185,7 @@ class BuildingValidationOptimizer:
             penalty += self.design.constraints.min_automation_constraint - auto
         return [penalty]
 
-    def __objective(self, trial, clusters=None):
+    def _objective(self, trial, clusters=None):
         """Objective function for optuna optimization. Inner definition to access list of array of probas and list of targets."""
         # TODO: incude as configurable parameters
         params = {
@@ -206,7 +206,7 @@ class BuildingValidationOptimizer:
         self.bv.rules = rules(**params)
         decisions = np.array(
             [
-                self.bv.__make_group_decision(c.probabilities, c.overlays)
+                self.bv._make_group_decision(c.probabilities, c.overlays)
                 for c in clusters
             ]
         )
@@ -228,7 +228,7 @@ class BuildingValidationOptimizer:
         )
         return auto, precision, recall
 
-    def __select_best_rules(self, study):
+    def _select_best_rules(self, study):
         """Find the trial that meets constraints and that maximizes automation."""
         trials = sorted(study.best_trials, key=lambda x: x.values[0], reverse=True)
         TRIALS_BELOW_ZERO_ARE_VALID = 0

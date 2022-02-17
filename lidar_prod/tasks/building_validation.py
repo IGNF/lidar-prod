@@ -46,7 +46,7 @@ class BuildingValidator:
 
     def setup(self, building_validation_thresholds_pickle):
         if osp.exists(building_validation_thresholds_pickle):
-            self.set_rules_from_pickle(building_validation_thresholds_pickle)
+            self._set_rules_from_pickle(building_validation_thresholds_pickle)
             log.info(f"Using best trial from: {building_validation_thresholds_pickle}")
         else:
             log.warning(
@@ -161,37 +161,6 @@ class BuildingValidator:
         pipeline = pdal.Pipeline(pipeline)
         pipeline.execute()
 
-    def __make_group_decision(self, *args, **kwargs):
-        detailed_code = self.__make_detailed_group_decision(*args, **kwargs)
-        return self.codes.detailed_to_final[detailed_code]
-
-    def __make_detailed_group_decision(self, probas_arr, overlay_bools_arr):
-        """
-        Confirm or refute candidate building shape based on fraction of confirmed/refuted points and
-        on fraction of points overlayed by a building shape in a database.
-        """
-        ia_confirmed = (
-            np.mean(probas_arr >= self.rules.min_confidence_confirmation)
-            >= self.rules.min_frac_confirmation
-        )
-        ia_refuted = (
-            np.mean((1 - probas_arr) >= self.rules.min_confidence_refutation)
-            >= self.rules.min_frac_refutation
-        )
-        uni_overlayed = np.mean(overlay_bools_arr) >= self.rules.min_uni_db_overlay_frac
-
-        if ia_refuted:
-            if uni_overlayed:
-                return self.codes.detailed.ia_refuted_and_db_overlayed
-            return self.codes.detailed.ia_refuted
-        if ia_confirmed:
-            if uni_overlayed:
-                return self.codes.detailed.both_confirmed
-            return self.codes.detailed.ia_confirmed_only
-        if uni_overlayed:
-            return self.codes.detailed.db_overlayed_only
-        return self.codes.detailed.both_unsure
-
     def update(self, prepared_f: str, out_f: str):
         """
         Update point cloud classification channel.
@@ -226,7 +195,38 @@ class BuildingValidator:
                 ] = detailed_code
         las.write(out_f)
 
-    def set_rules_from_pickle(self, building_validation_thresholds_pickle):
+    def _make_group_decision(self, *args, **kwargs):
+        detailed_code = self.__make_detailed_group_decision(*args, **kwargs)
+        return self.codes.detailed_to_final[detailed_code]
+
+    def __make_detailed_group_decision(self, probas_arr, overlay_bools_arr):
+        """
+        Confirm or refute candidate building shape based on fraction of confirmed/refuted points and
+        on fraction of points overlayed by a building shape in a database.
+        """
+        ia_confirmed = (
+            np.mean(probas_arr >= self.rules.min_confidence_confirmation)
+            >= self.rules.min_frac_confirmation
+        )
+        ia_refuted = (
+            np.mean((1 - probas_arr) >= self.rules.min_confidence_refutation)
+            >= self.rules.min_frac_refutation
+        )
+        uni_overlayed = np.mean(overlay_bools_arr) >= self.rules.min_uni_db_overlay_frac
+
+        if ia_refuted:
+            if uni_overlayed:
+                return self.codes.detailed.ia_refuted_and_db_overlayed
+            return self.codes.detailed.ia_refuted
+        if ia_confirmed:
+            if uni_overlayed:
+                return self.codes.detailed.both_confirmed
+            return self.codes.detailed.ia_confirmed_only
+        if uni_overlayed:
+            return self.codes.detailed.db_overlayed_only
+        return self.codes.detailed.both_unsure
+
+    def _set_rules_from_pickle(self, building_validation_thresholds_pickle):
         with open(building_validation_thresholds_pickle, "rb") as f:
             self.rules: rules = pickle.load(f)
 
