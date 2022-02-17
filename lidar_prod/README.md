@@ -80,34 +80,36 @@ pip install --upgrade https://github.com/IGNF/lidar-prod-quality-control/tarball
 pip install -e .  # from local sources
 ```
 
-To run the module as a package, you will need:
+To run the module as a package, you will need a source cloud point in LAS format with an additional channel containing predicted building probabilites (specified by `config.data_format.las_channel_names.ai_building_proba`).
 
-- A source cloud point in LAS format with an additional channel containing predicted building probabilites (specified by `config.data_format.las_channel_names.ai_building_proba`).
-- A yaml configuration specifying parameters. It is saved by hydra when running `python run.py`. You can edit `paths.output_dir` to customize where results will be saved.
-Then run using
+To run using default configurations of the installed package, use
 ```bash
-python -m lidar_prod.application --config-path [/path/to/.hydra] --config-name config.yaml paths.src_las=[/path/to/file.las]
+python -m lidar_prod.run paths.src_las=[/path/to/file.las]
 ```
+
+To print default configuration run `python -m lidar_prod.run -h`. For pretty colors, run `python -m lidar_prod.run print_config=true`.
+
+You can override the yaml file with flags `--config-path` and `--config-name`. You can also override specific parameters. By default, results are saved to a `./outputs/` folder, but this can be overriden with `paths.output_dir` parameter. See [hydra documentation](https://hydra.cc/docs/next/tutorials/basic/your_first_app/config_file/) for reference on overriding syntax.
 
 ### Run sequentialy on multiple files
 
 Hydra supports running the python script with several different values for a parameter via a `--multiruns` flag and values separated by a comma.
 
 ```bash
-python -m lidar_prod.application --multiruns --config-path [/path/to/.hydra] --config-name config.yaml paths.src_las=[file_1.las],[file_2.las],[file_3.las]
+python -m lidar_prod.run --multiruns --config-path [/path/to/.hydra] --config-name config.yaml paths.src_las=[file_1.las],[file_2.las],[file_3.las]
 ```
 
 This is also supported when running from source (see below), with the limitation that code should not change between each run at the risk of breaking the loop (e.g. user should not move to git development branch when multiruning from source)
 
 ## Development
 
-### Use module directly from source
+### Use application from source
 
 Similar, but run from `run.py` entry point in local directory, without the need for a separate yaml configuration
 ```bash
 # activate an env matching ./bash/setup_env.sh requirements.
 conda activate lidar_prod
-python -m run.py paths.src_las=[/path/to/file.las] paths.output_dir=[/path/to/output/dir/]
+python -m lidar_prod/run.py paths.src_las=[/path/to/file.las] paths.output_dir=[/path/to/output/dir/]
 ```
 
 ### Optimization and evaluation of decision thresholds
@@ -116,7 +118,7 @@ Run a multi-objectives hyperparameters optimization of the decision thresholds, 
 
 ```bash
 conda activate lidar_prod
-python run.py +task=optimize building_validation.optimization.todo='prepare+optimize+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/val/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] 
+python lidar_prod/run.py +task=optimize building_validation.optimization.todo='prepare+optimize+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/val/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] 
 ```
 Nota: to run on a single file during development, add a `+building_validation.optimization.debug=true` flag to the command line.
 
@@ -126,5 +128,5 @@ To evaluate the optimized module on a test set, change input las folder, and rer
 
 ```bash
 conda activate lidar_prod
-python run.py +task=optimize building_validation.optimization.todo='prepare+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
+python lidar_prod/run.py +task=optimize building_validation.optimization.todo='prepare+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
 ```

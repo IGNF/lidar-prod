@@ -9,10 +9,10 @@ from sklearn.metrics import confusion_matrix
 from typing import Any, Dict
 import optuna
 from tqdm import tqdm
-from lidar_prod.tasks.building_validation import BuildingValidator, rules
 import os.path as osp
 import laspy
 
+from lidar_prod.tasks.building_validation import BuildingValidator, rules
 from lidar_prod.tasks.utils import split_idx_by_dim
 
 log = logging.getLogger(__name__)

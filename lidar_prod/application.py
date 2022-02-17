@@ -1,13 +1,11 @@
 import logging
 import os
 import os.path as osp
-import warnings
 import hydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 from typing import Optional
 
 from lidar_prod.utils import utils
-
 from lidar_prod.tasks.building_validation import BuildingValidator
 
 
@@ -22,19 +20,3 @@ def apply(config: DictConfig) -> Optional[float]:
         config.building_validation.application
     )
     bv.run(config.paths.src_las, out_f)
-
-
-@hydra.main(config_path="../configs/", config_name="config.yaml")
-def main(config: DictConfig):
-    utils.extras(config)
-
-    if config.get("print_config"):
-        utils.print_config(config, resolve=False)
-
-    return apply(config)
-
-
-if __name__ == "__main__":
-    # cf. https://github.com/facebookresearch/hydra/issues/1283
-    OmegaConf.register_new_resolver("get_method", hydra.utils.get_method)
-    main()
