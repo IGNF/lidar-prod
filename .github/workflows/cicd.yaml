@@ -1,0 +1,23 @@
+name: CICD
+
+on:
+#  push:
+#    branches: [test_ci]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test_push:
+    runs-on: self-hosted
+
+    steps:
+
+    - name: Checkout branch       
+      uses: actions/checkout@v2
+    
+    - name: unit testing
+      run: pytest --ignore=actions-runner --ignore="notebooks"
+
+    - name: Package install in self-hosted environment
+      run: pip install -e .
+      run: python -m lidar_prod.run -h
