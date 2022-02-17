@@ -120,6 +120,7 @@ class BuildingValidationOptimizer:
         mts_gt = np.array([c.target for c in clusters])
         metrics_dict = self.__evaluate_decisions(mts_gt, decisions)
         log.info(f"\n Results:\n{self.__get_results_logs_str(metrics_dict)}")
+        return metrics_dict
 
     def update(self):
         log.info(f"Updated las will be saved in {self.paths.results_output_dir}")
