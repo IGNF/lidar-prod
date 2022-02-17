@@ -21,6 +21,8 @@ log = logging.getLogger(__name__)
 
 
 class BuildingValidator:
+    """Logic of building validation."""
+
     def __init__(
         self,
         bd_uni_connection_params=None,
@@ -45,6 +47,7 @@ class BuildingValidator:
         self.setup(building_validation_thresholds_pickle)
 
     def setup(self, building_validation_thresholds_pickle):
+        """Setup, loading optimized thresholds if available."""
         if osp.exists(building_validation_thresholds_pickle):
             self._set_rules_from_pickle(building_validation_thresholds_pickle)
             log.info(f"Using best trial from: {building_validation_thresholds_pickle}")
@@ -72,6 +75,22 @@ class BuildingValidator:
         out_f: str,
         tempdir: str = "for_prepared_las_and_given_by_decorator",
     ):
+        """Application.
+
+        Transform cloud at `in_f` following validation logic, and save it to
+        `out_f`
+
+        Args:
+            in_f (str): path to input LAS file with a building probability channel
+            out_f (str): path for saving updated LAS file.
+            tempdir (str, optional): This is a path to a temporary directory created
+        by the decorator, which is automatically deleted afterward. Used to store intermediary,
+        prepared LAS file.
+
+        Returns:
+            _type_: returns `out_f` for potential terminal piping.
+
+        """
         log.info(f"Applying Building Validation to file \n{in_f}")
         log.info("Preparation - Clustering + Requesting Building database")
         temp_f = osp.join(tempdir, osp.basename(in_f))
@@ -90,9 +109,11 @@ class BuildingValidator:
     ):
         """
         Prepare las for later decision process.
-        Will:
-        - Cluster candidates points, thus creating a ClusterId channel (default cluster: 0).
-        - Identify points overlayed by a BDTopo shape, thus creating a BDTopoOverlay channel (no overlap: 0).
+
+        1. Cluster candidates points (-> adds a ClusterId channel).
+        2. Identify points overlayed by a BD Uni building (-> adds a BDTopoOverlay channel).
+
+
         """
 
         shapefile_path = os.path.join(tempdir, "temp.shp")
@@ -162,10 +183,8 @@ class BuildingValidator:
         pipeline.execute()
 
     def update(self, prepared_f: str, out_f: str):
-        """
-        Update point cloud classification channel.
-        Params is a dict-like object with optimized decision thresholds.
-        """
+        """Update point cloud classification channel."""
+
         las = laspy.read(prepared_f)
         # 1) Set to default all candidates points
         candidate_building_points_mask = (
@@ -193,6 +212,7 @@ class BuildingValidator:
                 las[self.data_format.las_channel_names.classification][
                     pts_idx
                 ] = detailed_code
+        os.makedirs(osp.dirname(out_f), exist_ok=True)
         las.write(out_f)
 
     def _make_group_decision(self, *args, **kwargs):
@@ -200,9 +220,11 @@ class BuildingValidator:
         return self.codes.detailed_to_final[detailed_code]
 
     def __make_detailed_group_decision(self, probas_arr, overlay_bools_arr):
-        """
+        """Decision process at the cluster level.
+
         Confirm or refute candidate building shape based on fraction of confirmed/refuted points and
         on fraction of points overlayed by a building shape in a database.
+
         """
         ia_confirmed = (
             np.mean(probas_arr >= self.rules.min_confidence_confirmation)
@@ -240,9 +262,12 @@ def request_bd_uni_for_building_shapefile(
     srid: int,
     shapefile_path: str,
 ):
-    """
-    Create a shapefile with non destructed building on
-    the area and saves it. Also add a column "presence" with only 1 in it
+    """BD Uni request.
+
+    Create a shapefile with non destructed building on the area of interest
+    and saves it.
+    Also add a "PRESENCE" column filled with 1 for later use by pdal.
+
     """
     sql_request = f"SELECT st_setsrid(batiment.geometrie,{srid}) AS geometry, 1 as presence  FROM batiment WHERE batiment.geometrie && ST_MakeEnvelope({xmin}, {ymin}, {xmax}, {ymax}, {srid}) and not gcms_detruit"
     cmd = [
@@ -278,6 +303,8 @@ def request_bd_uni_for_building_shapefile(
 
 @dataclass
 class rules:
+    """The deciison threshold for cluser-level decisions."""
+
     min_confidence_confirmation: float
     min_frac_confirmation: float
     min_uni_db_overlay_frac: float

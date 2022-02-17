@@ -24,12 +24,16 @@ def constraints_func(trial):
 
 @dataclass
 class BuildngValidationClusterInfo:
+    """Minimal candidate building point-cluster data to make a validation"""
+
     probabilities: np.ndarray
     overlays: np.ndarray
     target: int
 
 
 class BuildingValidationOptimizer:
+    """Optimization logic for the BuildingValidation decision thresholds."""
+
     def __init__(
         self,
         todo: str,
@@ -52,6 +56,7 @@ class BuildingValidationOptimizer:
         self.setup()
 
     def run(self):
+        """Run decision threshold optimization."""
         if "prepare" in self.todo:
             self.prepare()
         if "optimize" in self.todo:
@@ -62,6 +67,12 @@ class BuildingValidationOptimizer:
             self.update()
 
     def setup(self):
+        """Setup step.
+
+        Setup a few attributes and override BuildingValidator classification
+        codes to adapt to those of the optimization dataset.
+
+        """
         self.las_filepaths = glob(osp.join(self.paths.input_las_dir, "*.las"))
         self.las_filepaths = sorted(self.las_filepaths)
         if self.debug:
@@ -89,6 +100,12 @@ class BuildingValidationOptimizer:
         ]
 
     def prepare(self):
+        """Preparation step.
+
+        Cluster clouds and cross with building vector database, then
+        extract cluster-level information.
+
+        """
         clusters = []
         for in_f, out_f in tqdm(
             zip(self.las_filepaths, self.prepared_las_filepaths),
@@ -101,6 +118,7 @@ class BuildingValidationOptimizer:
         self.__dump_clusters(clusters)
 
     def optimize(self):
+        """Optimization step"""
         clusters = self.__load_clusters()
         objective = functools.partial(self._objective, clusters=clusters)
         self.study.optimize(objective, n_trials=self.design.n_trials)
@@ -109,6 +127,12 @@ class BuildingValidationOptimizer:
         self.__dump_best_rules(best_rules)
 
     def evaluate(self):
+        """Evaluation step
+
+        Returns:
+            dict: a name: value dict of metrics.
+
+        """
         clusters = self.__load_clusters()
         self.bv._set_rules_from_pickle(self.paths.building_validation_thresholds_pickle)
         decisions = np.array(
@@ -123,6 +147,11 @@ class BuildingValidationOptimizer:
         return metrics_dict
 
     def update(self):
+        """Update step.
+
+        Update point cloud classification using optimized decision thresholds.
+
+        """
         log.info(f"Updated las will be saved in {self.paths.results_output_dir}")
         self.bv._set_rules_from_pickle(self.paths.building_validation_thresholds_pickle)
         for prep_f, out_f in tqdm(
@@ -173,9 +202,7 @@ class BuildingValidationOptimizer:
         return self.bv.codes.final.unsure
 
     def __compute_penalty(self, auto, precision, recall):
-        """
-        Positive float indicative of how much a solution violates the constraint of minimal auto/precision/metrics
-        """
+        """Positive float indicative a solution violates the constraint of minimal auto/precision/metrics"""
         penalty = 0
         if precision < self.design.constraints.min_precision_constraint:
             penalty += self.design.constraints.min_precision_constraint - precision
@@ -269,7 +296,8 @@ class BuildingValidationOptimizer:
         return clusters
 
     def __evaluate_decisions(self, mts_gt, ia_decision):
-        """
+        """Evaluate confirmation and refutation decisions.
+
         Get dict of metrics to evaluate how good module decisions were in reference to ground truths.
         Targets: U=Unsure, N=No (not a building), Y=Yes (building)
         PRedictions : U=Unsure, C=Confirmation, R=Refutation
@@ -282,13 +310,15 @@ class BuildingValidationOptimizer:
         Maximization criteria:
         Proportion of each decision among total of candidate groups.
         We want to maximize it.
+
         Accuracies:
         Confirmation/Refutation Accuracy.
         Accurate decision if either "unsure" or the same as the label.
+
         Quality
         Precision and Recall, assuming perfect posterior decision for unsure predictions.
         Only candidate shapes with known ground truths are considered (ambiguous labels are ignored).
-        Precision :
+        Precision : (Yu + Yc) / (Yu + Yc + Nc)
         Recall : (Yu + Yc) / (Yu + Yn + Yc)
         """
         metrics_dict = dict()

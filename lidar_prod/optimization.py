@@ -12,7 +12,16 @@ log = logging.getLogger(__name__)
 
 
 @utils.eval_time
-def optimize(config: DictConfig) -> Optional[float]:
+def optimize(config: DictConfig):
+    """
+    Run a multi-objectives hyperparameters optimization of the decision
+    thresholds, to maximize recall and precision directly while
+    also maximizing automation.
+
+    Args:
+        config (DictConfig): Hydra config passed from run.py
+
+    """
     utils.extras(config)
 
     bvo: BuildingValidationOptimizer = hydra.utils.instantiate(

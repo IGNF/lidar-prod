@@ -1,8 +1,6 @@
 name: CICD
 
 on:
-#  push:
-#    branches: [test_ci]
   pull_request:
     branches: [main]
 
@@ -18,6 +16,14 @@ jobs:
     - name: unit testing
       run: pytest --ignore=actions-runner --ignore="notebooks"
 
-    - name: Package install in self-hosted environment
-      run: pip install -e .
-      run: python -m lidar_prod.run -h
+    - name: Setup conda env
+      run: bash -i CI/setup_env.sh
+
+    - name: Package install
+      run: bash -i CI/install_as_a_package.sh
+
+    - name: Evaluate decisions on single LAS
+      run: bash -i CI/evaluate_bv_single_las.sh
+
+    - name: Run on a point cloud
+      run: bash -i CI/run_app.sh

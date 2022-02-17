@@ -16,10 +16,8 @@ def main(config: DictConfig):
     extras(config)
     print(config.paths.output_dir)
     if config.get("task") == "optimize":
-        """Optimization of decision threshold applied to predictions of the NN."""
         return optimize(config)
     else:
-        """Automate semantic segmentation decisions"""
         return apply(config)
 
 
