@@ -19,13 +19,6 @@ def extras(config):
 
 def print_config(
     config: DictConfig,
-    fields: Sequence[str] = (
-        "hydra",
-        "paths",
-        "data_format",
-        "building_validation",
-        "building_identification",
-    ),
     resolve: bool = True,
 ) -> None:
     """Prints content of DictConfig using Rich library and its tree structure.
@@ -40,9 +33,7 @@ def print_config(
     style = "dim"
     tree = rich.tree.Tree("CONFIG", style=style, guide_style=style)
 
-    for (
-        field
-    ) in fields:  # TODO: try replacing fields by config to print them all in order...
+    for field in config:
         branch = tree.add(field, style=style, guide_style=style)
 
         config_section = config.get(field)

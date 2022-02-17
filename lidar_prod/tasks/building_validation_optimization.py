@@ -112,7 +112,10 @@ class BuildingValidationOptimizer:
         clusters = self.__load_clusters()
         self.bv.set_rules_from_pickle(self.paths.building_validation_thresholds_pickle)
         decisions = np.array(
-            [self.bv.make_group_decision(c.probabilities, c.overlays) for c in clusters]
+            [
+                self.bv.__make_group_decision(c.probabilities, c.overlays)
+                for c in clusters
+            ]
         )
         mts_gt = np.array([c.target for c in clusters])
         metrics_dict = self.__evaluate_decisions(mts_gt, decisions)
@@ -201,7 +204,10 @@ class BuildingValidationOptimizer:
         }
         self.bv.rules = rules(**params)
         decisions = np.array(
-            [self.bv.make_group_decision(c.probabilities, c.overlays) for c in clusters]
+            [
+                self.bv.__make_group_decision(c.probabilities, c.overlays)
+                for c in clusters
+            ]
         )
         mts_gt = np.array([c.target for c in clusters])
         metrics_dict = self.__evaluate_decisions(mts_gt, decisions)

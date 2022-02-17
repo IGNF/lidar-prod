@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 def optimize(config: DictConfig) -> Optional[float]:
     utils.extras(config)
 
-    bv: BuildingValidationOptimizer = hydra.utils.instantiate(
+    bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
         config.building_validation.optimization
     )
-    bv.run()
+    bvo.run()

@@ -21,7 +21,6 @@ log = logging.getLogger(__name__)
 
 
 class BuildingValidator:
-    # TODO: replace data_format with a dataclass object .
     def __init__(
         self,
         bd_uni_connection_params=None,
@@ -71,11 +70,11 @@ class BuildingValidator:
         self,
         in_f: str,
         out_f: str,
-        temporary_dir: str = "for_prepared_las_and_given_by_decorator",
+        tempdir: str = "for_prepared_las_and_given_by_decorator",
     ):
         log.info(f"Applying Building Validation to file \n{in_f}")
         log.info("Preparation - Clustering + Requesting Building database")
-        temp_f = osp.join(temporary_dir, osp.basename(in_f))
+        temp_f = osp.join(tempdir, osp.basename(in_f))
         self.prepare(in_f, temp_f)
         log.info("Using AI and Databases to update cloud Classification")
         self.update(temp_f, out_f)
@@ -87,7 +86,7 @@ class BuildingValidator:
         self,
         input_filepath: str,
         output_filepath: str,
-        temporary_dir: str = "for_shapefile_and_given_by_decorator",
+        tempdir: str = "for_shapefile_and_given_by_decorator",
     ):
         """
         Prepare las for later decision process.
@@ -96,7 +95,7 @@ class BuildingValidator:
         - Identify points overlayed by a BDTopo shape, thus creating a BDTopoOverlay channel (no overlap: 0).
         """
 
-        shapefile_path = os.path.join(temporary_dir, "temp.shp")
+        shapefile_path = os.path.join(tempdir, "temp.shp")
 
         buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
             self.bd_uni_connection_params,
@@ -162,11 +161,11 @@ class BuildingValidator:
         pipeline = pdal.Pipeline(pipeline)
         pipeline.execute()
 
-    def make_group_decision(self, *args, **kwargs):
-        detailed_code = self.make_detailed_group_decision(*args, **kwargs)
+    def __make_group_decision(self, *args, **kwargs):
+        detailed_code = self.__make_detailed_group_decision(*args, **kwargs)
         return self.codes.detailed_to_final[detailed_code]
 
-    def make_detailed_group_decision(self, probas_arr, overlay_bools_arr):
+    def __make_detailed_group_decision(self, probas_arr, overlay_bools_arr):
         """
         Confirm or refute candidate building shape based on fraction of confirmed/refuted points and
         on fraction of points overlayed by a building shape in a database.
@@ -193,14 +192,13 @@ class BuildingValidator:
             return self.codes.detailed.db_overlayed_only
         return self.codes.detailed.both_unsure
 
-    def update(self, prepared_las_path: str, output_las_path: str):
+    def update(self, prepared_f: str, out_f: str):
         """
         Update point cloud classification channel.
         Params is a dict-like object with optimized decision thresholds.
         """
-        las = laspy.read(prepared_las_path)
-        # 1) Set to default all candidats points
-        # TODO: check if that logic is ok in new production process.
+        las = laspy.read(prepared_f)
+        # 1) Set to default all candidates points
         candidate_building_points_mask = (
             las[self.data_format.las_channel_names.classification]
             == self.candidate_buildings_codes
@@ -211,11 +209,10 @@ class BuildingValidator:
 
         # 2) Decide at the group-level
         split_idx = split_idx_by_dim(las[self.data_format.las_channel_names.cluster_id])
-        # TODO: make it more robust ? Assurance that it is ordered?
         split_idx = split_idx[1:]  # remove unclustered group with ClusterID = 0
         for pts_idx in tqdm(split_idx, desc="Updating LAS."):
             pts = las.points[pts_idx]
-            detailed_code = self.make_detailed_group_decision(
+            detailed_code = self.__make_detailed_group_decision(
                 pts[self.data_format.las_channel_names.ai_building_proba],
                 pts[self.data_format.las_channel_names.uni_db_overlay],
             )
@@ -227,8 +224,7 @@ class BuildingValidator:
                 las[self.data_format.las_channel_names.classification][
                     pts_idx
                 ] = detailed_code
-        las.write(output_las_path)
-        return las
+        las.write(out_f)
 
     def set_rules_from_pickle(self, building_validation_thresholds_pickle):
         with open(building_validation_thresholds_pickle, "rb") as f:

@@ -16,7 +16,10 @@ class BDUniConnectionParams:
 
 
 def split_idx_by_dim(dim_array):
-    """Returns a sequence of arrays of indices of elements sharing the same value in dim_array"""
+    """
+    Returns a sequence of arrays of indices of elements sharing the same value in dim_array
+    Groups are ordered by ascending value.
+    """
     idx = np.argsort(dim_array)
     sorted_dim_array = dim_array[idx]
     group_idx = np.array_split(idx, np.where(np.diff(sorted_dim_array) != 0)[0] + 1)
@@ -51,7 +54,7 @@ def tempdir(**kw):
         @wraps(fn)
         def wrapper(*args, **kwargs):
             with TemporaryDirectory(**kw) as td:
-                kwargs.update({"temporary_dir": td})
+                kwargs.update({"tempdir": td})
                 return fn(*args, **kwargs)
 
         return wrapper
