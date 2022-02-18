@@ -1,0 +1,3 @@
+defaults:
+  - application: default.yaml
+  - optimization: default.yaml
