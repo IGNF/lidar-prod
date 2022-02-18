@@ -1,23 +1,10 @@
 #!/bin/bash
-# export PYTORCHVERSION="1.8.0"
-# export TORCHVISIONVERSION="0.9.0"
 
-export PYTORCHVERSION="1.8.1"
-export TORCHVISIONVERSION="0.9.1"
-export CUDA="cu111"
+# Be sure that you are using last pip version
+# by running pip install --upgrade pip
 
 set -e
-conda install mamba -n base -c conda-forge
 
-# some mamba specific issue occurs as in https://github.com/conda-incubator/conda-lock/issues/101
-mamba env create -f bash/setup_environment/requirements.yml
-
-# eval "$(conda shell.bash hook)"
-conda activate validation_module
-
-pip install torch==$PYTORCHVERSION torchvision==$TORCHVISIONVERSION -f https://download.pytorch.org/whl/torch_stable.html
-mamba install -y pytorch-lightning -c conda-forge
-pip install torch-sparse -f https://pytorch-geometric.com/whl/torch-$PYTORCHVERSION+$CUDA.html
-conda install -y pytorch pyg -c pytorch -c pyg -c conda-forge  
-FORCE_CUDA=1 pip install torch-points-kernels --no-cache    # needs nvidia-cuda-toolkit
-conda install -c conda-forge python-pdal
+conda install mamba --yes -n base -c conda-forge # mamba is a conda on steroids
+mamba env create -f bash/setup_environment/requirements.yml --force
+conda activate lidar_prod

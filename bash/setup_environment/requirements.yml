@@ -1,36 +1,26 @@
-name: validation_module
+name: lidar_prod
 channels:
   - conda-forge
   - anaconda
-  - comet_ml
-  - pytorch
 dependencies:
-  - python==3.9
+  - python==3.9.*
   - pip
-  # --------- numpy --------- #
-  - numpy==1.20
-  # --------- geo --------- #
-  - laspy
-  - python-pdal
-  - pyshp
-  - geopandas
-  - pygeos
-  # --------- loggers --------- #
-  - comet_ml
   # --------- linters --------- #
   - pre-commit # hooks for applying linters on commit
   - black # code formatting
   - isort # import sorting
   - flake8 # code analysis
+  # --------- geo --------- #
+  - conda-forge:python-pdal
+  - conda-forge:laspy==2.1.*
+  - numpy
+  - scikit-learn
+  - geopandas
   # --------- others --------- #
-  - python-dotenv # loading env variables from .env file
-  - rich # beautiful text formatting in terminal
-  - pytest # tests
-  - sh # for running bash commands in some tests
-  - scikit-learn # used in some callbacks
-  - seaborn # used in some callbacks
   - jupyterlab # better jupyter notebooks
   - pudb # debugger
+  - rich==11.2.*  # rich text formatting
+  - pytest==6.2.*  # tests
   # --------- torch --------- #
   - pip:
       - -r requirements.txt
