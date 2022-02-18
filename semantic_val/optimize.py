@@ -484,7 +484,7 @@ def select_best_trial(study):
     ]
     try:
         best_trial = good_enough_trials[0]
-    except:
+    except Exception:
         log.warning(
             "No trial meeting constraint - returning best metrics-products instead."
         )
