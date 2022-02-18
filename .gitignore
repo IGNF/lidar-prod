@@ -1,5 +1,6 @@
-# Usr defined
+# User defined
 nohup.out
+inputs/
 outputs/
 
 # Byte-compiled / optimized / DLL files
