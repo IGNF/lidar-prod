@@ -266,7 +266,7 @@ class BuildingValidationOptimizer:
         ]
         try:
             best = respect_constraints[0]
-        except:
+        except Exception:
             log.warning(
                 "No trial respecting constraints - returning best metrics-products."
             )

@@ -53,7 +53,7 @@ class BuildingValidator:
             log.info(f"Using best trial from: {building_validation_thresholds_pickle}")
         else:
             log.warning(
-                f"Using config decision thresholds - specify "
+                "Using config decision thresholds - specify "
                 "'building_validation.application.building_validation_thresholds_pickle' "
                 "to use optimized threshold"
             )
