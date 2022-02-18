@@ -1,0 +1,73 @@
+_target_: lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer
+
+todo: "prepare+optimize+evaluate+update"  # for test data use prepare+evaluate+update
+
+
+use_final_classification_codes: 
+building_validator: ${building_validation.application}
+
+paths:
+  input_las_dir:  "/path/to/folder/"  # contains .las files
+  results_output_dir: "/path/to/folder/"  # will contain best optimization trial and (optionnaly) updated las
+  group_info_pickle_path: ${.results_output_dir}/group_info.pickle
+  prepared_las_dir: ${.results_output_dir}/prepared/
+  updated_las_dir: ${.results_output_dir}/updated/
+  building_validation_thresholds_pickle: ${.results_output_dir}/optimized_thresholds.pickle # Wher
+
+
+# CLASSIFICATION CODES of dataset 20211001_building_val, which was inspected and labeled post TerraSolid macro
+labels_from_20211001_building_val:
+  codes:
+    true_positives: [19] # building that was found by the macro
+    false_positives: [20, 110, 112, 114, 115] # e.g. trees, hedge, trucks
+    false_negatives: [21]  # e.g. buildings under vegetation, low building
+  min_frac:
+    true_positives: 0.95 # >=x% of confirmed points --> a building
+    false_positives: 0.05 # <x% of confirmed points --> not a building
+
+
+study:
+  _target_: optuna.create_study
+  study_name: "auto_precision_recall"
+  directions: ["maximize","maximize","maximize"]
+  sampler:
+    _target_: optuna.samplers.NSGAIISampler
+    population_size: 30
+    mutation_prob: 0.25
+    crossover_prob: 0.8
+    swapping_prob: 0.5
+    seed: 12345
+    constraints_func:
+      _target_: functools.partial
+      _args_:
+        - "${get_method:lidar_prod.tasks.building_validation_optimization.constraints_func}"
+
+design:
+  n_trials: 300
+  constraints:
+    min_precision_constraint: 0.98
+    min_recall_constraint: 0.98
+    min_automation_constraint: 0.35
+  metrics:
+    groups_count: "groups_count"
+    group_building: "group_building"
+    group_no_buildings: "group_no_buildings"
+    group_unsure: "group_unsure"
+
+    # amount of each decision
+    proportion_of_uncertainty: "p_unsure"
+    proportion_of_refutation: "p_refute"
+    proportion_of_confirmation: "p_confirm"
+    confusion_matrix_norm: "confusion_matrix_norm"
+    confusion_matrix_no_norm: "confusion_matrix_no_norm"
+
+    # to maximize:
+    precision: "precision"
+    recall: "recall"
+    proportion_of_automated_decisions: "p_auto"
+
+    # constraints:
+    refutation_accuracy: "a_refute"
+    confirmation_accuracy: "a_confirm"
+
+

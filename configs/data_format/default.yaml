@@ -1,0 +1,15 @@
+# put in a "las_format" group
+tile_size_meters: 1000
+crs_prefix: "EPSG:"
+crs: 2154
+
+
+# input
+las_channel_names:
+  classification: classification
+  cluster_id: ClusterID
+  uni_db_overlay: BDTopoOverlay
+  ai_building_proba: building
+
+codes:
+  unclassified: 1
