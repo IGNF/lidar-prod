@@ -153,3 +153,6 @@ wandb/
 
 # .hydra
 .hydra/
+
+# optimize output directory
+opti/
