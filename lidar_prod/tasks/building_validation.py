@@ -67,6 +67,9 @@ class BuildingValidator:
             self.codes.detailed.db_overlayed_only: self.codes.final.building,
             self.codes.detailed.both_confirmed: self.codes.final.building,
         }
+        self.codes.detailed_to_final_mapper = np.vectorize(
+            lambda detailed_code: self.codes.detailed_to_final.get(detailed_code)
+        )
 
     @tempdir()
     def run(
@@ -190,13 +193,12 @@ class BuildingValidator:
 
         las = laspy.read(prepared_f)
         # 1) Set all candidates points to a single class
-        mask = np.isin(
-            las[self.data_format.las_channel_names.classification],
+        clf = self.data_format.las_channel_names.classification
+        candidates_idx = np.isin(
+            las[clf],
             self.candidate_buildings_codes,
         )
-        las[self.data_format.las_channel_names.classification][
-            mask
-        ] = self.codes.detailed.unclustered
+        las[clf][candidates_idx] = self.codes.detailed.unclustered
 
         # 2) Decide at the group-level
         split_idx = split_idx_by_dim(
@@ -209,14 +211,12 @@ class BuildingValidator:
                 pts[self.data_format.las_channel_names.ai_building_proba],
                 pts[self.data_format.las_channel_names.uni_db_overlay],
             )
-            if self.use_final_classification_codes:
-                las[self.data_format.las_channel_names.classification][
-                    pts_idx
-                ] = self.codes.detailed_to_final[detailed_code]
-            else:
-                las[self.data_format.las_channel_names.classification][
-                    pts_idx
-                ] = detailed_code
+            las[clf][pts_idx] = detailed_code
+
+        if self.use_final_classification_codes:
+            las[clf][candidates_idx] = self.codes.detailed_to_final_mapper(
+                las[clf][candidates_idx]
+            )
         os.makedirs(osp.dirname(out_f), exist_ok=True)
         las.write(out_f)
 
