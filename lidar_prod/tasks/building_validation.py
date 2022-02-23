@@ -31,7 +31,7 @@ class BuildingValidator:
         rules=None,
         building_validation_thresholds_pickle: str = None,
         codes=None,
-        candidate_buildings_codes: int = [6],
+        candidate_buildings_codes: int = [202],
         use_final_classification_codes: bool = True,
         data_format=None,
     ):

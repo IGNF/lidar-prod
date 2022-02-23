@@ -2,7 +2,9 @@ from dataclasses import dataclass
 import re
 from functools import wraps
 from tempfile import TemporaryDirectory
+from typing import List, Union
 import numpy as np
+import pdal
 
 
 @dataclass
@@ -60,3 +62,21 @@ def tempdir(**kw):
         return wrapper
 
     return decorator
+
+
+def clean_las_attributes(
+    in_f: str,
+    out_f: str,
+    forward: Union[str, List[str]] = "all",
+    extra_dims: Union[str, List[str]] = "all",
+):
+    """Will rerad an rewrite a modified LAS to keep only usefull dimensions.
+
+    Args:
+        in_f (str): _description_
+        forward (str, optional): Channel to forward based on input schema. Defaults to "all".
+        extra_dims (str, optional): Extra dims to keep. Defaults to "all".
+    """
+    pipeline = pdal.Pipeline()
+    pipeline |= pdal.Reader(in_f)
+    # pipeline |=

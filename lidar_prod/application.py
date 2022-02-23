@@ -7,6 +7,7 @@ from typing import Optional
 
 from lidar_prod.utils import utils
 from lidar_prod.tasks.building_validation import BuildingValidator
+from lidar_prod.tasks.building_identification import BuildingIdentifier
 
 
 log = logging.getLogger(__name__)
@@ -23,8 +24,14 @@ def apply(config: DictConfig):
 
     """
     assert os.path.exists(config.paths.src_las)
-    out_f = osp.join(config.paths.output_dir, osp.basename(config.paths.src_las))
-    bv: BuildingValidator = hydra.utils.instantiate(
-        config.building_validation.application
-    )
-    bv.run(config.paths.src_las, out_f)
+    in_f = config.paths.src_las
+    out_f = osp.join(config.paths.output_dir, osp.basename(in_f))
+    bi: BuildingIdentifier = hydra.utils.instantiate(config.building_identification)
+    bi.run(in_f, out_f)
+
+    # TODO: uncomment after devn of BI
+
+    # bv: BuildingValidator = hydra.utils.instantiate(
+    #     config.building_validation.application
+    # )
+    # bv.run(out_f, out_f)
