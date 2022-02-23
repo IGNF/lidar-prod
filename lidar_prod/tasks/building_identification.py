@@ -56,7 +56,7 @@ class BuildingIdentifier:
         )
         where = (
             "("
-            + f"{self.data_format.las_channel_names.macro_candidate_building_groups} > 0"
+            + f"{self.data_format.las_channel_names.macro_candidate_building_groups} == 0"
             + ")"
         )
         where += f" && (building>={self.min_building_proba})"
