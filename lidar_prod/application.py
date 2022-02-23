@@ -34,3 +34,5 @@ def apply(config: DictConfig):
 
     bi: BuildingIdentifier = hydra.utils.instantiate(config.building_identification)
     bi.run(out_f, out_f)
+
+    # TODO: add a cleaner of las channels
