@@ -3,7 +3,7 @@ _target_: lidar_prod.tasks.building_validation.BuildingValidator
 building_validation_thresholds_pickle: /path/to/best_trial.pkl
 
 candidate_buildings_codes: [202]  # a list
-use_final_classification_codes: False
+use_final_classification_codes: true
 
 data_format: ${data_format}
 
