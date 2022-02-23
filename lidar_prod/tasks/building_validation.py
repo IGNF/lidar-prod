@@ -68,7 +68,8 @@ class BuildingValidator:
             self.codes.detailed.both_confirmed: self.codes.final.building,
         }
         self.detailed_to_final_mapper = np.vectorize(
-            lambda detailed_code: self.detailed_to_final.get(detailed_code)
+            lambda detailed_code: self.detailed_to_final.get(detailed_code),
+            otypes=[np.int],
         )
 
     @tempdir()
