@@ -151,7 +151,11 @@ class BuildingValidator:
                 "min_points": self.cluster.min_points,
                 "tolerance": self.cluster.tolerance,
                 "where": which_points_to_cluster,
-            }
+            },
+            {
+                "type": "filters.ferry",
+                "dimensions": f"{self.data_format.las_channel_names.cluster_id}=>{self.data_format.las_channel_names.macro_candidate_building_groups}",
+            },
         ]
         _topo_overlay = [
             {
@@ -195,7 +199,9 @@ class BuildingValidator:
         ] = self.codes.detailed.unclustered
 
         # 2) Decide at the group-level
-        split_idx = split_idx_by_dim(las[self.data_format.las_channel_names.cluster_id])
+        split_idx = split_idx_by_dim(
+            las[self.data_format.las_channel_names.macro_candidate_building_groups]
+        )
         split_idx = split_idx[1:]  # removes unclustered group with ClusterID = 0
         for pts_idx in tqdm(split_idx, desc="Updating LAS."):
             pts = las.points[pts_idx]

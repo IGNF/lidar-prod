@@ -42,7 +42,10 @@ class BuildingIdentifier:
         return out_f
 
     def update(self, in_f: str, out_f: str):
-        """Identify potential buildings in a new channel."""
+        """Identify potential buildings in a new channel, excluding former
+        candidates from search based on their group ID.
+
+        """
         # self.data_format.las_channel_names.AICandidateBuilding
         pipeline = pdal.Pipeline()
         pipeline |= pdal.Reader(
@@ -52,11 +55,8 @@ class BuildingIdentifier:
             override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
         )
         where = (
-            "!("
-            + " || ".join(
-                f"Classification == {int(candidat_code)}"
-                for candidat_code in self.candidate_buildings_codes
-            )
+            "("
+            + f"{self.data_format.las_channel_names.macro_candidate_building_groups} > 0"
             + ")"
         )
         where += f" && (building>={self.min_building_proba})"

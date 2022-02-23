@@ -5,13 +5,14 @@ crs: 2154
 
 las_channel_names:
   # input
-  classification: classification
+  classification: classification  #las format
   cluster_id: ClusterID  #pdal-defined
   uni_db_overlay: BDTopoOverlay  # user-defined
   ai_building_proba: building  # user-defined
+
   # output - for now custom channels
+  macro_candidate_building_groups: CandidateBuildingGroups
   ai_building_identified: AICandidateBuilding
-  # TODO: this should be made accessible in a differnt format than las.
 
 codes:
   candidates:
