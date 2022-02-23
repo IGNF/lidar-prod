@@ -26,12 +26,11 @@ def apply(config: DictConfig):
     assert os.path.exists(config.paths.src_las)
     in_f = config.paths.src_las
     out_f = osp.join(config.paths.output_dir, osp.basename(in_f))
+
     bi: BuildingIdentifier = hydra.utils.instantiate(config.building_identification)
     bi.run(in_f, out_f)
 
-    # TODO: uncomment after devn of BI
-
-    # bv: BuildingValidator = hydra.utils.instantiate(
-    #     config.building_validation.application
-    # )
-    # bv.run(out_f, out_f)
+    bv: BuildingValidator = hydra.utils.instantiate(
+        config.building_validation.application
+    )
+    bv.run(out_f, out_f)

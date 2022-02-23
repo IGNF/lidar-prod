@@ -1,13 +1,13 @@
 _target_: lidar_prod.tasks.building_identification.BuildingIdentifier
 
-candidate_buildings_codes: [202]  # a list
+candidate_buildings_codes: ${data_format.codes.candidates.building}
 
 data_format: ${data_format}
 
-min_building_proba: 0.5
+min_building_proba: ${building_validation.application.rules.min_confidence_confirmation}
 
 cluster:
-  min_points: 100
+  min_points: 200
   tolerance: 0.5  # meters
   is3d: false  # group in 2d for better detection
 

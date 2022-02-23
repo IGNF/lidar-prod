@@ -12,3 +12,7 @@ las_channel_names:
   # output - for now custom channels
   ai_building_identified: AICandidateBuilding
   # TODO: this should be made accessible in a differnt format than las.
+
+codes:
+  candidates:
+    building: [202]
