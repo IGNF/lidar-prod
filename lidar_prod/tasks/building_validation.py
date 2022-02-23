@@ -117,7 +117,6 @@ class BuildingValidator:
         """
 
         shapefile_path = os.path.join(tempdir, "temp.shp")
-
         buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
             self.bd_uni_connection_params,
             *extract_coor(
@@ -186,18 +185,18 @@ class BuildingValidator:
         """Update point cloud classification channel."""
 
         las = laspy.read(prepared_f)
-        # 1) Set to default all candidates points
-        candidate_building_points_mask = (
-            las[self.data_format.las_channel_names.classification]
-            == self.candidate_buildings_codes
+        # 1) Set all candidates points to a single class
+        mask = np.isin(
+            las[self.data_format.las_channel_names.classification],
+            self.candidate_buildings_codes,
         )
         las[self.data_format.las_channel_names.classification][
-            candidate_building_points_mask
-        ] = self.data_format.codes.unclassified
+            mask
+        ] = self.codes.detailed.unclustered
 
         # 2) Decide at the group-level
         split_idx = split_idx_by_dim(las[self.data_format.las_channel_names.cluster_id])
-        split_idx = split_idx[1:]  # remove unclustered group with ClusterID = 0
+        split_idx = split_idx[1:]  # removes unclustered group with ClusterID = 0
         for pts_idx in tqdm(split_idx, desc="Updating LAS."):
             pts = las.points[pts_idx]
             detailed_code = self.__make_detailed_group_decision(

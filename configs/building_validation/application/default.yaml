@@ -2,8 +2,8 @@ _target_: lidar_prod.tasks.building_validation.BuildingValidator
 
 building_validation_thresholds_pickle: /path/to/best_trial.pkl
 
-candidate_buildings_codes: [6]  # a list
-use_final_classification_codes: True
+candidate_buildings_codes: [202]  # a list
+use_final_classification_codes: False
 
 data_format: ${data_format}
 
@@ -21,7 +21,6 @@ cluster:
 bd_uni_request:
   buffer: 50
 
-# TODO: make a package group to make it loadable by pickel directly at instantiation time.
 rules:
   min_confidence_confirmation: 0.768
   min_frac_confirmation: 0.732
@@ -31,15 +30,15 @@ rules:
 
 codes:
   detailed:
-    unclustered: 6  # refuted
-    ia_refuted: 33  # refuted
-    ia_refuted_and_db_overlayed: 34  # unsure
-    both_unsure: 35  # unsure
-    ia_confirmed_only: 36  # confirmed
-    db_overlayed_only: 37  # confirmed
-    both_confirmed: 38  # confirmed
+    unclustered: 202  # refuted
+    ia_refuted: 110  # refuted
+    ia_refuted_and_db_overlayed: 111  # unsure
+    both_unsure: 112  # unsure
+    ia_confirmed_only: 113  # confirmed
+    db_overlayed_only: 114  # confirmed
+    both_confirmed: 115  # confirmed
   final:
-    unsure: 35  # unsure
-    not_building: 33  # refuted
-    building: 38  # confirmed
+    unsure: 214  # unsure
+    not_building: 208  # refuted
+    building: 6  # confirmed
 

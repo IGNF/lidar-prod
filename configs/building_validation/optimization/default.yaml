@@ -3,7 +3,7 @@ _target_: lidar_prod.tasks.building_validation_optimization.BuildingValidationOp
 todo: "prepare+optimize+evaluate+update"  # for test data use prepare+evaluate+update
 
 
-use_final_classification_codes: 
+use_final_classification_codes: true
 building_validator: ${building_validation.application}
 
 paths:
@@ -16,6 +16,7 @@ paths:
 
 
 # CLASSIFICATION CODES of dataset 20211001_building_val, which was inspected and labeled post TerraSolid macro
+# Those are used to override the app default codes.
 labels_from_20211001_building_val:
   codes:
     true_positives: [19] # building that was found by the macro
