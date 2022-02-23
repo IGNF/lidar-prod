@@ -58,7 +58,7 @@ class BuildingValidator:
                 "to use optimized threshold"
             )
 
-        self.codes.detailed_to_final = {
+        self.detailed_to_final = {
             self.codes.detailed.unclustered: self.codes.final.not_building,
             self.codes.detailed.ia_refuted: self.codes.final.not_building,
             self.codes.detailed.ia_refuted_and_db_overlayed: self.codes.final.unsure,
@@ -67,8 +67,8 @@ class BuildingValidator:
             self.codes.detailed.db_overlayed_only: self.codes.final.building,
             self.codes.detailed.both_confirmed: self.codes.final.building,
         }
-        self.codes.detailed_to_final_mapper = np.vectorize(
-            lambda detailed_code: self.codes.detailed_to_final.get(detailed_code)
+        self.detailed_to_final_mapper = np.vectorize(
+            lambda detailed_code: self.detailed_to_final.get(detailed_code)
         )
 
     @tempdir()
@@ -214,7 +214,7 @@ class BuildingValidator:
             las[clf][pts_idx] = detailed_code
 
         if self.use_final_classification_codes:
-            las[clf][candidates_idx] = self.codes.detailed_to_final_mapper(
+            las[clf][candidates_idx] = self.detailed_to_final_mapper(
                 las[clf][candidates_idx]
             )
         os.makedirs(osp.dirname(out_f), exist_ok=True)
@@ -222,7 +222,7 @@ class BuildingValidator:
 
     def _make_group_decision(self, *args, **kwargs):
         detailed_code = self.__make_detailed_group_decision(*args, **kwargs)
-        return self.codes.detailed_to_final[detailed_code]
+        return self.detailed_to_final[detailed_code]
 
     def __make_detailed_group_decision(self, probas_arr, overlay_bools_arr):
         """Decision process at the cluster level.
