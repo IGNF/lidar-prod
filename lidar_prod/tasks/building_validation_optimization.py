@@ -165,7 +165,9 @@ class BuildingValidationOptimizer:
 
     def __extract_clusters_from_las(self, prepared_las_path):
         las = laspy.read(prepared_las_path)
-        cluster_id = las[self.bv.data_format.las_channel_names.cluster_id]
+        cluster_id = las[
+            self.bv.data_format.las_channel_names.macro_candidate_building_groups
+        ]
         UNCLUSTERED = 0
         mask = cluster_id != UNCLUSTERED
         no_cluster = mask.sum() == 0

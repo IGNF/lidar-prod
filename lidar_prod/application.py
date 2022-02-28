@@ -7,6 +7,7 @@ from typing import Optional
 
 from lidar_prod.utils import utils
 from lidar_prod.tasks.building_validation import BuildingValidator
+from lidar_prod.tasks.building_identification import BuildingIdentifier
 
 
 log = logging.getLogger(__name__)
@@ -23,8 +24,15 @@ def apply(config: DictConfig):
 
     """
     assert os.path.exists(config.paths.src_las)
-    out_f = osp.join(config.paths.output_dir, osp.basename(config.paths.src_las))
+    in_f = config.paths.src_las
+    out_f = osp.join(config.paths.output_dir, osp.basename(in_f))
+
     bv: BuildingValidator = hydra.utils.instantiate(
         config.building_validation.application
     )
-    bv.run(config.paths.src_las, out_f)
+    bv.run(in_f, out_f)
+
+    bi: BuildingIdentifier = hydra.utils.instantiate(config.building_identification)
+    bi.run(out_f, out_f)
+
+    # TODO: add a cleaner of las channels
