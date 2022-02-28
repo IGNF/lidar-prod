@@ -16,33 +16,45 @@ The Lidar HD project ambitions to map France in 3D using 10 pulse/m² aerial Lid
 
 A simple geometric rule-based semantic segmentation algorithm was applied on 160km² of Lidar data in three areas, to identify its buildings. An audit of the resulting classification showed a large number of false positive. A thorough inspection and labelling was performed to evaluate the quality of this classification, with an identification of its false positive and false negative. At larger scale, this kind of human inspection would be intractable, and more powerful methods are needed to validate the quality of the segmentation before its diffusion.
 
-### Content
-We develop a fusion module which augments rules-based semantic segmentation algorithms with deep learning neural network predictions and a public building vector database. The end goal is to edit the input (rules-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for a final human inspection.
-
-- **Input**: point cloud that went through a first geometric algorithm that identified `candidates building points` based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building (see [this repo](https://github.com/IGNF/lidar-deep-segmentation)) 
-- **Output**: the same point cloud with a majority of groups of `candidates building points` either `confirmed` or `refuted`. The remaining groups are are labeled `unsure` for further human inspection.
-
-![](assets/img/LidarBati-IlluMotteBDProbaV2.1-ENGLISH.png)
+We therefore develop a production module which augments rules-based semantic segmentation algorithms with deep learning neural network predictions and a public building vector database. 
 
 Components are:
 
 - `application.py`: Fuse together rules-based classification, deep learning building probabilities, and building database, highlighting area of uncertainty for a final human inspection.
-- `optimization.py`: Multi-objective hyperparameter optimization of the decision thresholds.
+- `optimization.py`: Multi-objective hyperparameter optimization of the bulding validation decision thresholds.
 
 ### Process
-    
-1) Prediction of point-level probabilities for a 1km*1km point cloud. For this, you can leverage [this repository](https://github.com/IGNF/lidar-deep-segmentation)).
-2) Clustering of _candidate buildings points_ into connected components.
-3) Point-level decision
+
+The end goal is to edit the input (rules-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for human inspection.
+
+**Input**: point cloud that went through a first geometric algorithm that identified `candidates building points` based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building. The default name for this extra dimension is `building`. You can leverage this [package for aerial lidar deep learning segmentation](https://github.com/IGNF/lidar-deep-segmentation).
+
+#### A) Building Validation
+
+Goal: Confirm or refute groups of candidate building points when possible, mark them as unsure elsewise.
+
+1) Clustering of _candidate buildings points_ into connected components.
+2) Point-level decision
     1) Decision at the point-level based on probabilities : `confirmed` if p>=`C1` /  `refuted` if (1-p)>=`R1`
     2) Identification of points that are `overlayed` by a building vector from the database.
-4) Group-level decision :
+3) Group-level decision :
     1) Confirmation: if proportion of `confirmed` points >= `C2` OR if proportion of `overlayed` points >= `O1`
     2) Refutation: if proportion of `refuted` points >= `R2` AND proportion of `overlayed` points < `O1`
     3) Uncertainty: elsewise.
-5) Update of the point cloud classification
+4) Update of the point cloud classification
 
-Decision thresholds `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a multi-objective hyperparameter optimization that aims to maximize automation, precision, and recall of the decisions.
+Decision thresholds `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a multi-objective hyperparameter optimization that aims to maximize automation, precision, and recall of the decisions. Right now we have automation=90%, precision=98%, recall=98% on a validation dataset. Illustration comes from older version.
+
+![](assets/img/LidarBati-BuildingValidationM7.1V2.0.png)
+
+#### B) Building Identification
+
+Goal: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection. 
+
+Clustering of points that have a probability of beind a building p>=`C1` AND are **not** _candidate buildings points_. This clustering defines a LAS extra dimensions (default name `AICandidateBuilding`).
+
+![](assets/img/LidarBati-BuildingIdentification.png)
+
 
 ## Usage
 
@@ -69,7 +81,7 @@ conda activate lidar_prod
 
 ### Use application as a package
 
-If you are interested in running the module from anywhere, you can install as a package in a your virtual environment.
+To run the module from anywhere, you can install as a package in a your virtual environment.
 
 ```bash
 # activate an env matching ./bash/setup_env.sh requirements.
@@ -110,7 +122,7 @@ conda activate lidar_prod
 python lidar_prod/run.py paths.src_las=[/path/to/file.las]
 ```
 
-### Optimization and evaluation of decision thresholds
+### Optimization and evaluation of building validation decision thresholds
 
 Run a multi-objectives hyperparameters optimization of the decision thresholds, to maximize recall and precision directly while also maximizing automation. For this, you need a set of LAS with 1) a channel with predicted building probability, 2) a classification with labels that distinguish false positive, false negative, and true positive from a rules-based building classification.
 
