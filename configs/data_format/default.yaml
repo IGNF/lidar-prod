@@ -2,7 +2,7 @@ tile_size_meters: 1000
 crs_prefix: "EPSG:"
 crs: 2154
 
-
+# To connect logic between application tasks
 las_channel_names:
   # input
   classification: classification  #las format
@@ -18,3 +18,6 @@ las_channel_names:
 codes:
   candidates:
     building: [202]
+
+defaults:
+  - cleaning: default.yaml
