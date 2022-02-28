@@ -3,8 +3,7 @@ eval "$(conda shell.bash hook)"
 conda activate lidar_prod
 HYDRA_FULL_ERROR=1
 
-# TODO: add building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
-# Nota: debug flag is for single las evaluation.
+# NB: debug flag is for single las evaluation.
 
 python -m lidar_prod.run \
 print_config=true \
