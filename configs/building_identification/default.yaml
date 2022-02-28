@@ -8,6 +8,6 @@ min_building_proba: ${building_validation.application.rules.min_confidence_confi
 
 cluster:
   min_points: 200
-  tolerance: 0.5  # meters
+  tolerance: 1  # meters
   is3d: false  # group in 2d for better detection
 

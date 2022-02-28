@@ -10,7 +10,8 @@ las_channel_names:
   uni_db_overlay: BDTopoOverlay  # user-defined
   ai_building_proba: building  # user-defined
 
-  # output - for now custom channels
+  # custom channels
+  candidate_buildings_flag: CandidateBuildingsFlag
   macro_candidate_building_groups: CandidateBuildingGroups
   ai_building_identified: AICandidateBuilding
 

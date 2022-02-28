@@ -42,11 +42,11 @@ class BuildingIdentifier:
         return out_f
 
     def update(self, in_f: str, out_f: str):
-        """Identify potential buildings in a new channel, excluding former
-        candidates from search based on their group ID.
+        """Identify potential buildings in a new channel, excluding former candidates from
+        search based on their group ID. ClusterID needs to be reset to avoid unwanted merge
+        of information from previous VuildingValidation clustering.
 
         """
-        # self.data_format.las_channel_names.AICandidateBuilding
         pipeline = pdal.Pipeline()
         pipeline |= pdal.Reader(
             in_f,

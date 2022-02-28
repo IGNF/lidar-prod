@@ -107,24 +107,58 @@ class BuildingValidator:
     @tempdir()
     def prepare(
         self,
-        input_filepath: str,
-        output_filepath: str,
+        in_f: str,
+        out_f: str,
         tempdir: str = "for_shapefile_and_given_by_decorator",
     ):
         """
         Prepare las for later decision process.
 
-        1. Cluster candidates points (-> adds a ClusterId channel).
-        2. Identify points overlayed by a BD Uni building (-> adds a BDTopoOverlay channel).
+        1. Cluster candidates points.
+        2. Identify points overlayed by a BD Uni building.
 
 
         """
+
+        _flag = self.data_format.las_channel_names.candidate_buildings_flag
+        _cluster_id = self.data_format.las_channel_names.cluster_id
+        _groups = self.data_format.las_channel_names.macro_candidate_building_groups
+        _overlay = self.data_format.las_channel_names.uni_db_overlay
+
+        pipeline = pdal.Pipeline()
+        pipeline |= pdal.Reader(
+            in_f,
+            type="readers.las",
+            nosrs=True,
+            override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
+        )
+        pipeline |= pdal.Filter.ferry(dimensions=f"=>{_flag}")
+        conditional_expression = (
+            "("
+            + " || ".join(
+                f"Classification == {int(candidat_code)}"
+                for candidat_code in self.candidate_buildings_codes
+            )
+            + ")"
+        )
+        pipeline |= pdal.Filter.assign(
+            value=f"{_flag} = 1 WHERE {conditional_expression}"
+        )
+        pipeline |= pdal.Filter.cluster(
+            min_points=self.cluster.min_points,
+            tolerance=self.cluster.tolerance,
+            where=f"{_flag} == 1",
+        )
+        # TODO: might be removed if we do not keep ClusterID.
+        pipeline |= pdal.Filter.ferry(dimensions=f"{_cluster_id}=>{_groups}")
+        # reset to avoid crash with future clustering
+        pipeline |= pdal.Filter.assign(value=f"{_cluster_id} = 0")
 
         shapefile_path = os.path.join(tempdir, "temp.shp")
         buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
             self.bd_uni_connection_params,
             *extract_coor(
-                os.path.basename(input_filepath),
+                os.path.basename(in_f),
                 self.data_format.tile_size_meters,
                 self.data_format.tile_size_meters,
                 self.bd_uni_request.buffer,
@@ -133,60 +167,16 @@ class BuildingValidator:
             shapefile_path,
         )
 
-        _reader = [
-            {
-                "type": "readers.las",
-                "filename": input_filepath,
-                "override_srs": self.data_format.crs_prefix + str(self.data_format.crs),
-                "nosrs": True,
-            }
-        ]
-        which_points_to_cluster = (
-            "("
-            + " || ".join(
-                f"Classification == {int(candidat_code)}"
-                for candidat_code in self.candidate_buildings_codes
-            )
-            + ")"
-        )
-        _cluster = [
-            {
-                "type": "filters.cluster",
-                "min_points": self.cluster.min_points,
-                "tolerance": self.cluster.tolerance,
-                "where": which_points_to_cluster,
-            },
-            {
-                "type": "filters.ferry",
-                "dimensions": f"{self.data_format.las_channel_names.cluster_id}=>{self.data_format.las_channel_names.macro_candidate_building_groups}",
-            },
-        ]
-        _topo_overlay = [
-            {
-                "type": "filters.ferry",
-                "dimensions": f"=>{self.data_format.las_channel_names.uni_db_overlay}",
-            }
-        ]
+        # Channel is always created even if there are no buildings in database.
+        pipeline |= pdal.Filter.ferry(dimensions=f"=>{_overlay}")
         if buildings_in_bd_topo:
-            _topo_overlay.append(
-                {
-                    "column": "PRESENCE",
-                    "datasource": shapefile_path,
-                    "dimension": f"{self.data_format.las_channel_names.uni_db_overlay}",
-                    "type": "filters.overlay",
-                },
+            pipeline |= pdal.Filter.overlay(
+                column="PRESENCE", datasource=shapefile_path, dimension=_overlay
             )
-        _writer = [
-            {
-                "type": "writers.las",
-                "filename": output_filepath,
-                "forward": "all",  # keep all dimensions based on input format
-                "extra_dims": "all",  # keep all extra dims as well
-            }
-        ]
-        pipeline = {"pipeline": _reader + _cluster + _topo_overlay + _writer}
-        pipeline = json.dumps(pipeline)
-        pipeline = pdal.Pipeline(pipeline)
+        pipeline |= pdal.Writer(
+            type="writers.las", filename=out_f, forward="all", extra_dims="all"
+        )
+        os.makedirs(osp.dirname(out_f), exist_ok=True)
         pipeline.execute()
 
     def update(self, prepared_f: str, out_f: str):
@@ -194,38 +184,38 @@ class BuildingValidator:
 
         las = laspy.read(prepared_f)
         # 1) Set all candidates points to a single class
-        clf = self.data_format.las_channel_names.classification
-        candidates_idx = np.isin(
-            las[clf],
-            self.candidate_buildings_codes,
-        )
-        las[clf][candidates_idx] = self.codes.detailed.unclustered
+        _clf = self.data_format.las_channel_names.classification
+        _flag = self.data_format.las_channel_names.candidate_buildings_flag
+        candidates_idx = las[_flag] == 1
+        las[_clf][candidates_idx] = self.codes.detailed.unclustered
 
         # 2) Decide at the group-level
         split_idx = split_idx_by_dim(
             las[self.data_format.las_channel_names.macro_candidate_building_groups]
         )
         split_idx = split_idx[1:]  # removes unclustered group with ClusterID = 0
-        for pts_idx in tqdm(split_idx, desc="Updating LAS."):
+        for pts_idx in tqdm(
+            split_idx, desc="Update groups of candidate buildings", unit="grp"
+        ):
             pts = las.points[pts_idx]
-            detailed_code = self.__make_detailed_group_decision(
+            detailed_code = self._make_detailed_group_decision(
                 pts[self.data_format.las_channel_names.ai_building_proba],
                 pts[self.data_format.las_channel_names.uni_db_overlay],
             )
-            las[clf][pts_idx] = detailed_code
+            las[_clf][pts_idx] = detailed_code
 
         if self.use_final_classification_codes:
-            las[clf][candidates_idx] = self.detailed_to_final_mapper(
-                las[clf][candidates_idx]
+            las[_clf][candidates_idx] = self.detailed_to_final_mapper(
+                las[_clf][candidates_idx]
             )
         os.makedirs(osp.dirname(out_f), exist_ok=True)
         las.write(out_f)
 
     def _make_group_decision(self, *args, **kwargs):
-        detailed_code = self.__make_detailed_group_decision(*args, **kwargs)
+        detailed_code = self._make_detailed_group_decision(*args, **kwargs)
         return self.detailed_to_final[detailed_code]
 
-    def __make_detailed_group_decision(self, probas_arr, overlay_bools_arr):
+    def _make_detailed_group_decision(self, probas_arr, overlay_bools_arr):
         """Decision process at the cluster level.
 
         Confirm or refute candidate building shape based on fraction of confirmed/refuted points and
