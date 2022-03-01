@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="lidar_prod",
-    version="1.0.0",
+    version="1.0.1",
     description="A 3D semantic segmentation production tool to augment rules-based Lidar classification with AI and databases.",
     author="Charles GAYDON",
     author_email="charles.gaydon@gmail.com",
