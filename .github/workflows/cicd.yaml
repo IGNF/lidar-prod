@@ -25,11 +25,11 @@ jobs:
     - name: Package install
       run: bash -i CI/install_as_a_package.sh
 
+    - name: Run on a small point cloud
+      run: bash -i CI/run_app.sh
+
     - name: Evaluate decisions on single LAS
       run: bash -i CI/evaluate_bv_single_las.sh
-
-    - name: Run on a point cloud
-      run: bash -i CI/run_app.sh
 
     - name: Delete the anaconda environment
       run: conda env remove -n lidar_prod

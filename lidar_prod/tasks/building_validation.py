@@ -155,6 +155,7 @@ class BuildingValidator:
         pipeline |= pdal.Filter.assign(value=f"{_cluster_id} = 0")
 
         shapefile_path = os.path.join(tempdir, "temp.shp")
+        # TODO: extract coordinates from LAS directly using pdal.
         buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
             self.bd_uni_connection_params,
             *extract_coor(
