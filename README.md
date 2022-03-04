@@ -51,7 +51,7 @@ Decision thresholds `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a multi-objectiv
 
 Goal: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection. 
 
-Clustering of points that have a probability of beind a building p>=`C1` AND are **not** _candidate buildings points_. This clustering defines a LAS extra dimensions (default name `AICandidateBuilding`).
+Clustering of points that have a probability of beind a building p>=`C1` AND are **not** _candidate buildings points_. This clustering defines a LAS extra dimensions (default name `Group`).
 
 ![](assets/img/LidarBati-BuildingIdentification.png)
 

@@ -13,7 +13,7 @@ las_channel_names:
   # custom channels
   candidate_buildings_flag: CandidateBuildingsFlag
   macro_candidate_building_groups: CandidateBuildingGroups
-  ai_building_identified: AICandidateBuilding
+  ai_building_identified: Group
 
 codes:
   candidates:
