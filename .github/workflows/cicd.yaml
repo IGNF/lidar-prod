@@ -45,5 +45,8 @@ jobs:
     - name: unit testing
       run: docker run predict_im pytest --ignore=actions-runner --ignore="notebooks"
 
+      # full run: the volume path is set to /lidar/CICD_github_assets 
+      # but will be used as /CICD_github_assets because of the dockerfile working directory
     - name: test full run
-      run: docker run -v /var/data/cicd/CICD_github_assets:/lidar/CICD_github_assets predict_im
+      run: docker run -v /var/data/cicd/CICD_github_assets:/lidar/CICD_github_assets predict_im 
+      
