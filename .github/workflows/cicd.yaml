@@ -4,8 +4,7 @@ on:
   pull_request:
     branches: [main]
 
-  push
-
+on: push
 
 jobs:
   test_push:
