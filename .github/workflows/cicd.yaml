@@ -38,3 +38,12 @@ jobs:
 
     - name: build docker image       
       run: docker build -t predict_im .
+
+    - name: Check code neatness (linter)
+      run: docker run predict_im flake8
+
+    - name: unit testing
+      run: docker run predict_im pytest --ignore=actions-runner --ignore="notebooks"
+
+    - name: test full run
+      run: docker run -v "$(pwd)"/var/data/cicd/CICD_github_assets:/lidar/CICD_github_assets predict_im
