@@ -37,4 +37,4 @@ jobs:
     #   run: conda env remove -n lidar_prod
 
     - name: build docker image       
-      uses: docker build -t predict_im .
+      run: docker build -t predict_im .
