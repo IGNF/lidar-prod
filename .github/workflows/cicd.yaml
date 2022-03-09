@@ -12,8 +12,8 @@ jobs:
 
     steps:
 
-    # - name: Checkout branch       
-    #   uses: actions/checkout@v2
+    - name: Checkout branch       
+      uses: actions/checkout@v2
 
     # - name: Setup conda env
     #   run: bash -i CI/setup_env.sh
