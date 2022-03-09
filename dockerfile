@@ -23,13 +23,13 @@ RUN /bin/bash ~/anaconda.sh -b -p /opt/conda && \
     rm ~/anaconda.sh
 ENV PATH /opt/conda/bin:$PATH
 
+WORKDIR /lidar
+
 # copy all the data now (because the requirements files are needed for anaconda)
 COPY . .
 
-# update the requirements.txt path indicated in requirements.yml, to be able to use it in docker
-RUN sed -i "s|requirements.txt|/bash/setup_environment/requirements.txt |g" /bash/setup_environment/requirements.yml
 # install the python packages via anaconda
-RUN conda env create -f /bash/setup_environment/requirements.yml
+RUN conda env create -f bash/setup_environment/requirements.yml
 
 # Make RUN commands use the new environment:
 SHELL ["conda", "run", "-n", "lidar_prod", "/bin/bash", "-c"]
@@ -38,13 +38,14 @@ SHELL ["conda", "run", "-n", "lidar_prod", "/bin/bash", "-c"]
 RUN echo "Make sure pdal is installed:"
 RUN python -c "import pdal"
 
-# the command executed by this docker image
+# the entrypoint garanty that all command will be runned in the conda environment
 ENTRYPOINT ["conda",                \   
             "run",                  \
             "-n",                   \
-            "lidar_prod",           \
-            "python",               \
-            "/lidar_prod/run.py",   \
+            "lidar_prod"]
+
+CMD        ["python",               \
+            "lidar_prod/run.py",   \
             "print_config=true",    \
             "+task='optimize'",     \
             "+building_validation.optimization.debug=true", \
