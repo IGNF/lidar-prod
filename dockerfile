@@ -61,8 +61,8 @@ CMD        ["python",               \
             "+task='optimize'",     \
             "+building_validation.optimization.debug=true", \
             "building_validation.optimization.todo='prepare+evaluate+update'", \
-            "building_validation.optimization.paths.input_las_dir=/CICD_github_assets/M8.0/20220204_building_val_V0.0_model/20211001_buiding_val_val/" \
-            "building_validation.optimization.paths.results_output_dir=/CICD_github_assets/opti/" \
+            "building_validation.optimization.paths.input_las_dir=/CICD_github_assets/M8.0/20220204_building_val_V0.0_model/20211001_buiding_val_val/", \
+            "building_validation.optimization.paths.results_output_dir=/CICD_github_assets/opti/", \
             "building_validation.optimization.paths.building_validation_thresholds_pickle=/CICD_github_assets/M8.0/20220204_building_val_V0.0_model/M8.0B2V0.0_buildingvalidation_thresholds.pickle"]
 
 # CMD        ["python",               \
