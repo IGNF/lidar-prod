@@ -22,7 +22,7 @@ jobs:
       run: docker run lidar_prod_im flake8
 
     - name: unit testing
-      run: docker run lidar_prod pytest --ignore=actions-runner --ignore="notebooks"
+      run: docker run lidar_prod_im pytest --ignore=actions-runner --ignore="notebooks"
 
     - name: Evaluate decisions on single LAS
       run: >
