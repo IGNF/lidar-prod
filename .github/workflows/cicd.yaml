@@ -7,7 +7,7 @@ on:
 # on: push
 
 jobs:
-  test_push:
+  lidar_on_docker:
     runs-on: self-hosted
 
     steps:
