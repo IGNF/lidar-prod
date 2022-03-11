@@ -1,10 +1,10 @@
 name: CICD
 
-# on:
-#   pull_request:
-#     branches: [main]
+on:
+  pull_request:
+    branches: [main]
 
-on: push
+# on: push
 
 jobs:
   test_push:
@@ -14,12 +14,6 @@ jobs:
 
     - name: Checkout branch       
       uses: actions/checkout@v2
-
-    # - name: Package install
-    #   run: bash -i CI/install_as_a_package.sh
-
-    # - name: Run on a small point cloud
-    #   run: bash -i CI/run_app.sh
 
     - name: build docker image       
       run: docker build -t predict_im .
