@@ -4,8 +4,10 @@ on:
   pull_request:
     branches: [main]
 
+# on: push
+
 jobs:
-  test_push:
+  lidar_on_docker:
     runs-on: self-hosted
 
     steps:
@@ -13,23 +15,31 @@ jobs:
     - name: Checkout branch       
       uses: actions/checkout@v2
 
-    - name: Setup conda env
-      run: bash -i CI/setup_env.sh
+    - name: build docker image       
+      run: docker build -t lidar_prod_im .
 
     - name: Check code neatness (linter)
-      run: flake8
+      run: docker run lidar_prod_im flake8
 
     - name: unit testing
-      run: pytest --ignore=actions-runner --ignore="notebooks"
-
-    - name: Package install
-      run: bash -i CI/install_as_a_package.sh
-
-    - name: Run on a small point cloud
-      run: bash -i CI/run_app.sh
+      run: docker run lidar_prod_im pytest --ignore=actions-runner --ignore="notebooks"
 
     - name: Evaluate decisions on single LAS
-      run: bash -i CI/evaluate_bv_single_las.sh
+      run: >
+        docker run -v /var/data/cicd/CICD_github_assets:/CICD_github_assets lidar_prod_im
+        python lidar_prod/run.py print_config=true +task='optimize'
+        +building_validation.optimization.debug=true
+        building_validation.optimization.todo='prepare+evaluate+update'
+        building_validation.optimization.paths.input_las_dir=/CICD_github_assets/M8.0/20220204_building_val_V0.0_model/20211001_buiding_val_val/
+        building_validation.optimization.paths.results_output_dir=/CICD_github_assets/opti/
+        building_validation.optimization.paths.building_validation_thresholds_pickle=/CICD_github_assets/M8.0/20220204_building_val_V0.0_model/M8.0B2V0.0_buildingvalidation_thresholds.pickle
 
-    - name: Delete the anaconda environment
-      run: conda env remove -n lidar_prod
+    - name: test full run
+      run: docker run -v /var/data/cicd/CICD_github_assets:/CICD_github_assets predict_im 
+
+    - name: clean the server for further uses
+      if: always()  # always do it, even if something failed
+      run: docker system prune  # remove obsolete docker images (take a HUGE amount of space)
+
+
+      
