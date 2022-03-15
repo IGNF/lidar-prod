@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 class BuildingIdentifier:
     """Logic of building validation.
-    
+
     Points that were not found by rule-based algorithms are clustered but with a high-enough deep learning probability of
     being a building are clustered into candidate groups of buildings.
 
@@ -31,7 +31,9 @@ class BuildingIdentifier:
         self.candidate_buildings_codes = candidate_buildings_codes
         self.data_format = data_format
         self.min_building_proba = min_building_proba
-        self.min_building_proba_multiplier_if_bd_uni_overlay = min_building_proba_multiplier_if_bd_uni_overlay
+        self.min_building_proba_multiplier_if_bd_uni_overlay = (
+            min_building_proba_multiplier_if_bd_uni_overlay
+        )
 
     def run(self, in_f: str, out_f: str):
         """Application.
@@ -71,8 +73,12 @@ class BuildingIdentifier:
             + ")"
         )
         p_heq_threshold = f"(building>={self.min_building_proba})"
-        p_heq_threshold_under_bd_uni = f"(building>={self.min_building_proba * self.min_building_proba_multiplier_if_bd_uni_overlay})"
-        where =  f"{non_candidates} && ({p_heq_threshold} | {p_heq_threshold_under_bd_uni})"
+        A = f"(building>={self.min_building_proba * self.min_building_proba_multiplier_if_bd_uni_overlay})"
+        B = f"({self.data_format.las_channel_names.uni_db_overlay} > 0)"
+        p_heq_threshold_under_bd_uni = f"({A} && {B})"
+        where = (
+            f"{non_candidates} && ({p_heq_threshold} || {p_heq_threshold_under_bd_uni})"
+        )
         pipeline |= pdal.Filter.cluster(
             min_points=self.cluster.min_points,
             tolerance=self.cluster.tolerance,

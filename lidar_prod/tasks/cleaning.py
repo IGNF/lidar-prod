@@ -1,6 +1,9 @@
+import logging
 import os
 import os.path as osp
 import pdal
+
+log = logging.getLogger(__name__)
 
 
 class Cleaner:
@@ -28,3 +31,4 @@ class Cleaner:
             filename=out_f, forward="all", extra_dims=self.keep_extra_dims
         )
         pipeline.execute()
+        log.info(f"Saved to {out_f}")

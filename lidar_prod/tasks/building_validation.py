@@ -53,9 +53,9 @@ class BuildingValidator:
             log.info(f"Using best trial from: {building_validation_thresholds_pickle}")
         else:
             log.warning(
-                "Using config decision thresholds - specify "
+                "Using default decision thresholds - specify "
                 "'building_validation.application.building_validation_thresholds_pickle' "
-                "to use optimized threshold"
+                "to use thresholds of an ad-hoc optimization step"
             )
 
         self.detailed_to_final = {
@@ -96,12 +96,11 @@ class BuildingValidator:
 
         """
         log.info(f"Applying Building Validation to file \n{in_f}")
-        log.info("Preparation - Clustering + Requesting Building database")
+        log.info("Preparation : Clustering of candidates buildings & Requesting BDUni")
         temp_f = osp.join(tempdir, osp.basename(in_f))
         self.prepare(in_f, temp_f)
         log.info("Using AI and Databases to update cloud Classification")
         self.update(temp_f, out_f)
-        log.info(f"Saved to\n{out_f}")
         return out_f
 
     @tempdir()
@@ -149,7 +148,6 @@ class BuildingValidator:
             tolerance=self.cluster.tolerance,
             where=f"{_flag} == 1",
         )
-        # TODO: might be removed if we do not keep ClusterID.
         pipeline |= pdal.Filter.ferry(dimensions=f"{_cluster_id}=>{_groups}")
         # reset to avoid crash with future clustering
         pipeline |= pdal.Filter.assign(value=f"{_cluster_id} = 0")
