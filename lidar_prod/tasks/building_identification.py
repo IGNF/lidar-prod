@@ -68,9 +68,7 @@ class BuildingIdentifier:
             override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
         )
         non_candidates = (
-            "("
-            + f"{self.data_format.las_channel_names.macro_candidate_building_groups} == 0"
-            + ")"
+            f"({self.data_format.las_channel_names.candidate_buildings_flag} == 0)"
         )
         p_heq_threshold = f"(building>={self.min_building_proba})"
         A = f"(building>={self.min_building_proba * self.min_building_proba_multiplier_if_bd_uni_overlay})"
