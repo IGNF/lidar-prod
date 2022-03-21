@@ -8,4 +8,5 @@ defaults:
   - data_format: default.yaml
   - building_validation: default.yaml
   - building_identification: default.yaml
+  - building_completion: default.yaml
   - _self_  # needed by pdal for legacy reasons

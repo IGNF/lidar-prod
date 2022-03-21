@@ -3,7 +3,6 @@ _target_: lidar_prod.tasks.building_validation.BuildingValidator
 building_validation_thresholds_pickle: /path/to/best_trial.pkl
 
 data_format: ${data_format}
-candidate_buildings_codes: ${data_format.codes.candidates.building}
 use_final_classification_codes: true
 
 
@@ -27,18 +26,3 @@ rules:
   min_uni_db_overlay_frac: 0.508
   min_confidence_refutation: 0.872
   min_frac_refutation: 0.964
-
-codes:
-  detailed:
-    unclustered: 202  # refuted
-    ia_refuted: 110  # refuted
-    ia_refuted_and_db_overlayed: 111  # unsure
-    both_unsure: 112  # unsure
-    ia_confirmed_only: 113  # confirmed
-    db_overlayed_only: 114  # confirmed
-    both_confirmed: 115  # confirmed
-  final:
-    unsure: 214  # unsure
-    not_building: 208  # refuted
-    building: 6  # confirmed
-

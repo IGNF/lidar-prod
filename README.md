@@ -92,7 +92,7 @@ pip install --upgrade https://github.com/IGNF/lidar-prod-quality-control/tarball
 pip install -e .  # from local sources
 ```
 
-To run the module as a package, you will need a source cloud point in LAS format with an additional channel containing predicted building probabilities. The name of this channel is specified by `config.data_format.las_channel_names.ai_building_proba`.
+To run the module as a package, you will need a source cloud point in LAS format with an additional channel containing predicted building probabilities. The name of this channel is specified by `config.data_format.las_dimensions.ai_building_proba`.
 
 To run using default configurations of the installed package, use
 ```bash

@@ -16,26 +16,24 @@ class BuildingIdentifier:
     High enough probability means :
     - p>=min_building_proba
     OR, IF point fall in a building vector from the BDUni:
-    - p>=(min_building_proba*min_building_proba_multiplier_if_bd_uni_overlay).
+    - p>=(min_building_proba*min_building_proba_relaxation_if_bd_uni_overlay).
     """
 
     def __init__(
         self,
-        candidate_buildings_codes: int = [202],
         min_building_proba: float = 0.75,
-        min_building_proba_multiplier_if_bd_uni_overlay: float = 1.0,
+        min_building_proba_relaxation_if_bd_uni_overlay: float = 1.0,
         cluster=None,
         data_format=None,
     ):
         self.cluster = cluster
-        self.candidate_buildings_codes = candidate_buildings_codes
         self.data_format = data_format
         self.min_building_proba = min_building_proba
-        self.min_building_proba_multiplier_if_bd_uni_overlay = (
-            min_building_proba_multiplier_if_bd_uni_overlay
+        self.min_building_proba_relaxation_if_bd_uni_overlay = (
+            min_building_proba_relaxation_if_bd_uni_overlay
         )
 
-    def run(self, in_f: str, out_f: str):
+    def run(self, in_f: str, out_f: str) -> str:
         """Application.
 
         Transform cloud at `in_f` following identification logic, and save it to
@@ -46,33 +44,31 @@ class BuildingIdentifier:
             out_f (str): path for saving updated LAS file.
 
         Returns:
-            _type_: returns `out_f` for potential terminal piping.
+            str:  `out_f`
 
         """
         log.info(f"Applying Building Identification to file \n{in_f}")
-        log.info("Clustering of points with high building proba")
-        self.update(in_f, out_f)
+        log.info("Clustering of points with high building proba.")
+        self.prepare(in_f, out_f)
         return out_f
 
-    def update(self, in_f: str, out_f: str):
+    def prepare(self, in_f: str, out_f: str) -> None:
         """Identify potential buildings in a new channel, excluding former candidates from
         search based on their group ID. ClusterID needs to be reset to avoid unwanted merge
         of information from previous VuildingValidation clustering.
 
+        Args:
+            in_f (str): input LAS
+            out_f (str): output LAS
         """
         pipeline = pdal.Pipeline()
-        pipeline |= pdal.Reader(
-            in_f,
-            type="readers.las",
-            nosrs=True,
-            override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
-        )
+        pipeline |= pdal.Reader(in_f, type="readers.las")
         non_candidates = (
-            f"({self.data_format.las_channel_names.candidate_buildings_flag} == 0)"
+            f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
         )
         p_heq_threshold = f"(building>={self.min_building_proba})"
-        A = f"(building>={self.min_building_proba * self.min_building_proba_multiplier_if_bd_uni_overlay})"
-        B = f"({self.data_format.las_channel_names.uni_db_overlay} > 0)"
+        A = f"(building>={self.min_building_proba * self.min_building_proba_relaxation_if_bd_uni_overlay})"
+        B = f"({self.data_format.las_dimensions.uni_db_overlay} > 0)"
         p_heq_threshold_under_bd_uni = f"({A} && {B})"
         where = (
             f"{non_candidates} && ({p_heq_threshold} || {p_heq_threshold_under_bd_uni})"
@@ -83,9 +79,14 @@ class BuildingIdentifier:
             is3d=self.cluster.is3d,
             where=where,
         )
+        # Always move and reset ClusterID to avoid conflict with later tasks.
         pipeline |= pdal.Filter.ferry(
-            dimensions=f"{self.data_format.las_channel_names.cluster_id}=>{self.data_format.las_channel_names.ai_building_identified}"
+            dimensions=f"{self.data_format.las_dimensions.cluster_id}=>{self.data_format.las_dimensions.ai_building_identified}"
         )
+        pipeline |= pdal.Filter.assign(
+            value=f"{self.data_format.las_dimensions.cluster_id} = 0"
+        )
+
         pipeline |= pdal.Writer(
             type="writers.las", filename=out_f, forward="all", extra_dims="all"
         )
