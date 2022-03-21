@@ -56,6 +56,8 @@ Cluster them together with previously confirmed building points in a relaxed, ve
 For each cluster, if some points were confirmed, the others are considered to belong to the same building, and are 
 therefore confirmed as well.
 
+![](assets/img/LidarBati-BuildingCompletion.png)
+
 
 #### C) Building Identification
 
