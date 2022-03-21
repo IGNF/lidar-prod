@@ -47,7 +47,17 @@ Decision thresholds `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a multi-objectiv
 
 ![](assets/img/LidarBati-BuildingValidationM7.1V2.0.png)
 
-#### B) Building Identification
+#### B) Building Completion
+
+Goal: Confirm points that were too isolated to make up a group but have high-enough probability nevertheless (e.g. walls)
+
+Identify  _candidate buildings points_ that have not been clustered in previous step due AND have high enough probability (p>=0.5)).
+Cluster them together with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
+For each cluster, if some points were confirmed, the others are considered to belong to the same building, and are 
+therefore confirmed as well.
+
+
+#### C) Building Identification
 
 Goal: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection. 
 
