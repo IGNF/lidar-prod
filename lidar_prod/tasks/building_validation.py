@@ -11,11 +11,7 @@ from tempfile import TemporaryDirectory
 import geopandas
 import laspy
 from tqdm import tqdm
-from lidar_prod.tasks.utils import (
-    BDUniConnectionParams,
-    extract_coor,
-    split_idx_by_dim
-)
+from lidar_prod.tasks.utils import BDUniConnectionParams, extract_coor, split_idx_by_dim
 
 log = logging.getLogger(__name__)
 
@@ -79,8 +75,8 @@ class BuildingValidator:
     ):
         """Application.
 
-        Transform cloud at `in_f` following validation logic, and save it to
-        `out_f`
+        Transform cloud at `in_f` following building validation logic,
+        and save it to `out_f`
 
         Args:
             in_f (str): path to input LAS file with a building probability channel
@@ -92,7 +88,9 @@ class BuildingValidator:
         """
         with TemporaryDirectory() as td:
             log.info(f"Applying Building Validation to file \n{in_f}")
-            log.info("Preparation : Clustering of candidates buildings & Requesting BDUni")
+            log.info(
+                "Preparation : Clustering of candidates buildings & Requesting BDUni"
+            )
             _temp_f = osp.join(td, osp.basename(in_f))
             self.prepare(in_f, _temp_f)
             log.info("Using AI and Databases to update cloud Classification")
@@ -131,8 +129,8 @@ class BuildingValidator:
             _is_candidate_building = (
                 "("
                 + " || ".join(
-                    f"Classification == {int(candidat_code)}"
-                    for candidat_code in self.candidate_buildings_codes
+                    f"Classification == {int(candidate_code)}"
+                    for candidate_code in self.candidate_buildings_codes
                 )
                 + ")"
             )

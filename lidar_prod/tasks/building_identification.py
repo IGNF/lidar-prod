@@ -10,12 +10,12 @@ log = logging.getLogger(__name__)
 class BuildingIdentifier:
     """Logic of building validation.
 
-    Points that were not found by rule-based algorithms are clustered but with a high-enough deep learning probability of
+    Points that were not found by rule-based algorithms but which have a high-enough probability of
     being a building are clustered into candidate groups of buildings.
 
-    High enough means :
+    High enough probability means :
     - p>=min_building_proba
-    OR if point fall in a building vector from the BDUni:
+    OR, IF point fall in a building vector from the BDUni:
     - p>=(min_building_proba*min_building_proba_multiplier_if_bd_uni_overlay).
     """
 
@@ -23,7 +23,7 @@ class BuildingIdentifier:
         self,
         candidate_buildings_codes: int = [202],
         min_building_proba: float = 0.75,
-        min_building_proba_multiplier_if_bd_uni_overlay: float = 0.5,
+        min_building_proba_multiplier_if_bd_uni_overlay: float = 1.0,
         cluster=None,
         data_format=None,
     ):
