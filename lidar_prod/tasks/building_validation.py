@@ -203,15 +203,20 @@ class BuildingValidator:
         os.makedirs(osp.dirname(out_f), exist_ok=True)
         las.write(out_f)
 
-    def _make_group_decision(self, *args, **kwargs):
+    def _make_group_decision(self, *args, **kwargs) -> int:
+        f"""Wrapper to simplify decision codes during LAS update.
+        Signature follows the one of {self._make_detailed_group_decision.__name__}
+        Returns:
+            int: final classification code for the considered group.
+        """
         detailed_code = self._make_detailed_group_decision(*args, **kwargs)
         return self.detailed_to_final[detailed_code]
 
     def _make_detailed_group_decision(self, probas_arr, overlay_bools_arr):
         """Decision process at the cluster level.
 
-        Confirm or refute candidate building shape based on fraction of confirmed/refuted points and
-        on fraction of points overlayed by a building shape in a database.
+        Confirm or refute candidate building groups based on fraction of confirmed/refuted points and
+        on fraction of points overlayed by a building vector in BDUni.
 
         """
         ia_confirmed = (
@@ -236,7 +241,13 @@ class BuildingValidator:
             return self.codes.detailed.db_overlayed_only
         return self.codes.detailed.both_unsure
 
-    def _set_rules_from_pickle(self, building_validation_thresholds_pickle):
+    def _set_rules_from_pickle(self, building_validation_thresholds_pickle: str):
+        """Specifiy all thresholds from serialized rules.
+        This is used in thresholds optimization.
+
+        Args:
+            building_validation_thresholds_pickle (str): _description_
+        """
         with open(building_validation_thresholds_pickle, "rb") as f:
             self.rules: rules = pickle.load(f)
 
