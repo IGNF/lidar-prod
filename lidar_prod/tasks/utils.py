@@ -44,26 +44,6 @@ def extract_coor(las_name: str, x_span: float, y_span: float, buffer: float):
     )
 
 
-def tempdir(**kw):
-    """
-    A decorator for building a temporary directory. The temproary directory is created
-    just before the wrapped function is called and is destroyed imediately after the wrapped function returns.
-    The functions should have temporary_dict as its first
-    Inspired from https://gist.github.com/waylan/50a067d79386aabf9073dbab7beb2950
-    """
-
-    def decorator(fn):
-        @wraps(fn)
-        def wrapper(*args, **kwargs):
-            with TemporaryDirectory(**kw) as td:
-                kwargs.update({"tempdir": td})
-                return fn(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
-
-
 def clean_las_attributes(
     in_f: str,
     out_f: str,

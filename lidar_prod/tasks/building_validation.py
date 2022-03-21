@@ -7,15 +7,11 @@ import pickle
 import subprocess
 import numpy as np
 import pdal
+from tempfile import TemporaryDirectory
 import geopandas
 import laspy
 from tqdm import tqdm
-from lidar_prod.tasks.utils import (
-    BDUniConnectionParams,
-    extract_coor,
-    split_idx_by_dim,
-    tempdir,
-)
+from lidar_prod.tasks.utils import BDUniConnectionParams, extract_coor, split_idx_by_dim
 
 log = logging.getLogger(__name__)
 
@@ -53,9 +49,9 @@ class BuildingValidator:
             log.info(f"Using best trial from: {building_validation_thresholds_pickle}")
         else:
             log.warning(
-                "Using config decision thresholds - specify "
+                "Using default decision thresholds - specify "
                 "'building_validation.application.building_validation_thresholds_pickle' "
-                "to use optimized threshold"
+                "to use thresholds of an ad-hoc optimization step"
             )
 
         self.detailed_to_final = {
@@ -72,113 +68,108 @@ class BuildingValidator:
             otypes=[np.int],
         )
 
-    @tempdir()
     def run(
         self,
         in_f: str,
         out_f: str,
-        tempdir: str = "for_prepared_las_and_given_by_decorator",
     ):
         """Application.
 
-        Transform cloud at `in_f` following validation logic, and save it to
-        `out_f`
+        Transform cloud at `in_f` following building validation logic,
+        and save it to `out_f`
 
         Args:
             in_f (str): path to input LAS file with a building probability channel
             out_f (str): path for saving updated LAS file.
-            tempdir (str, optional): This is a path to a temporary directory created
-        by the decorator, which is automatically deleted afterward. Used to store intermediary,
-        prepared LAS file.
 
         Returns:
             _type_: returns `out_f` for potential terminal piping.
 
         """
-        log.info(f"Applying Building Validation to file \n{in_f}")
-        log.info("Preparation - Clustering + Requesting Building database")
-        temp_f = osp.join(tempdir, osp.basename(in_f))
-        self.prepare(in_f, temp_f)
-        log.info("Using AI and Databases to update cloud Classification")
-        self.update(temp_f, out_f)
-        log.info(f"Saved to\n{out_f}")
+        with TemporaryDirectory() as td:
+            log.info(f"Applying Building Validation to file \n{in_f}")
+            log.info(
+                "Preparation : Clustering of candidates buildings & Requesting BDUni"
+            )
+            _temp_f = osp.join(td, osp.basename(in_f))
+            self.prepare(in_f, _temp_f)
+            log.info("Using AI and Databases to update cloud Classification")
+            self.update(_temp_f, out_f)
         return out_f
 
-    @tempdir()
-    def prepare(
-        self,
-        in_f: str,
-        out_f: str,
-        tempdir: str = "for_shapefile_and_given_by_decorator",
-    ):
-        """
-        Prepare las for later decision process.
+    def prepare(self, in_f: str, out_f: str):
+        f"""
+        Prepare las for later decision process:
+        1. Cluster candidates points, in a new `{self.data_format.las_channel_names.macro_candidate_building_groups}`
+        dimension where the index of clusters starts at 1 (0 means no cluster).
+        2. Identify points overlayed by a BD Uni building, in a new
+        `{self.data_format.las_channel_names.uni_db_overlay}` dimension (0/1 flag).
 
-        1. Cluster candidates points.
-        2. Identify points overlayed by a BD Uni building.
-
+        In the process is created a new dimensions which identifies candidate buildings (0/1 flag)
+        `{self.data_format.las_channel_names.candidate_buildings_flag}`, to ignore them in later
+        buildings identification.
 
         """
 
-        _flag = self.data_format.las_channel_names.candidate_buildings_flag
+        _candidate_flag = self.data_format.las_channel_names.candidate_buildings_flag
         _cluster_id = self.data_format.las_channel_names.cluster_id
         _groups = self.data_format.las_channel_names.macro_candidate_building_groups
         _overlay = self.data_format.las_channel_names.uni_db_overlay
 
-        pipeline = pdal.Pipeline()
-        pipeline |= pdal.Reader(
-            in_f,
-            type="readers.las",
-            nosrs=True,
-            override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
-        )
-        pipeline |= pdal.Filter.ferry(dimensions=f"=>{_flag}")
-        conditional_expression = (
-            "("
-            + " || ".join(
-                f"Classification == {int(candidat_code)}"
-                for candidat_code in self.candidate_buildings_codes
+        # We use a temporary directory to clean intermediary files automatically
+        with TemporaryDirectory() as td:
+            pipeline = pdal.Pipeline()
+            pipeline |= pdal.Reader(
+                in_f,
+                type="readers.las",
+                nosrs=True,
+                override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
             )
-            + ")"
-        )
-        pipeline |= pdal.Filter.assign(
-            value=f"{_flag} = 1 WHERE {conditional_expression}"
-        )
-        pipeline |= pdal.Filter.cluster(
-            min_points=self.cluster.min_points,
-            tolerance=self.cluster.tolerance,
-            where=f"{_flag} == 1",
-        )
-        # TODO: might be removed if we do not keep ClusterID.
-        pipeline |= pdal.Filter.ferry(dimensions=f"{_cluster_id}=>{_groups}")
-        # reset to avoid crash with future clustering
-        pipeline |= pdal.Filter.assign(value=f"{_cluster_id} = 0")
-
-        shapefile_path = os.path.join(tempdir, "temp.shp")
-        # TODO: extract coordinates from LAS directly using pdal.
-        buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
-            self.bd_uni_connection_params,
-            *extract_coor(
-                os.path.basename(in_f),
-                self.data_format.tile_size_meters,
-                self.data_format.tile_size_meters,
-                self.bd_uni_request.buffer,
-            ),
-            self.data_format.crs,
-            shapefile_path,
-        )
-
-        # Channel is always created even if there are no buildings in database.
-        pipeline |= pdal.Filter.ferry(dimensions=f"=>{_overlay}")
-        if buildings_in_bd_topo:
-            pipeline |= pdal.Filter.overlay(
-                column="PRESENCE", datasource=shapefile_path, dimension=_overlay
+            pipeline |= pdal.Filter.ferry(dimensions=f"=>{_candidate_flag}")
+            _is_candidate_building = (
+                "("
+                + " || ".join(
+                    f"Classification == {int(candidate_code)}"
+                    for candidate_code in self.candidate_buildings_codes
+                )
+                + ")"
             )
-        pipeline |= pdal.Writer(
-            type="writers.las", filename=out_f, forward="all", extra_dims="all"
-        )
-        os.makedirs(osp.dirname(out_f), exist_ok=True)
-        pipeline.execute()
+            pipeline |= pdal.Filter.assign(
+                value=f"{_candidate_flag} = 1 WHERE {_is_candidate_building}"
+            )
+            pipeline |= pdal.Filter.cluster(
+                min_points=self.cluster.min_points,
+                tolerance=self.cluster.tolerance,
+                where=f"{_candidate_flag} == 1",
+            )
+            pipeline |= pdal.Filter.ferry(dimensions=f"{_cluster_id}=>{_groups}")
+            # We reset ClusterId to avoid crash with future clustering
+            pipeline |= pdal.Filter.assign(value=f"{_cluster_id} = 0")
+            _shp_p = os.path.join(td, "temp.shp")
+            # TODO: extract coordinates from LAS directly using pdal.
+            buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
+                self.bd_uni_connection_params,
+                *extract_coor(
+                    os.path.basename(in_f),
+                    self.data_format.tile_size_meters,
+                    self.data_format.tile_size_meters,
+                    self.bd_uni_request.buffer,
+                ),
+                self.data_format.crs,
+                _shp_p,
+            )
+
+            # Channel is always created even if there are no buildings in database.
+            pipeline |= pdal.Filter.ferry(dimensions=f"=>{_overlay}")
+            if buildings_in_bd_topo:
+                pipeline |= pdal.Filter.overlay(
+                    column="PRESENCE", datasource=_shp_p, dimension=_overlay
+                )
+            pipeline |= pdal.Writer(
+                type="writers.las", filename=out_f, forward="all", extra_dims="all"
+            )
+            os.makedirs(osp.dirname(out_f), exist_ok=True)
+            pipeline.execute()
 
     def update(self, prepared_f: str, out_f: str):
         """Update point cloud classification channel."""

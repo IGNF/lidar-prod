@@ -5,6 +5,7 @@ candidate_buildings_codes: ${data_format.codes.candidates.building}
 data_format: ${data_format}
 
 min_building_proba: ${building_validation.application.rules.min_confidence_confirmation}
+min_building_proba_multiplier_if_bd_uni_overlay: 1.0
 
 cluster:
   min_points: 200
