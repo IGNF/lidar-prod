@@ -223,7 +223,7 @@ class BuildingValidationOptimizer:
         Use prepared list to access group-level probas and targets.
 
         Args:
-            trial (_type_): optuna trial
+            trial: optuna trial
             clusters (List[BuildngValidationClusterInfo], optional): _description_. Defaults to None.
 
         Returns:
