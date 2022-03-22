@@ -127,7 +127,7 @@ python -m lidar_prod.run --multiruns paths.src_las=[file_1.las],[file_2.las],[fi
 
 ### Use application from source
 
-Similarly
+Simply run from python sources directly
 ```bash
 # activate an env matching ./bash/setup_env.sh requirements.
 conda activate lidar_prod
@@ -152,3 +152,14 @@ To evaluate the optimized module on a test set, change input las folder, and rer
 conda activate lidar_prod
 python lidar_prod/run.py +task=optimize building_validation.optimization.todo='prepare+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
 ```
+
+### CICD, Releases and versions
+
+New features are staged in the `dev` branch, and CICD workflow is run when a pull requets to merge is created.
+In Actions, check the output of a full evaluation on a single LAS to spot potential regression. The app is also run 
+on a subset of a LAS, which can be visually inspected before merging - there can always be surprises.
+
+Package version follows semantic versionning conventions and is defined in `setup.py`. 
+
+Releases are generated when new high-level functionnality are implemented (e.g. a new step in the production process) or
+when key parameters are changed. Generally speaking, the latest release `Vx.y.z` is the one to use in production. 
