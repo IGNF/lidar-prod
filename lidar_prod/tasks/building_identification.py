@@ -68,7 +68,7 @@ class BuildingIdentifier:
         )
         p_heq_threshold = f"(building>={self.min_building_proba})"
         A = f"(building>={self.min_building_proba * self.min_frac_confirmation_factor_if_bd_uni_overlay})"
-        B = f"({self.data_format.las_channel_names.uni_db_overlay} > 0)"
+        B = f"({self.data_format.las_dimensions.uni_db_overlay} > 0)"
         p_heq_modified_threshold_under_bd_uni = f"({A} && {B})"
         where = f"{non_candidates} && ({p_heq_threshold} || {p_heq_modified_threshold_under_bd_uni})"
         pipeline |= pdal.Filter.cluster(
