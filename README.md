@@ -47,7 +47,19 @@ Decision thresholds `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a multi-objectiv
 
 ![](assets/img/LidarBati-BuildingValidationM7.1V2.0.png)
 
-#### B) Building Identification
+#### B) Building Completion
+
+Goal: Confirm points that were too isolated to make up a group but have high-enough probability nevertheless (e.g. walls)
+
+Identify  _candidate buildings points_ that have not been clustered in previous step due AND have high enough probability (p>=0.5)).
+Cluster them together with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
+For each cluster, if some points were confirmed, the others are considered to belong to the same building, and are 
+therefore confirmed as well.
+
+![](assets/img/LidarBati-BuildingCompletion.png)
+
+
+#### C) Building Identification
 
 Goal: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection. 
 
@@ -92,7 +104,7 @@ pip install --upgrade https://github.com/IGNF/lidar-prod-quality-control/tarball
 pip install -e .  # from local sources
 ```
 
-To run the module as a package, you will need a source cloud point in LAS format with an additional channel containing predicted building probabilities. The name of this channel is specified by `config.data_format.las_channel_names.ai_building_proba`.
+To run the module as a package, you will need a source cloud point in LAS format with an additional channel containing predicted building probabilities. The name of this channel is specified by `config.data_format.las_dimensions.ai_building_proba`.
 
 To run using default configurations of the installed package, use
 ```bash

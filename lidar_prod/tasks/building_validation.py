@@ -17,7 +17,14 @@ log = logging.getLogger(__name__)
 
 
 class BuildingValidator:
-    """Logic of building validation."""
+    """Logic of building validation.
+
+    The candidate building points identified with a rule-based algorithm are cluster together.
+    The BDUni building vectors are overlayed on the points clouds, and points that fall under a vector are flagged.
+    Then, classification dim is updated on a per-group basis, based on both AI probabilities and BDUni flag.
+
+    See `README.md` for the detailed process.
+    """
 
     def __init__(
         self,
@@ -25,20 +32,20 @@ class BuildingValidator:
         cluster=None,
         bd_uni_request=None,
         rules=None,
-        building_validation_thresholds_pickle: str = None,
-        codes=None,
-        candidate_buildings_codes: int = [202],
-        use_final_classification_codes: bool = True,
         data_format=None,
+        building_validation_thresholds_pickle: str = None,
+        use_final_classification_codes: bool = True,
     ):
         self.bd_uni_connection_params = bd_uni_connection_params
         self.cluster = cluster
         self.bd_uni_request = bd_uni_request
-        self.candidate_buildings_codes = candidate_buildings_codes
         self.use_final_classification_codes = use_final_classification_codes
-        self.rules = rules  # default values
-        self.codes = codes
+        self.rules = rules
+
         self.data_format = data_format
+        # For easier access
+        self.codes = data_format.codes.building
+        self.candidate_buildings_codes = data_format.codes.building.candidates
 
         self.setup(building_validation_thresholds_pickle)
 
@@ -91,30 +98,30 @@ class BuildingValidator:
             log.info(
                 "Preparation : Clustering of candidates buildings & Requesting BDUni"
             )
-            _temp_f = osp.join(td, osp.basename(in_f))
-            self.prepare(in_f, _temp_f)
+            temp_f = osp.join(td, osp.basename(in_f))
+            self.prepare(in_f, temp_f)
             log.info("Using AI and Databases to update cloud Classification")
-            self.update(_temp_f, out_f)
+            self.update(temp_f, out_f)
         return out_f
 
     def prepare(self, in_f: str, out_f: str):
         f"""
         Prepare las for later decision process:
-        1. Cluster candidates points, in a new `{self.data_format.las_channel_names.macro_candidate_building_groups}`
+        1. Cluster candidates points, in a new `{self.data_format.las_dimensions.ClusterID_candidate_building}`
         dimension where the index of clusters starts at 1 (0 means no cluster).
         2. Identify points overlayed by a BD Uni building, in a new
-        `{self.data_format.las_channel_names.uni_db_overlay}` dimension (0/1 flag).
+        `{self.data_format.las_dimensions.uni_db_overlay}` dimension (0/1 flag).
 
         In the process is created a new dimensions which identifies candidate buildings (0/1 flag)
-        `{self.data_format.las_channel_names.candidate_buildings_flag}`, to ignore them in later
+        `{self.data_format.las_dimensions.candidate_buildings_flag}`, to ignore them in later
         buildings identification.
 
         """
 
-        _candidate_flag = self.data_format.las_channel_names.candidate_buildings_flag
-        _cluster_id = self.data_format.las_channel_names.cluster_id
-        _groups = self.data_format.las_channel_names.macro_candidate_building_groups
-        _overlay = self.data_format.las_channel_names.uni_db_overlay
+        _candidate_flag = self.data_format.las_dimensions.candidate_buildings_flag
+        _cluster_id = self.data_format.las_dimensions.cluster_id
+        _groups = self.data_format.las_dimensions.ClusterID_candidate_building
+        _overlay = self.data_format.las_dimensions.uni_db_overlay
 
         # We use a temporary directory to clean intermediary files automatically
         with TemporaryDirectory() as td:
@@ -142,11 +149,12 @@ class BuildingValidator:
                 tolerance=self.cluster.tolerance,
                 where=f"{_candidate_flag} == 1",
             )
+            # Always move and reset ClusterID to avoid conflict with later tasks.
             pipeline |= pdal.Filter.ferry(dimensions=f"{_cluster_id}=>{_groups}")
-            # We reset ClusterId to avoid crash with future clustering
             pipeline |= pdal.Filter.assign(value=f"{_cluster_id} = 0")
-            _shp_p = os.path.join(td, "temp.shp")
+
             # TODO: extract coordinates from LAS directly using pdal.
+            _shp_p = os.path.join(td, "temp.shp")
             buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
                 self.bd_uni_connection_params,
                 *extract_coor(
@@ -176,14 +184,14 @@ class BuildingValidator:
 
         las = laspy.read(prepared_f)
         # 1) Set all candidates points to a single class
-        _clf = self.data_format.las_channel_names.classification
-        _flag = self.data_format.las_channel_names.candidate_buildings_flag
+        _clf = self.data_format.las_dimensions.classification
+        _flag = self.data_format.las_dimensions.candidate_buildings_flag
         candidates_idx = las[_flag] == 1
         las[_clf][candidates_idx] = self.codes.detailed.unclustered
 
         # 2) Decide at the group-level
         split_idx = split_idx_by_dim(
-            las[self.data_format.las_channel_names.macro_candidate_building_groups]
+            las[self.data_format.las_dimensions.ClusterID_candidate_building]
         )
         split_idx = split_idx[1:]  # removes unclustered group with ClusterID = 0
         for pts_idx in tqdm(
@@ -191,8 +199,8 @@ class BuildingValidator:
         ):
             pts = las.points[pts_idx]
             detailed_code = self._make_detailed_group_decision(
-                pts[self.data_format.las_channel_names.ai_building_proba],
-                pts[self.data_format.las_channel_names.uni_db_overlay],
+                pts[self.data_format.las_dimensions.ai_building_proba],
+                pts[self.data_format.las_dimensions.uni_db_overlay],
             )
             las[_clf][pts_idx] = detailed_code
 
@@ -203,15 +211,20 @@ class BuildingValidator:
         os.makedirs(osp.dirname(out_f), exist_ok=True)
         las.write(out_f)
 
-    def _make_group_decision(self, *args, **kwargs):
+    def _make_group_decision(self, *args, **kwargs) -> int:
+        f"""Wrapper to simplify decision codes during LAS update.
+        Signature follows the one of {self._make_detailed_group_decision.__name__}
+        Returns:
+            int: final classification code for the considered group.
+        """
         detailed_code = self._make_detailed_group_decision(*args, **kwargs)
         return self.detailed_to_final[detailed_code]
 
     def _make_detailed_group_decision(self, probas_arr, overlay_bools_arr):
         """Decision process at the cluster level.
 
-        Confirm or refute candidate building shape based on fraction of confirmed/refuted points and
-        on fraction of points overlayed by a building shape in a database.
+        Confirm or refute candidate building groups based on fraction of confirmed/refuted points and
+        on fraction of points overlayed by a building vector in BDUni.
 
         """
         ia_confirmed = (
@@ -236,7 +249,13 @@ class BuildingValidator:
             return self.codes.detailed.db_overlayed_only
         return self.codes.detailed.both_unsure
 
-    def _set_rules_from_pickle(self, building_validation_thresholds_pickle):
+    def _set_rules_from_pickle(self, building_validation_thresholds_pickle: str):
+        """Specifiy all thresholds from serialized rules.
+        This is used in thresholds optimization.
+
+        Args:
+            building_validation_thresholds_pickle (str): _description_
+        """
         with open(building_validation_thresholds_pickle, "rb") as f:
             self.rules: rules = pickle.load(f)
 

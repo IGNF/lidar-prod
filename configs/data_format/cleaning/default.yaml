@@ -3,5 +3,5 @@ _target_: lidar_prod.tasks.cleaning.Cleaner
 # Extra dims that are kept when cleaning dimensions
 # You can override with "all" to keep all extra dimensions at development time.
 keep_extra_dims:
-  - "${data_format.las_channel_names.ai_building_identified}=uint"
-  - "${data_format.las_channel_names.ai_building_proba}=float"
+  - "${data_format.las_dimensions.ai_building_identified}=uint"
+  - "${data_format.las_dimensions.ai_building_proba}=float"

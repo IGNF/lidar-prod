@@ -1,0 +1,15 @@
+_target_: lidar_prod.tasks.building_completion.BuildingCompletor
+
+data_format: ${data_format}
+
+# TODO: uncomment when min_building_proba_relaxation_if_bd_uni_overlay is specified <1 to be consistent everywhere.
+# min_building_proba: ${building_validation.application.rules.min_confidence_confirmation}
+
+min_building_proba: 0.5
+min_building_proba_relaxation_if_bd_uni_overlay: 1.0  # No effect if = 1.0
+
+cluster:
+  min_points: 10 # including isolated points (in BuildingValidator) and confirmed candidates points.
+  tolerance: 1  # meters
+  is3d: false  # group in 2d for better detection
+

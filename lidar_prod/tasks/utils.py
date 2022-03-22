@@ -42,21 +42,3 @@ def extract_coor(las_name: str, x_span: float, y_span: float, buffer: float):
         x_min + x_span + buffer,
         y_max + buffer,
     )
-
-
-def clean_las_attributes(
-    in_f: str,
-    out_f: str,
-    forward: Union[str, List[str]] = "all",
-    extra_dims: Union[str, List[str]] = "all",
-):
-    """Will rerad an rewrite a modified LAS to keep only usefull dimensions.
-
-    Args:
-        in_f (str): _description_
-        forward (str, optional): Channel to forward based on input schema. Defaults to "all".
-        extra_dims (str, optional): Extra dims to keep. Defaults to "all".
-    """
-    pipeline = pdal.Pipeline()
-    pipeline |= pdal.Reader(in_f)
-    # pipeline |=

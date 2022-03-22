@@ -166,7 +166,7 @@ class BuildingValidationOptimizer:
     def __extract_clusters_from_las(self, prepared_las_path):
         las = laspy.read(prepared_las_path)
         cluster_id = las[
-            self.bv.data_format.las_channel_names.macro_candidate_building_groups
+            self.bv.data_format.las_dimensions.ClusterID_candidate_building
         ]
         UNCLUSTERED = 0
         mask = cluster_id != UNCLUSTERED
@@ -174,9 +174,9 @@ class BuildingValidationOptimizer:
         if no_cluster:
             return []
         cluster_id = cluster_id[mask]
-        classification = las[self.bv.data_format.las_channel_names.classification][mask]
-        uni_db_overlay = las[self.bv.data_format.las_channel_names.uni_db_overlay][mask]
-        ai_probas = las[self.bv.data_format.las_channel_names.ai_building_proba][mask]
+        classification = las[self.bv.data_format.las_dimensions.classification][mask]
+        uni_db_overlay = las[self.bv.data_format.las_dimensions.uni_db_overlay][mask]
+        ai_probas = las[self.bv.data_format.las_dimensions.ai_building_proba][mask]
 
         clusters = []
         split_idx = split_idx_by_dim(cluster_id)

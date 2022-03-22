@@ -2,22 +2,38 @@ tile_size_meters: 1000
 crs_prefix: "EPSG:"
 crs: 2154
 
-# To connect logic between application tasks
-las_channel_names:
+# Those names connect the logics between successive tasks
+las_dimensions:
   # input
   classification: classification  #las format
-  cluster_id: ClusterID  #pdal-defined
-  uni_db_overlay: BDTopoOverlay  # user-defined
-  ai_building_proba: building  # user-defined
+  ai_building_proba: building  # user-defined - output by deep learning model
 
-  # custom channels
-  candidate_buildings_flag: CandidateBuildingsFlag
-  macro_candidate_building_groups: CandidateBuildingGroups
+  # intermediary channels
+  cluster_id: ClusterID  # pdal-defined -> created by clustering operations
+  uni_db_overlay: BDTopoOverlay  # user-defined -> a 0/1 flag for presence of a BDUni vector
+  candidate_buildings_flag: F_CandidateB # -> a 0/1 flag identifying candidate buildings found by rules-based classification  
+  ClusterID_candidate_building: CID_CandidateB  # -> Cluster index from BuildingValidator, 0 if no cluster, 1-n elsewise
+  ClusterID_isolated_plus_confirmed: CID_IsolatedOrConfirmed  # -> Cluster index from BuildingCompletor, 0 if no cluster, 1-n elsewise
+
+
+  # additionnal output channel
   ai_building_identified: Group
 
 codes:
-  candidates:
-    building: [202]
+  building:
+    candidates: [202]  # found by rules-based classification (TerraScan)
+    detailed:  # used for detailed output when doing threshold optimization
+      unclustered: 202  # refuted
+      ia_refuted: 110  # refuted
+      ia_refuted_and_db_overlayed: 111  # unsure
+      both_unsure: 112  # unsure
+      ia_confirmed_only: 113  # confirmed
+      db_overlayed_only: 114  # confirmed
+      both_confirmed: 115  # confirmed
+    final:  # used at the end of the building process
+      unsure: 214  # unsure
+      not_building: 208  # refuted
+      building: 6  # confirmed
 
 defaults:
   - cleaning: default.yaml
