@@ -31,8 +31,8 @@ class BuildingValidator:
         bd_uni_connection_params=None,
         cluster=None,
         bd_uni_request=None,
-        rules=None,
         data_format=None,
+        thresholds=None,
         building_validation_thresholds_pickle: str = None,
         use_final_classification_codes: bool = True,
     ):
@@ -40,8 +40,7 @@ class BuildingValidator:
         self.cluster = cluster
         self.bd_uni_request = bd_uni_request
         self.use_final_classification_codes = use_final_classification_codes
-        self.rules = rules
-
+        self.thresholds = thresholds  # default values
         self.data_format = data_format
         # For easier access
         self.codes = data_format.codes.building
@@ -52,8 +51,10 @@ class BuildingValidator:
     def setup(self, building_validation_thresholds_pickle):
         """Setup, loading optimized thresholds if available."""
         if osp.exists(building_validation_thresholds_pickle):
-            self._set_rules_from_pickle(building_validation_thresholds_pickle)
-            log.info(f"Using best trial from: {building_validation_thresholds_pickle}")
+            self._set_thresholds_from_pickle(building_validation_thresholds_pickle)
+            log.info(
+                f"Using optimized thresholds from: {building_validation_thresholds_pickle}"
+            )
         else:
             log.warning(
                 "Using default decision thresholds - specify "
@@ -220,22 +221,35 @@ class BuildingValidator:
         detailed_code = self._make_detailed_group_decision(*args, **kwargs)
         return self.detailed_to_final[detailed_code]
 
-    def _make_detailed_group_decision(self, probas_arr, overlay_bools_arr):
+    def _make_detailed_group_decision(self, probas, bduni_flag):
         """Decision process at the cluster level.
 
         Confirm or refute candidate building groups based on fraction of confirmed/refuted points and
         on fraction of points overlayed by a building vector in BDUni.
 
+        See Readme for details of this group-level decision process.
+
         """
+        p_heq_threshold = probas >= self.thresholds.min_confidence_confirmation
+
+        relaxed_threshold = (
+            self.thresholds.min_confidence_confirmation
+            * self.thresholds.min_frac_confirmation_factor_if_bd_uni_overlay
+        )
+        p_heq_relaxed_threshold = probas >= relaxed_threshold
+
+        ia_confirmed_flag = np.logical_or(
+            p_heq_threshold, np.logical_and(bduni_flag, p_heq_relaxed_threshold)
+        )
+
         ia_confirmed = (
-            np.mean(probas_arr >= self.rules.min_confidence_confirmation)
-            >= self.rules.min_frac_confirmation
+            np.mean(ia_confirmed_flag) >= self.thresholds.min_frac_confirmation
         )
         ia_refuted = (
-            np.mean((1 - probas_arr) >= self.rules.min_confidence_refutation)
-            >= self.rules.min_frac_refutation
+            np.mean((1 - probas) >= self.thresholds.min_confidence_refutation)
+            >= self.thresholds.min_frac_refutation
         )
-        uni_overlayed = np.mean(overlay_bools_arr) >= self.rules.min_uni_db_overlay_frac
+        uni_overlayed = np.mean(bduni_flag) >= self.thresholds.min_uni_db_overlay_frac
 
         if ia_refuted:
             if uni_overlayed:
@@ -249,7 +263,7 @@ class BuildingValidator:
             return self.codes.detailed.db_overlayed_only
         return self.codes.detailed.both_unsure
 
-    def _set_rules_from_pickle(self, building_validation_thresholds_pickle: str):
+    def _set_thresholds_from_pickle(self, building_validation_thresholds_pickle: str):
         """Specifiy all thresholds from serialized rules.
         This is used in thresholds optimization.
 
@@ -257,7 +271,7 @@ class BuildingValidator:
             building_validation_thresholds_pickle (str): _description_
         """
         with open(building_validation_thresholds_pickle, "rb") as f:
-            self.rules: rules = pickle.load(f)
+            self.thresholds: thresholds = pickle.load(f)
 
 
 def request_bd_uni_for_building_shapefile(
@@ -309,11 +323,12 @@ def request_bd_uni_for_building_shapefile(
 
 
 @dataclass
-class rules:
+class thresholds:
     """The deciison threshold for cluser-level decisions."""
 
     min_confidence_confirmation: float
     min_frac_confirmation: float
+    min_frac_confirmation_factor_if_bd_uni_overlay: float
     min_uni_db_overlay_frac: float
     min_confidence_refutation: float
     min_frac_refutation: float

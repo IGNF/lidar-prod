@@ -6,13 +6,13 @@ import os
 import pickle
 import numpy as np
 from sklearn.metrics import confusion_matrix
-from typing import Any, Dict
+from typing import Any, Dict, List
 import optuna
 from tqdm import tqdm
 import os.path as osp
 import laspy
 
-from lidar_prod.tasks.building_validation import BuildingValidator, rules
+from lidar_prod.tasks.building_validation import BuildingValidator, thresholds
 from lidar_prod.tasks.utils import split_idx_by_dim
 
 log = logging.getLogger(__name__)
@@ -123,7 +123,7 @@ class BuildingValidationOptimizer:
         objective = functools.partial(self._objective, clusters=clusters)
         self.study.optimize(objective, n_trials=self.design.n_trials)
         best_rules = self._select_best_rules(self.study)
-        log.info(f"Best_trial rules: \n{best_rules}")
+        log.info(f"Best_trial thresholds: \n{best_rules}")
         self.__dump_best_rules(best_rules)
 
     def evaluate(self):
@@ -134,7 +134,9 @@ class BuildingValidationOptimizer:
 
         """
         clusters = self.__load_clusters()
-        self.bv._set_rules_from_pickle(self.paths.building_validation_thresholds_pickle)
+        self.bv._set_thresholds_from_pickle(
+            self.paths.building_validation_thresholds_pickle
+        )
         decisions = np.array(
             [
                 self.bv._make_group_decision(c.probabilities, c.overlays)
@@ -153,7 +155,9 @@ class BuildingValidationOptimizer:
 
         """
         log.info(f"Updated las will be saved in {self.paths.results_output_dir}")
-        self.bv._set_rules_from_pickle(self.paths.building_validation_thresholds_pickle)
+        self.bv._set_thresholds_from_pickle(
+            self.paths.building_validation_thresholds_pickle
+        )
         for prep_f, out_f in tqdm(
             zip(self.prepared_las_filepaths, self.out_las_filepaths),
             total=len(self.prepared_las_filepaths),
@@ -214,9 +218,17 @@ class BuildingValidationOptimizer:
             penalty += self.design.constraints.min_automation_constraint - auto
         return [penalty]
 
-    def _objective(self, trial, clusters=None):
-        """Objective function for optuna optimization. Inner definition to access list of array of probas and list of targets."""
-        # TODO: incude as configurable parameters
+    def _objective(self, trial, clusters: List[BuildngValidationClusterInfo] = None):
+        """Objective function for optuna optimization.
+        Use prepared list to access group-level probas and targets.
+
+        Args:
+            trial: optuna trial
+            clusters (List[BuildngValidationClusterInfo], optional): _description_. Defaults to None.
+
+        Returns:
+            float, float, float: automatisation, precision, recall
+        """
         params = {
             "min_confidence_confirmation": trial.suggest_float(
                 "min_confidence_confirmation", 0.0, 1.0
@@ -229,10 +241,13 @@ class BuildingValidationOptimizer:
             ),
             "min_frac_refutation": trial.suggest_float("min_frac_refutation", 0.0, 1.0),
             "min_uni_db_overlay_frac": trial.suggest_float(
-                "min_uni_db_overlay_frac", 0.50, 1.0
+                "min_uni_db_overlay_frac", 0.5, 1.0
+            ),
+            "min_frac_confirmation_factor_if_bd_uni_overlay": trial.suggest_float(
+                "min_frac_confirmation_factor_if_bd_uni_overlay", 0.5, 1.0
             ),
         }
-        self.bv.rules = rules(**params)
+        self.bv.thresholds = thresholds(**params)
         decisions = np.array(
             [
                 self.bv._make_group_decision(c.probabilities, c.overlays)
@@ -276,7 +291,7 @@ class BuildingValidationOptimizer:
                 study.best_trials, key=lambda x: np.product(x.values), reverse=True
             )
             best = trials[0]
-        best_rules = rules(**best.params)
+        best_rules = thresholds(**best.params)
         return best_rules
 
     def __dump_best_rules(self, best_trial_params):

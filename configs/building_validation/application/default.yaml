@@ -20,9 +20,11 @@ cluster:
 bd_uni_request:
   buffer: 50
 
-rules:
-  min_confidence_confirmation: 0.768
-  min_frac_confirmation: 0.732
+# TODO: update min_frac_confirmation_factor_if_bd_uni_overlay and others after optimization...
+thresholds:
+  min_confidence_confirmation: 0.697
+  min_frac_confirmation: 0.384
+  min_frac_confirmation_factor_if_bd_uni_overlay: 0.808
   min_uni_db_overlay_frac: 0.508
-  min_confidence_refutation: 0.872
-  min_frac_refutation: 0.964
+  min_confidence_refutation: 0.973
+  min_frac_refutation: 0.285

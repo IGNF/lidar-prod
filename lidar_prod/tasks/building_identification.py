@@ -16,21 +16,21 @@ class BuildingIdentifier:
     High enough probability means :
     - p>=min_building_proba
     OR, IF point fall in a building vector from the BDUni:
-    - p>=(min_building_proba*min_building_proba_relaxation_if_bd_uni_overlay).
+    - p>=(min_building_proba*min_frac_confirmation_factor_if_bd_uni_overlay).
     """
 
     def __init__(
         self,
         min_building_proba: float = 0.75,
-        min_building_proba_relaxation_if_bd_uni_overlay: float = 1.0,
+        min_frac_confirmation_factor_if_bd_uni_overlay: float = 1.0,
         cluster=None,
         data_format=None,
     ):
         self.cluster = cluster
         self.data_format = data_format
         self.min_building_proba = min_building_proba
-        self.min_building_proba_relaxation_if_bd_uni_overlay = (
-            min_building_proba_relaxation_if_bd_uni_overlay
+        self.min_frac_confirmation_factor_if_bd_uni_overlay = (
+            min_frac_confirmation_factor_if_bd_uni_overlay
         )
 
     def run(self, in_f: str, out_f: str) -> str:
@@ -67,12 +67,10 @@ class BuildingIdentifier:
             f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
         )
         p_heq_threshold = f"(building>={self.min_building_proba})"
-        A = f"(building>={self.min_building_proba * self.min_building_proba_relaxation_if_bd_uni_overlay})"
+        A = f"(building>={self.min_building_proba * self.min_frac_confirmation_factor_if_bd_uni_overlay})"
         B = f"({self.data_format.las_dimensions.uni_db_overlay} > 0)"
-        p_heq_threshold_under_bd_uni = f"({A} && {B})"
-        where = (
-            f"{non_candidates} && ({p_heq_threshold} || {p_heq_threshold_under_bd_uni})"
-        )
+        p_heq_modified_threshold_under_bd_uni = f"({A} && {B})"
+        where = f"{non_candidates} && ({p_heq_threshold} || {p_heq_modified_threshold_under_bd_uni})"
         pipeline |= pdal.Filter.cluster(
             min_points=self.cluster.min_points,
             tolerance=self.cluster.tolerance,

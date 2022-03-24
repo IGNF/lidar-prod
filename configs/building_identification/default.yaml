@@ -2,8 +2,8 @@ _target_: lidar_prod.tasks.building_identification.BuildingIdentifier
 
 data_format: ${data_format}
 
-min_building_proba: ${building_validation.application.rules.min_confidence_confirmation}
-min_building_proba_relaxation_if_bd_uni_overlay: 1.0
+min_building_proba: ${building_validation.application.thresholds.min_confidence_confirmation}
+min_frac_confirmation_factor_if_bd_uni_overlay: ${building_validation.application.thresholds.min_frac_confirmation_factor_if_bd_uni_overlay}
 
 cluster:
   min_points: 200  # Large so that small artefact are ignored
