@@ -33,10 +33,10 @@ study:
   directions: ["maximize","maximize","maximize"]
   sampler:
     _target_: optuna.samplers.NSGAIISampler
-    population_size: 30
+    population_size: 50
     mutation_prob: 0.25
-    crossover_prob: 0.8
-    swapping_prob: 0.5
+    crossover_prob: 0.1
+    swapping_prob: 0.1
     seed: 12345
     constraints_func:
       _target_: functools.partial

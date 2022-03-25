@@ -120,7 +120,7 @@ class BuildingValidator:
 
     def prepare(self, in_f: str, out_f: str):
         f"""
-        Prepare las for later decision process:
+        Prepare las for later decision process. .
         1. Cluster candidates points, in a new `{self.data_format.las_dimensions.ClusterID_candidate_building}`
         dimension where the index of clusters starts at 1 (0 means no cluster).
         2. Identify points overlayed by a BD Uni building, in a new
@@ -129,6 +129,8 @@ class BuildingValidator:
         In the process is created a new dimensions which identifies candidate buildings (0/1 flag)
         `{self.data_format.las_dimensions.candidate_buildings_flag}`, to ignore them in later
         buildings identification.
+
+        Dimension classification should not be modified here, as optimization step needs unmo
 
         """
 
