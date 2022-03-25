@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import logging
 import os
 import os.path as osp
-import json
+from typing import Optional
 import pickle
 import subprocess
 import numpy as np
@@ -14,6 +14,18 @@ from tqdm import tqdm
 from lidar_prod.tasks.utils import BDUniConnectionParams, extract_coor, split_idx_by_dim
 
 log = logging.getLogger(__name__)
+
+
+@dataclass
+class BuildingValidationClusterInfo:
+    """Elements needed to either confirm, refute, or be uncertain about a cluster of cnadidate building points."""
+
+    probabilities: np.ndarray
+    overlays: np.ndarray
+    entropies: np.ndarray
+
+    # target is based on corrected labels - only needed for optimization of decision thresholds
+    target: Optional[int] = None
 
 
 class BuildingValidator:
@@ -67,6 +79,7 @@ class BuildingValidator:
             self.codes.detailed.ia_refuted: self.codes.final.not_building,
             self.codes.detailed.ia_refuted_and_db_overlayed: self.codes.final.unsure,
             self.codes.detailed.both_unsure: self.codes.final.unsure,
+            self.codes.detailed.unsure_by_entropy: self.codes.final.unsure,
             self.codes.detailed.ia_confirmed_only: self.codes.final.building,
             self.codes.detailed.db_overlayed_only: self.codes.final.building,
             self.codes.detailed.both_confirmed: self.codes.final.building,
@@ -184,33 +197,58 @@ class BuildingValidator:
         """Update point cloud classification channel."""
 
         las = laspy.read(prepared_f)
-        # 1) Set all candidates points to a single class
+        # 1) Map all points to a single class in case there was multiple codes to flag candidate buildings.
+        # TODO: perform this at preparation step.
+
         _clf = self.data_format.las_dimensions.classification
         _flag = self.data_format.las_dimensions.candidate_buildings_flag
         candidates_idx = las[_flag] == 1
         las[_clf][candidates_idx] = self.codes.detailed.unclustered
 
         # 2) Decide at the group-level
+        # TODO: check if this can be moved somewhere else. WARNING: use_final_classification_codes may be modified in
+        # an unsafe manner during optimization. Consider using a setter that will change decision_func alongside.
+
+        decision_func = self._make_group_decision
+        if self.use_final_classification_codes:
+            decision_func = self._make_detailed_group_decision
+
         split_idx = split_idx_by_dim(
             las[self.data_format.las_dimensions.ClusterID_candidate_building]
         )
-        split_idx = split_idx[1:]  # removes unclustered group with ClusterID = 0
+        START_IDX_OF_CLUSTERS = 1
+        split_idx = split_idx[
+            START_IDX_OF_CLUSTERS:
+        ]  # removes unclustered group that have ClusterID = 0
         for pts_idx in tqdm(
-            split_idx, desc="Update groups of candidate buildings", unit="grp"
+            split_idx, desc="Update cluster classification", unit="clusters"
         ):
-            pts = las.points[pts_idx]
-            detailed_code = self._make_detailed_group_decision(
-                pts[self.data_format.las_dimensions.ai_building_proba],
-                pts[self.data_format.las_dimensions.uni_db_overlay],
-            )
-            las[_clf][pts_idx] = detailed_code
+            infos = self._extract_cluster_info_by_idx(las, pts_idx)
+            las[_clf][pts_idx] = decision_func(infos)
 
-        if self.use_final_classification_codes:
-            las[_clf][candidates_idx] = self.detailed_to_final_mapper(
-                las[_clf][candidates_idx]
-            )
         os.makedirs(osp.dirname(out_f), exist_ok=True)
         las.write(out_f)
+
+    def _extract_cluster_info_by_idx(
+        self, las: laspy.LasData, pts_idx: np.ndarray
+    ) -> BuildingValidationClusterInfo:
+        """Extract all necessary information to make a decision based on points indices.
+
+        Args:
+            las (laspy.LasData): point cloud of interest
+            pts_idx (np.ndarray): indices of points in considered clusters
+
+        Returns:
+            _type_: _description_
+        """
+        pts = las.points[pts_idx]
+        probabilities = pts[self.data_format.las_dimensions.ai_building_proba]
+        overlays = pts[self.data_format.las_dimensions.uni_db_overlay]
+        entropies = pts[self.data_format.las_dimensions.entropy]
+        targets = pts[self.data_format.las_dimensions.classification]
+        return BuildingValidationClusterInfo(
+            probabilities, overlays, entropies, targets
+        )
 
     def _make_group_decision(self, *args, **kwargs) -> int:
         f"""Wrapper to simplify decision codes during LAS update.
@@ -221,7 +259,7 @@ class BuildingValidator:
         detailed_code = self._make_detailed_group_decision(*args, **kwargs)
         return self.detailed_to_final[detailed_code]
 
-    def _make_detailed_group_decision(self, probas, bduni_flag):
+    def _make_detailed_group_decision(self, infos: BuildingValidationClusterInfo):
         """Decision process at the cluster level.
 
         Confirm or refute candidate building groups based on fraction of confirmed/refuted points and
@@ -229,28 +267,53 @@ class BuildingValidator:
 
         See Readme for details of this group-level decision process.
 
+        Args:
+            infos (BuildngValidationClusterInfo): arrays describing the cluster of candidate builiding points
+
+        Returns:
+            int: detailed classification code for the considered group.
         """
-        p_heq_threshold = probas >= self.thresholds.min_confidence_confirmation
+        # HIGH ENTROPY
+
+        high_entropy = (
+            np.mean(infos.entropies >= self.thresholds.min_entropy_uncertainty)
+            >= self.thresholds.min_frac_entropy_uncertain
+        )
+
+        # CONFIRMATION - threshold is relaxed under BDUni
+        p_heq_threshold = (
+            infos.probabilities >= self.thresholds.min_confidence_confirmation
+        )
 
         relaxed_threshold = (
             self.thresholds.min_confidence_confirmation
             * self.thresholds.min_frac_confirmation_factor_if_bd_uni_overlay
         )
-        p_heq_relaxed_threshold = probas >= relaxed_threshold
+        p_heq_relaxed_threshold = infos.probabilities >= relaxed_threshold
 
         ia_confirmed_flag = np.logical_or(
-            p_heq_threshold, np.logical_and(bduni_flag, p_heq_relaxed_threshold)
+            p_heq_threshold, np.logical_and(infos.overlays, p_heq_relaxed_threshold)
         )
 
         ia_confirmed = (
             np.mean(ia_confirmed_flag) >= self.thresholds.min_frac_confirmation
         )
+
+        # REFUTATION
         ia_refuted = (
-            np.mean((1 - probas) >= self.thresholds.min_confidence_refutation)
+            np.mean(
+                (1 - infos.probabilities) >= self.thresholds.min_confidence_refutation
+            )
             >= self.thresholds.min_frac_refutation
         )
-        uni_overlayed = np.mean(bduni_flag) >= self.thresholds.min_uni_db_overlay_frac
+        uni_overlayed = (
+            np.mean(infos.overlays) >= self.thresholds.min_uni_db_overlay_frac
+        )
 
+        # TODO: decide if entropy is leveraged after refutation, which would be equivalent to saying
+        # that high entropy always translates refutation. This could be risky.
+        if high_entropy:
+            return self.codes.detailed.unsure_by_entropy
         if ia_refuted:
             if uni_overlayed:
                 return self.codes.detailed.ia_refuted_and_db_overlayed
@@ -332,3 +395,5 @@ class thresholds:
     min_uni_db_overlay_frac: float
     min_confidence_refutation: float
     min_frac_refutation: float
+    min_entropy_uncertainty: float
+    min_frac_entropy_uncertain: float

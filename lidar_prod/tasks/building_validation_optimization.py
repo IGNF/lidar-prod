@@ -12,7 +12,11 @@ from tqdm import tqdm
 import os.path as osp
 import laspy
 
-from lidar_prod.tasks.building_validation import BuildingValidator, thresholds
+from lidar_prod.tasks.building_validation import (
+    BuildingValidator,
+    BuildingValidationClusterInfo,
+    thresholds,
+)
 from lidar_prod.tasks.utils import split_idx_by_dim
 
 log = logging.getLogger(__name__)
@@ -20,15 +24,6 @@ log = logging.getLogger(__name__)
 
 def constraints_func(trial):
     return trial.user_attrs["constraint"]
-
-
-@dataclass
-class BuildngValidationClusterInfo:
-    """Minimal candidate building point-cluster data to make a validation"""
-
-    probabilities: np.ndarray
-    overlays: np.ndarray
-    target: int
 
 
 class BuildingValidationOptimizer:
@@ -137,12 +132,7 @@ class BuildingValidationOptimizer:
         self.bv._set_thresholds_from_pickle(
             self.paths.building_validation_thresholds_pickle
         )
-        decisions = np.array(
-            [
-                self.bv._make_group_decision(c.probabilities, c.overlays)
-                for c in clusters
-            ]
-        )
+        decisions = np.array([self.bv._make_group_decision(c) for c in clusters])
         mts_gt = np.array([c.target for c in clusters])
         metrics_dict = self.__evaluate_decisions(mts_gt, decisions)
         log.info(f"\n Results:\n{self.__get_results_logs_str(metrics_dict)}")
@@ -167,37 +157,45 @@ class BuildingValidationOptimizer:
             self.bv.update(prep_f, out_f)
             log.info(f"Saved to {out_f}")
 
-    def __extract_clusters_from_las(self, prepared_las_path):
-        las = laspy.read(prepared_las_path)
-        cluster_id = las[
+    def __extract_clusters_from_las(
+        self, prepared_las: str
+    ) -> List[BuildingValidationClusterInfo]:
+        """Extract a cluster information object  in a prepared LAS.
+
+        Args:
+            prepared_las (str): path to LAS prepared for building validation.
+
+        Returns:
+            List[BuildingValidationClusterInfo]: cluster information for each cluster of candidate buildings
+        """
+        las = laspy.read(prepared_las)
+        dim_cluster_id = las[
             self.bv.data_format.las_dimensions.ClusterID_candidate_building
         ]
-        UNCLUSTERED = 0
-        mask = cluster_id != UNCLUSTERED
-        no_cluster = mask.sum() == 0
-        if no_cluster:
-            return []
-        cluster_id = cluster_id[mask]
-        classification = las[self.bv.data_format.las_dimensions.classification][mask]
-        uni_db_overlay = las[self.bv.data_format.las_dimensions.uni_db_overlay][mask]
-        ai_probas = las[self.bv.data_format.las_dimensions.ai_building_proba][mask]
-
+        dim_classification = las[self.bv.data_format.las_dimensions.classification]
+        split_idx = split_idx_by_dim(dim_cluster_id)
+        START_IDX_OF_CLUSTERS = 1
+        split_idx = split_idx[
+            START_IDX_OF_CLUSTERS:
+        ]  # removes unclustered group that have ClusterID = 0
         clusters = []
-        split_idx = split_idx_by_dim(cluster_id)
         for pts_idx in tqdm(
-            split_idx, desc="Aggregating group-level information...", unit="clusters"
+            split_idx, desc="Extract cluster info from LAS", unit="clusters"
         ):
-            probabilities = ai_probas[pts_idx]
-            overlays = uni_db_overlay[pts_idx]
-            target = self.__define_MTS_ground_truth_flag(classification[pts_idx])
-            clusters += [BuildngValidationClusterInfo(probabilities, overlays, target)]
+            infos: BuildingValidationClusterInfo = self.bv._extract_cluster_info_by_idx(
+                las, pts_idx
+            )
+            infos.target = self._define_MTS_ground_truth_flag(
+                dim_classification[pts_idx]
+            )
+            clusters += [infos]
         return clusters
 
-    def __define_MTS_ground_truth_flag(self, group_classification):
+    def _define_MTS_ground_truth_flag(self, targets) -> int:
         """Based on the fraction of confirmed building points, set the nature of the shape or declare an ambiguous case"""
         tp_frac = np.mean(
             np.isin(
-                group_classification,
+                targets,
                 self.labels_from_20211001_building_val.codes.true_positives,
             )
         )
@@ -218,7 +216,7 @@ class BuildingValidationOptimizer:
             penalty += self.design.constraints.min_automation_constraint - auto
         return [penalty]
 
-    def _objective(self, trial, clusters: List[BuildngValidationClusterInfo] = None):
+    def _objective(self, trial, clusters: List[BuildingValidationClusterInfo] = None):
         """Objective function for optuna optimization.
         Use prepared list to access group-level probas and targets.
 
@@ -246,17 +244,19 @@ class BuildingValidationOptimizer:
             "min_frac_confirmation_factor_if_bd_uni_overlay": trial.suggest_float(
                 "min_frac_confirmation_factor_if_bd_uni_overlay", 0.5, 1.0
             ),
+            "min_entropy_uncertainty": trial.suggest_float(
+                "min_entropy_uncertainty", 0.5, 1.0
+            ),
+            "min_frac_entropy_uncertain": trial.suggest_float(
+                "min_frac_entropy_uncertain", 0.33, 1.0
+            ),
         }
         self.bv.thresholds = thresholds(**params)
-        decisions = np.array(
-            [
-                self.bv._make_group_decision(c.probabilities, c.overlays)
-                for c in clusters
-            ]
-        )
+        decisions = np.array([self.bv._make_group_decision(c) for c in clusters])
         mts_gt = np.array([c.target for c in clusters])
         metrics_dict = self.__evaluate_decisions(mts_gt, decisions)
 
+        # WARNING: order should always be automation, precision, recall
         values = (
             metrics_dict[self.design.metrics.proportion_of_automated_decisions],
             metrics_dict[self.design.metrics.precision],

@@ -5,8 +5,9 @@ crs: 2154
 # Those names connect the logics between successive tasks
 las_dimensions:
   # input
-  classification: classification  #las format
+  classification: classification  # las format
   ai_building_proba: building  # user-defined - output by deep learning model
+  entropy: entropy # user-defined - output by deep learning model
 
   # intermediary channels
   cluster_id: ClusterID  # pdal-defined -> created by clustering operations
@@ -23,10 +24,11 @@ codes:
   building:
     candidates: [202]  # found by rules-based classification (TerraScan)
     detailed:  # used for detailed output when doing threshold optimization
+      unsure_by_entropy: 200 # unsure (based on entropy)
       unclustered: 202  # refuted
       ia_refuted: 110  # refuted
       ia_refuted_and_db_overlayed: 111  # unsure
-      both_unsure: 112  # unsure
+      both_unsure: 112  # unsure (elsewise)
       ia_confirmed_only: 113  # confirmed
       db_overlayed_only: 114  # confirmed
       both_confirmed: 115  # confirmed
