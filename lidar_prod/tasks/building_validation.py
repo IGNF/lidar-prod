@@ -77,7 +77,7 @@ class BuildingValidator:
         self.detailed_to_final = {
             self.codes.detailed.unclustered: self.codes.final.not_building,
             self.codes.detailed.ia_refuted: self.codes.final.not_building,
-            self.codes.detailed.ia_refuted_and_db_overlayed: self.codes.final.unsure,
+            self.codes.detailed.ia_refuted_but_under_db_uni: self.codes.final.unsure,
             self.codes.detailed.both_unsure: self.codes.final.unsure,
             self.codes.detailed.unsure_by_entropy: self.codes.final.unsure,
             self.codes.detailed.ia_confirmed_only: self.codes.final.building,
@@ -318,7 +318,7 @@ class BuildingValidator:
             return self.codes.detailed.unsure_by_entropy
         if ia_refuted:
             if uni_overlayed:
-                return self.codes.detailed.ia_refuted_and_db_overlayed
+                return self.codes.detailed.ia_refuted_but_under_db_uni
             return self.codes.detailed.ia_refuted
         if ia_confirmed:
             if uni_overlayed:
