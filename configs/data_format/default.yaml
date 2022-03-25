@@ -27,7 +27,7 @@ codes:
       unsure_by_entropy: 200 # unsure (based on entropy)
       unclustered: 202  # refuted
       ia_refuted: 110  # refuted
-      ia_refuted_and_db_overlayed: 111  # unsure
+      ia_refuted_but_under_db_uni: 111  # unsure
       both_unsure: 112  # unsure (elsewise)
       ia_confirmed_only: 113  # confirmed
       db_overlayed_only: 114  # confirmed
