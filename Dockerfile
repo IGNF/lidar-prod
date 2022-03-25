@@ -39,16 +39,11 @@ RUN echo "Make sure pdal is installed:"
 RUN python -c "import pdal"
 
 # the entrypoint garanty that all command will be runned in the conda environment
-ENTRYPOINT ["conda",                \   
-    "run",                  \
-    "-n",                   \
-    "lidar_prod"]
+ENTRYPOINT ["conda", "run", "-n", "lidar_prod"]
 
 # cmd for a normal run (non evaluate)
-CMD        ["python",               \
-    "lidar_prod/run.py",    \
+CMD  ["python", \
+    "lidar_prod/run.py", \
     "print_config=true",    \
-    "paths.src_las=/CICD_github_assets/M8.0/20220204_building_val_V0.0_model/subsets/871000_6617000_subset_with_probas.las", \
-    "paths.output_dir=/CICD_github_assets/app/", \
-    "data_format.codes.building.candidates=[202]", \
-    "building_validation.application.building_validation_thresholds_pickle=/CICD_github_assets/M8.3B2V0.0/optimized_thresholds.pickle"]
+    "paths.src_las=your_las.las", \
+    "paths.output_dir=./path/to/outputs/"]

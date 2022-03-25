@@ -312,8 +312,6 @@ class BuildingValidator:
             np.mean(infos.overlays) >= self.thresholds.min_uni_db_overlay_frac
         )
 
-        # TODO: decide if entropy is leveraged after refutation, which would be equivalent to saying
-        # that high entropy always translates refutation. This could be risky.
         if high_entropy:
             return self.codes.detailed.unsure_by_entropy
         if ia_refuted:
