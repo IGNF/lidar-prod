@@ -86,7 +86,12 @@ class BuildingIdentifier:
         )
 
         pipeline |= pdal.Writer(
-            type="writers.las", filename=out_f, forward="all", extra_dims="all"
+            type="writers.las",
+            filename=out_f,
+            forward="all",
+            extra_dims="all",
+            minor_version=4,
+            dataformat_id=8,
         )
         os.makedirs(osp.dirname(out_f), exist_ok=True)
         pipeline.execute()

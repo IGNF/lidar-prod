@@ -6,19 +6,35 @@ crs: 2154
 las_dimensions:
   # input
   classification: classification  # las format
+
+  # Extra dims
+  # ATTENTION: If extra dimensions are added, you may want to add them in cleaning.in parameter as well.
   ai_building_proba: building  # user-defined - output by deep learning model
   entropy: entropy # user-defined - output by deep learning model
 
-  # intermediary channels
+  # Intermediary channels
   cluster_id: ClusterID  # pdal-defined -> created by clustering operations
   uni_db_overlay: BDTopoOverlay  # user-defined -> a 0/1 flag for presence of a BDUni vector
   candidate_buildings_flag: F_CandidateB # -> a 0/1 flag identifying candidate buildings found by rules-based classification  
   ClusterID_candidate_building: CID_CandidateB  # -> Cluster index from BuildingValidator, 0 if no cluster, 1-n elsewise
   ClusterID_isolated_plus_confirmed: CID_IsolatedOrConfirmed  # -> Cluster index from BuildingCompletor, 0 if no cluster, 1-n elsewise
 
-
-  # additionnal output channel
+  # Additionnal output channel
   ai_building_identified: Group
+
+cleaning:
+  input:
+    _target_: lidar_prod.tasks.cleaning.Cleaner
+    extra_dims:
+      - "${data_format.las_dimensions.ai_building_proba}=float"
+      - "${data_format.las_dimensions.entropy}=float"
+  output:
+    # Extra dims that are kept when cleaning dimensions
+    # You can override with "all" to keep all extra dimensions at development time.
+    _target_: lidar_prod.tasks.cleaning.Cleaner
+    extra_dims:
+      - "${data_format.las_dimensions.ai_building_identified}=uint"
+      - "${data_format.las_dimensions.ai_building_proba}=float"
 
 codes:
   building:
@@ -36,6 +52,3 @@ codes:
       unsure: 214  # unsure
       not_building: 208  # refuted
       building: 6  # confirmed
-
-defaults:
-  - cleaning: default.yaml

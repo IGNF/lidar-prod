@@ -29,23 +29,31 @@ def apply(config: DictConfig):
 
     """
     assert os.path.exists(config.paths.src_las)
-    in_f = config.paths.src_las
-    out_f = osp.join(config.paths.output_dir, osp.basename(in_f))
+    IN_F = config.paths.src_las
+    OUF_F = osp.join(config.paths.output_dir, osp.basename(IN_F))
 
     with TemporaryDirectory() as td:
         # Temporary LAS file for intermediary results.
-        temp_f = osp.join(td, osp.basename(in_f))
+        temp_f = osp.join(td, osp.basename(IN_F))
 
+        # Removes unnecessary input dimensions to reduce memory usage
+        cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.input)
+        cl.run(IN_F, temp_f)
+
+        # Validate buildings (unsure/confirmed/refuted) on a per-group basis.
         bv: BuildingValidator = hydra.utils.instantiate(
             config.building_validation.application
         )
-        bv.run(in_f, temp_f)
+        bv.run(temp_f, temp_f)
 
+        # Complete buildings with non-candidates that were nevertheless confirmed
         bc: BuildingCompletor = hydra.utils.instantiate(config.building_completion)
         bc.run(temp_f, temp_f)
 
+        # Define groups of confirmed building points among non-candidates
         bi: BuildingIdentifier = hydra.utils.instantiate(config.building_identification)
         bi.run(temp_f, temp_f)
 
-        cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning)
-        cl.run(temp_f, out_f)
+        # Remove unnecessary intermediary dimensions
+        cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.output)
+        cl.run(temp_f, OUF_F)

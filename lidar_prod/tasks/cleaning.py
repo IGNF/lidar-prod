@@ -7,10 +7,10 @@ log = logging.getLogger(__name__)
 
 
 class Cleaner:
-    """Discard unnecessary extra dimensions channels."""
+    """Keep only necessary extra dimensions channels."""
 
-    def __init__(self, keep_extra_dims):
-        self.keep_extra_dims = ",".join(keep_extra_dims)
+    def __init__(self, extra_dims):
+        self.extra_dims = ",".join(extra_dims)
 
     def run(self, in_f: str, out_f: str):
         self.setup(out_f)
@@ -28,7 +28,11 @@ class Cleaner:
         pipeline = pdal.Pipeline()
         pipeline |= pdal.Reader(in_f, type="readers.las")
         pipeline |= pdal.Writer.las(
-            filename=out_f, forward="all", extra_dims=self.keep_extra_dims
+            filename=out_f,
+            forward="all",
+            extra_dims=self.extra_dims,
+            minor_version=4,
+            dataformat_id=8,
         )
         pipeline.execute()
         log.info(f"Saved to {out_f}")
