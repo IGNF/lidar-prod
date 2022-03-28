@@ -35,15 +35,21 @@ Goal: Confirm or refute groups of candidate building points when possible, mark 
 
 1) Clustering of _candidate buildings points_ into connected components.
 2) Point-level decision
-    1) Decision at the point-level based on probabilities : `confirmed` if p>=`C1` /  `refuted` if (1-p)>=`R1`
-    2) Identification of points that are `overlayed` by a building vector from the database.
+   1) Identification of points with ambiguous probability: `high entropy` if entropy $\geq$ E1 
+   2) Identification of points that are `overlayed` by a building vector from the database.
+   3) Decision at the point-level based on probabilities : 
+      1) `confirmed` if:
+         1) p$\geq$`C1`, or
+         2) `overlayed` and p$\geq$ (`C1` * `Cr`), where `Cr` is a relaxation factor that reduces the confidence we require to confirm when a point overlayed by a building vector. 
+      2) `refuted` if (1-p)$\geq$`R1`
 3) Group-level decision :
-    1) Confirmation: if proportion of `confirmed` points >= `C2` OR if proportion of `overlayed` points >= `O1`
-    2) Refutation: if proportion of `refuted` points >= `R2` AND proportion of `overlayed` points < `O1`
-    3) Uncertainty: elsewise.
+    1) Uncertain due to high entropy: if proportion of `high entropy` points $\geq$ `E2`
+    2) Confirmation: if proportion of `confirmed` points $\geq$ `C2` OR if proportion of `overlayed` points $\geq$ `O1`
+    3) Refutation: if proportion of `refuted` points $\geq$ `R2` AND proportion of `overlayed` points < `O1`
+    4) Uncertainty: elsewise (this is a safeguard: uncertain groups are supposed to be already captured via their entropy)
 4) Update of the point cloud classification
 
-Decision thresholds `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a multi-objective hyperparameter optimization that aims to maximize automation, precision, and recall of the decisions. Right now we have automation=90%, precision=98%, recall=98% on a validation dataset. Illustration comes from older version.
+Decision thresholds `E1`, `E2` , `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a multi-objective hyperparameter optimization that aims to maximize automation, precision, and recall of the decisions. Right now we have automation=91%, precision=98.5%, recall=98.1% on a validation dataset. Illustration comes from older version.
 
 ![](assets/img/LidarBati-BuildingValidationM7.1V2.0.png)
 
@@ -51,7 +57,7 @@ Decision thresholds `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a multi-objectiv
 
 Goal: Confirm points that were too isolated to make up a group but have high-enough probability nevertheless (e.g. walls)
 
-Identify  _candidate buildings points_ that have not been clustered in previous step due AND have high enough probability (p>=0.5)).
+Among  _candidate buildings points_ that have not been clustered in previous step due, identify those which nevertheless meet the requirement to be `confirmed`.
 Cluster them together with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
 For each cluster, if some points were confirmed, the others are considered to belong to the same building, and are 
 therefore confirmed as well.
@@ -63,7 +69,9 @@ therefore confirmed as well.
 
 Goal: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection. 
 
-Clustering of points that have a probability of beind a building p>=`C1` AND are **not** _candidate buildings points_. This clustering defines a LAS extra dimensions (default name `Group`).
+Among points that were **not** _candidate buildings points_ identify those which meet the requirement to be `confirmed`, and cluster them.
+
+This clustering defines a LAS extra dimensions (`Group`) which indexes newly found cluster that may be some missed buildings.
 
 ![](assets/img/LidarBati-BuildingIdentification.png)
 
@@ -100,7 +108,7 @@ To run the module from anywhere, you can install as a package in a your virtual 
 conda activate lidar_prod
 
 # install the package
-pip install --upgrade https://github.com/IGNF/lidar-prod-quality-control/tarball/main  # from github directly
+pip install --upgrade https://github.com/IGNF/lidar-prod-quality-control/tarball/prod  # from github directly, using production branch
 pip install -e .  # from local sources
 ```
 
@@ -153,7 +161,7 @@ conda activate lidar_prod
 python lidar_prod/run.py +task=optimize building_validation.optimization.todo='prepare+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
 ```
 
-### CICD, Releases and versions
+### CICD and versions
 
 New features are staged in the `dev` branch, and CICD workflow is run when a pull requets to merge is created.
 In Actions, check the output of a full evaluation on a single LAS to spot potential regression. The app is also run 
@@ -161,5 +169,4 @@ on a subset of a LAS, which can be visually inspected before merging - there can
 
 Package version follows semantic versionning conventions and is defined in `setup.py`. 
 
-Releases are generated when new high-level functionnality are implemented (e.g. a new step in the production process) or
-when key parameters are changed. Generally speaking, the latest release `Vx.y.z` is the one to use in production. 
+Releases are generated when new high-level functionnality are implemented (e.g. a new step in the production process), with a documentation role. Production-ready code is fast-forwarded in the `prod` branch when needed. 
