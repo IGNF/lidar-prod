@@ -37,7 +37,7 @@ SHELL ["conda", "run", "-n", "lidar_prod", "/bin/bash", "-c"]
 RUN echo "Make sure pdal is installed:"
 RUN python -c "import pdal"
 
-# the entrypoint garanty that all command will be runned in the conda environment
+# the entrypoint garanties that all command will be runned in the conda environment
 ENTRYPOINT ["conda", \
     "run", \
     "-n", \

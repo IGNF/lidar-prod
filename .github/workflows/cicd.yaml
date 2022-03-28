@@ -26,20 +26,27 @@ jobs:
 
     - name: Full module run on LAS subset
       run: >
-        docker run -v /var/data/cicd/CICD_github_assets:/CICD_github_assets lidar_prod_im
+        docker run 
+        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/ lidar_prod_im
+        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/ lidar_prod_im
         python lidar_prod/run.py
         print_config=true
-        paths.src_las=/CICD_github_assets/M8.4/inputs/730000_6360000.subset.prototype_format202.las
-        paths.output_dir=/CICD_github_assets/M8.4/outputs/
+        paths.src_las=/inputs/730000_6360000.subset.prototype_format202.las
+        paths.output_dir=/outputs/
 
-    - name: Evaluate decisions using optimization code on a single, corrected LAS 
+    - name: Evaluate decisions using optimization task (debug mode, on a single, corrected LAS) 
       run: >
-        docker run -v /var/data/cicd/CICD_github_assets:/CICD_github_assets lidar_prod_im
-        python lidar_prod/run.py print_config=true +task='optimize'
+        docker run 
+        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/inputs/ lidar_prod_im
+        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/ lidar_prod_im
+        python lidar_prod/run.py 
+        print_config=true 
+        +task='optimize'
         +building_validation.optimization.debug=true
         building_validation.optimization.todo='prepare+evaluate+update'
-        building_validation.optimization.paths.input_las_dir=/CICD_github_assets/M8.4/inputs/evaluation/
-        building_validation.optimization.paths.results_output_dir=/CICD_github_assets/outputs/evaluation/
+        building_validation.optimization.paths.input_las_dir=/inputs/
+        building_validation.optimization.paths.results_output_dir=/outputs/evaluation/
+        building_validation.optimization.paths.building_validation_thresholds_pickle=/inputs/optimized_thresholds.pickle
 
     - name: clean the server for further uses
       if: always()  # always do it, even if something failed
