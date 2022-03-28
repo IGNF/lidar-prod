@@ -38,14 +38,14 @@ jobs:
       run: >
         docker run 
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/inputs/ lidar_prod_im
-        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/ lidar_prod_im
+        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/evaluation/:/outputs/ lidar_prod_im
         python lidar_prod/run.py 
         print_config=true 
         +task='optimize'
         +building_validation.optimization.debug=true
         building_validation.optimization.todo='prepare+evaluate+update'
         building_validation.optimization.paths.input_las_dir=/inputs/
-        building_validation.optimization.paths.results_output_dir=/outputs/evaluation/
+        building_validation.optimization.paths.results_output_dir=/outputs/
         building_validation.optimization.paths.building_validation_thresholds_pickle=/inputs/optimized_thresholds.pickle
 
     - name: clean the server for further uses
