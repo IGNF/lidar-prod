@@ -14,7 +14,6 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     wget                        \
     git                         \
     postgis                     \
-    pdal                        \
     libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6   # package needed for anaconda
 
 # install anaconda
@@ -39,7 +38,10 @@ RUN echo "Make sure pdal is installed:"
 RUN python -c "import pdal"
 
 # the entrypoint garanty that all command will be runned in the conda environment
-ENTRYPOINT ["conda", "run", "-n", "lidar_prod"]
+ENTRYPOINT ["conda", \
+    "run", \
+    "-n", \
+    "lidar_prod"]
 
 # cmd for a normal run (non evaluate)
 CMD  ["python", \
