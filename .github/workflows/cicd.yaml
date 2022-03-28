@@ -25,17 +25,28 @@ jobs:
       run: docker run lidar_prod_im pytest --ignore=actions-runner --ignore="notebooks"
 
     - name: Full module run on LAS subset
-      run: docker run -v /var/data/cicd/CICD_github_assets:/CICD_github_assets lidar_prod_im 
-
-    - name: Evaluate decisions using optimization code on a single, corrected LAS 
       run: >
-        docker run -v /var/data/cicd/CICD_github_assets:/CICD_github_assets lidar_prod_im
-        python lidar_prod/run.py print_config=true +task='optimize'
+        docker run 
+        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
+        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/ lidar_prod_im
+        python lidar_prod/run.py
+        print_config=true
+        paths.src_las=/inputs/730000_6360000.subset.prototype_format202.las
+        paths.output_dir=/outputs/
+
+    - name: Evaluate decisions using optimization task (debug mode, on a single, corrected LAS) 
+      run: >
+        docker run 
+        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/inputs/
+        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/evaluation/:/outputs/ lidar_prod_im
+        python lidar_prod/run.py 
+        print_config=true 
+        +task='optimize'
         +building_validation.optimization.debug=true
         building_validation.optimization.todo='prepare+evaluate+update'
-        building_validation.optimization.paths.input_las_dir=/CICD_github_assets/M8.0/20220204_building_val_V0.0_model/20211001_buiding_val_val/
-        building_validation.optimization.paths.results_output_dir=/CICD_github_assets/opti/
-        building_validation.optimization.paths.building_validation_thresholds_pickle=/CICD_github_assets/M8.3B2V0.0/optimized_thresholds.pickle
+        building_validation.optimization.paths.input_las_dir=/inputs/
+        building_validation.optimization.paths.results_output_dir=/outputs/
+        building_validation.optimization.paths.building_validation_thresholds_pickle=/inputs/optimized_thresholds.pickle
 
     - name: clean the server for further uses
       if: always()  # always do it, even if something failed
