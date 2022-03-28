@@ -29,7 +29,7 @@ jobs:
         docker run -v /var/data/cicd/CICD_github_assets:/CICD_github_assets lidar_prod_im
         python lidar_prod/run.py
         print_config=true
-        paths.src_las=/CICD_github_assets/M8.4/inputs/871000_6617000_subset_with_probas.las
+        paths.src_las=/CICD_github_assets/M8.4/inputs/730000_6360000.subset.prototype_format202.las
         paths.output_dir=/CICD_github_assets/M8.4/outputs/
 
     - name: Evaluate decisions using optimization code on a single, corrected LAS 
