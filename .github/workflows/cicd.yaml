@@ -38,8 +38,8 @@ jobs:
         python lidar_prod/run.py print_config=true +task='optimize'
         +building_validation.optimization.debug=true
         building_validation.optimization.todo='prepare+evaluate+update'
-        building_validation.optimization.paths.input_las_dir=/CICD_github_assets/M8.4/inputs_evaluation/
-        building_validation.optimization.paths.results_output_dir=/CICD_github_assets/outputs_evaluation/
+        building_validation.optimization.paths.input_las_dir=/CICD_github_assets/M8.4/inputs/evaluation/
+        building_validation.optimization.paths.results_output_dir=/CICD_github_assets/outputs/evaluation/
 
     - name: clean the server for further uses
       if: always()  # always do it, even if something failed
