@@ -216,9 +216,9 @@ class BuildingValidator:
         # TODO: check if this can be moved somewhere else. WARNING: use_final_classification_codes may be modified in
         # an unsafe manner during optimization. Consider using a setter that will change decision_func alongside.
 
-        decision_func = self._make_group_decision
+        decision_func = self._make_detailed_group_decision
         if self.use_final_classification_codes:
-            decision_func = self._make_detailed_group_decision
+            decision_func = self._make_group_decision
 
         split_idx = split_idx_by_dim(
             las[self.data_format.las_dimensions.ClusterID_candidate_building]
