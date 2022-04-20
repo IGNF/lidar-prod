@@ -20,6 +20,7 @@ class BuildingCompletor:
     - We perform vertical (XY) clustering including these points as well as confirmed buildings.
     - In the resulting groups, if there are some confirmed buildings, previously isolated points are
     considered to be parts of the same building and their class is updated accordingly.
+
     """
 
     def __init__(
