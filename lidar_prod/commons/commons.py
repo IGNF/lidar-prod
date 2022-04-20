@@ -17,7 +17,9 @@ def extras(config: DictConfig):
         print_config(config, resolve=True)
 
 
-def print_config(config: DictConfig, resolve: bool = True) -> None:
+def print_config(
+    config: DictConfig, resolve: bool = True, out_f: str = "config_tree.txt"
+) -> None:
     """Prints content of DictConfig using Rich library and its tree structure.
 
     Args:
@@ -25,6 +27,8 @@ def print_config(config: DictConfig, resolve: bool = True) -> None:
         fields (Sequence[str], optional): Determines which main fields from config will
         be printed and in what order.
         resolve (bool, optional): Whether to resolve reference fields of DictConfig.
+        out_f (str, optional): where to save the printed config.
+
     """
 
     style = "dim"
@@ -42,7 +46,7 @@ def print_config(config: DictConfig, resolve: bool = True) -> None:
 
     rich.print(tree)
 
-    with open("config_tree.txt", "w") as fp:
+    with open(out_f, "w") as fp:
         rich.print(tree, file=fp)
 
 
