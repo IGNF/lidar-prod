@@ -13,6 +13,11 @@ from lidar_prod.commons.commons import eval_time, extras, ignore_warnings, print
 def test_extras(default_hydra_cfg):
     # Will fail since hydra default config cannot be resolved
     # This is done to ensure coverage
+    default_hydra_cfg.ignore_warnings = False
+    default_hydra_cfg.print_config = False
+    extras(default_hydra_cfg)
+    default_hydra_cfg.ignore_warnings = True
+    default_hydra_cfg.print_config = True
     extras(default_hydra_cfg)
 
 
