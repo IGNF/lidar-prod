@@ -2,7 +2,6 @@ import logging
 import os
 import tempfile
 import time
-from hydra.experimental import compose, initialize
 
 from lidar_prod.commons.commons import eval_time, print_config
 
@@ -20,16 +19,12 @@ def test_eval_time(caplog):
         assert caplog.records[-1].message.endswith(f"{d}s")
 
 
-def test_file_existence():
+def test_file_existence(default_hydra_cfg):
     with tempfile.TemporaryDirectory() as td:
         out_f = os.path.join(td, "config_tree.txt")
-        with initialize(
-            config_path=os.path.join("./../../../", "configs/"), job_name="config"
-        ):
-            cfg = compose(config_name="config")
-            print_config(
-                cfg,
-                resolve=False,
-                out_f=out_f,
-            )
-            assert os.path.exists(out_f)
+        print_config(
+            default_hydra_cfg,
+            resolve=False,
+            out_f=out_f,
+        )
+        assert os.path.exists(out_f)
