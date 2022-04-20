@@ -9,7 +9,7 @@ def main(config: DictConfig):
 
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934
-    from lidar_prod.utils.utils import extras
+    from lidar_prod.commons.commons import extras
     from lidar_prod.application import apply
     from lidar_prod.optimization import optimize
 

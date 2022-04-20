@@ -1,14 +1,14 @@
 import logging
+from typing import Callable
 import warnings
 import time
-from typing import List, Sequence
 
 import rich.syntax
 import rich.tree
 from omegaconf import DictConfig, OmegaConf
 
 
-def extras(config):
+def extras(config: DictConfig):
     log = logging.getLogger(__name__)
     if config.ignore_warnings:
         log.debug("Disabling python warnings! <config.ignore_warnings=True>")
@@ -17,10 +17,7 @@ def extras(config):
         print_config(config, resolve=True)
 
 
-def print_config(
-    config: DictConfig,
-    resolve: bool = True,
-) -> None:
+def print_config(config: DictConfig, resolve: bool = True) -> None:
     """Prints content of DictConfig using Rich library and its tree structure.
 
     Args:
@@ -49,16 +46,16 @@ def print_config(
         rich.print(tree, file=fp)
 
 
-def eval_time(method):
+def eval_time(function: Callable):
     """decorator to log the duration of the decorated method"""
 
     def timed(*args, **kwargs):
         log = logging.getLogger(__name__)
         time_start = time.time()
-        result = method(*args, **kwargs)
+        result = function(*args, **kwargs)
         time_elapsed = round(time.time() - time_start, 2)
 
-        log.info(f"Processing time of {method.__name__}: {time_elapsed}s")
+        log.info(f"Processing time of {function.__name__}: {time_elapsed}s")
         return result
 
     return timed

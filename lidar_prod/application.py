@@ -8,7 +8,7 @@ from typing import Optional
 from lidar_prod.tasks.building_completion import BuildingCompletor
 from lidar_prod.tasks.cleaning import Cleaner
 
-from lidar_prod.utils import utils
+from lidar_prod.commons import commons
 from lidar_prod.tasks.building_validation import BuildingValidator
 from lidar_prod.tasks.building_identification import BuildingIdentifier
 
@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 # TODO: intermediary out_f should be in a tempr dir instead to avoid unfinised business
 
 
-@utils.eval_time
+@commons.eval_time
 def apply(config: DictConfig):
     """
     Augment rule-based classification of a point cloud with deep learning
