@@ -12,9 +12,13 @@ def extras(config: DictConfig):
     log = logging.getLogger(__name__)
     if config.ignore_warnings:
         log.debug("Disabling python warnings! <config.ignore_warnings=True>")
-        warnings.filterwarnings("ignore")
+        ignore_warnings()
     if config.print_config:
-        print_config(config, resolve=True)
+        print_config(config)
+
+
+def ignore_warnings():
+    warnings.filterwarnings("ignore")
 
 
 def print_config(
@@ -24,8 +28,6 @@ def print_config(
 
     Args:
         config (DictConfig): Configuration composed by Hydra.
-        fields (Sequence[str], optional): Determines which main fields from config will
-        be printed and in what order.
         resolve (bool, optional): Whether to resolve reference fields of DictConfig.
         out_f (str, optional): where to save the printed config.
 
