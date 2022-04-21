@@ -1,7 +1,6 @@
 import logging
 import hydra
 from omegaconf import DictConfig
-from typing import Optional
 from lidar_prod.tasks.building_validation_optimization import (
     BuildingValidationOptimizer,
 )

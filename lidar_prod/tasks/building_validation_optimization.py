@@ -83,10 +83,12 @@ class BuildingValidationOptimizer:
             for f in self.las_filepaths
         ]
 
+        # We must adapt BuildingValidator to corrected data by specifyinbg the codes to use as candidates
         self.bv.candidate_buildings_codes = (
             self.labels_from_20211001_building_val.codes.true_positives
             + self.labels_from_20211001_building_val.codes.false_positives
         )
+        # We also specify if, when updating corrected data (for inspection) we want final codes or detailed ones.
         self.bv.use_final_classification_codes = self.use_final_classification_codes
         self.design.confusion_matrix_order = [
             self.bv.codes.final.unsure,

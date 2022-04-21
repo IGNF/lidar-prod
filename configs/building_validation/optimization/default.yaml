@@ -2,7 +2,7 @@ _target_: lidar_prod.tasks.building_validation_optimization.BuildingValidationOp
 
 todo: "prepare+optimize+evaluate+update"  # for test data use prepare+evaluate+update
 
-
+# By default we update corrected data and keep etailed codes instead of final ones.
 use_final_classification_codes: false
 building_validator: ${building_validation.application}
 

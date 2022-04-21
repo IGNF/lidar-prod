@@ -15,7 +15,7 @@ from tests.conftest import (
 IN_F = "tests/files/870000_6618000.subset.postIA.las"
 
 
-def test_run_on_subset(default_hydra_cfg):
+def test_apply_on_subset(default_hydra_cfg):
     default_hydra_cfg.paths.src_las = IN_F
     # TODO: ignore the warning here.
     with tempfile.TemporaryDirectory() as td:
@@ -36,11 +36,11 @@ def test_run_on_subset(default_hydra_cfg):
         # Ensure that the final spatial reference is French CRS Lambert-93
         assert "Lambert-93" in metadata["spatialreference"]
 
-        a1 = pdal_read_las_array(out_f)
+        arr1 = pdal_read_las_array(out_f)
 
         # Check that we have 1 group of suggested building points
-        assert a1["Group"].min() == 0
-        assert a1["Group"].max() == 1
+        assert arr1["Group"].min() == 0
+        assert arr1["Group"].max() == 1
 
         # Check that we have either 1/2 (ground/unclassified), or one of the three final classification code of the module
         final_codes = default_hydra_cfg.data_format.codes.building.final
@@ -51,5 +51,5 @@ def test_run_on_subset(default_hydra_cfg):
             final_codes.not_building,
             final_codes.unsure,
         }
-        actual_codes = {*np.unique(a1["Classification"])}
+        actual_codes = {*np.unique(arr1["Classification"])}
         assert expected_codes == actual_codes

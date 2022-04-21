@@ -23,5 +23,5 @@ def main(config: DictConfig):
 
 if __name__ == "__main__":
     sys.path.append(osp.dirname(osp.dirname(__file__)))
-    OmegaConf.register_new_resolver("get_method", hydra.utils.get_method)
+    # OmegaConf.register_new_resolver("get_method", hydra.utils.get_method)
     main()
