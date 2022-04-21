@@ -1,9 +1,14 @@
 import tempfile
+import numpy as np
 import pytest
 
 from lidar_prod.application import apply
 from lidar_prod.tasks.utils import get_las_metadata
-from tests.conftest import assert_las_contains_dims, assert_las_invariance
+from tests.conftest import (
+    assert_las_contains_dims,
+    assert_las_invariance,
+    pdal_read_las_array,
+)
 
 # test a full run with no error
 
@@ -30,3 +35,21 @@ def test_run_on_subset(default_hydra_cfg):
 
         # Ensure that the final spatial reference is French CRS Lambert-93
         assert "Lambert-93" in metadata["spatialreference"]
+
+        a1 = pdal_read_las_array(out_f)
+
+        # Check that we have 1 group of suggested building points
+        assert a1["Group"].min() == 0
+        assert a1["Group"].max() == 1
+
+        # Check that we have either 1/2 (ground/unclassified), or one of the three final classification code of the module
+        final_codes = default_hydra_cfg.data_format.codes.building.final
+        expected_codes = {
+            1,
+            2,
+            final_codes.building,
+            final_codes.not_building,
+            final_codes.unsure,
+        }
+        actual_codes = {*np.unique(a1["Classification"])}
+        assert expected_codes == actual_codes
