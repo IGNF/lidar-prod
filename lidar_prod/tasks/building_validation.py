@@ -69,7 +69,7 @@ class BuildingValidator:
             )
         else:
             log.warning(
-                "Using default decision thresholds - specify "
+                "Using default decision thresholds - you may wannt to specify "
                 "'building_validation.application.building_validation_thresholds_pickle' "
                 "to use thresholds of an ad-hoc optimization step"
             )

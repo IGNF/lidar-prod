@@ -15,8 +15,6 @@ from lidar_prod.tasks.building_identification import BuildingIdentifier
 
 log = logging.getLogger(__name__)
 
-# TODO: intermediary out_f should be in a tempr dir instead to avoid unfinised business
-
 
 @commons.eval_time
 def apply(config: DictConfig):
