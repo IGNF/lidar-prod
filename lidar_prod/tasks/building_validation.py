@@ -142,9 +142,8 @@ class BuildingValidator:
         # We use a temporary directory to clean intermediary files automatically
         with TemporaryDirectory() as td:
             pipeline = pdal.Pipeline()
-            pipeline |= pdal.Reader(
+            pipeline |= pdal.Reader.las(
                 in_f,
-                type="readers.las",
                 nosrs=True,
                 override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
             )

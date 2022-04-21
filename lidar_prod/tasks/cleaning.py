@@ -39,7 +39,7 @@ class Cleaner:
 
     def update(self, in_f: str, out_f: str):
         pipeline = pdal.Pipeline()
-        pipeline |= pdal.Reader(in_f, type="readers.las")
+        pipeline |= pdal.Reader.las(in_f)
         pipeline |= pdal.Writer.las(
             filename=out_f,
             forward="all",

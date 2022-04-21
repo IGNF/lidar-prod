@@ -62,7 +62,12 @@ class BuildingIdentifier:
             out_f (str): output LAS
         """
         pipeline = pdal.Pipeline()
-        pipeline |= pdal.Reader(in_f, type="readers.las")
+        pipeline |= pdal.Reader(
+            in_f,
+            type="readers.las",
+            nosrs=True,
+            override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
+        )
         non_candidates = (
             f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
         )

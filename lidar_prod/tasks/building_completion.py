@@ -80,8 +80,8 @@ class BuildingCompletor:
         pipeline |= pdal.Reader(
             in_f,
             type="readers.las",
-            # nosrs=True,
-            # override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
+            nosrs=True,
+            override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
         )
         candidates = (
             f"({self.data_format.las_dimensions.candidate_buildings_flag} == 1)"
