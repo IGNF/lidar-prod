@@ -21,6 +21,11 @@ def assert_las_invariance(las1, las2):
         assert pytest.approx(np.mean(a2[d]), TOLERANCE) == np.mean(a1[d])
         assert pytest.approx(np.sum(a2[d]), TOLERANCE) == np.sum(a1[d])
 
+def assert_las_contains_dims(las1, dims_to_check=[]):
+    a1 = pdal_read_las_array(las1)
+    for d in dims_to_check:
+        assert d in a1.dtype.fields.keys()
+
 
 @pytest.fixture
 def default_hydra_cfg():

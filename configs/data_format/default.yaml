@@ -23,18 +23,21 @@ las_dimensions:
   ai_building_identified: Group
 
 cleaning:
+    # Extra dims that are kept when application starts. Others are removed to lighten the LAS.
   input:
     _target_: lidar_prod.tasks.cleaning.Cleaner
     extra_dims:
       - "${data_format.las_dimensions.ai_building_proba}=float"
       - "${data_format.las_dimensions.entropy}=float"
   output:
-    # Extra dims that are kept when cleaning dimensions
+    # Extra dims that are kept before final saving.
     # You can override with "all" to keep all extra dimensions at development time.
     _target_: lidar_prod.tasks.cleaning.Cleaner
     extra_dims:
-      - "${data_format.las_dimensions.ai_building_identified}=uint"
       - "${data_format.las_dimensions.ai_building_proba}=float"
+      - "${data_format.las_dimensions.entropy}=float"
+      - "${data_format.las_dimensions.ai_building_identified}=uint"
+
 
 codes:
   building:
