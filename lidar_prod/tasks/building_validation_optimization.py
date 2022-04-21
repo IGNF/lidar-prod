@@ -175,7 +175,7 @@ class BuildingValidationOptimizer:
         dim_classification = las[self.bv.data_format.las_dimensions.classification]
 
         split_idx = split_idx_by_dim(dim_cluster_id)
-        # removes unclustered group that have ClusterID = 0
+        # removes the group of unclustered points, which has ClusterID = 0
         START_IDX_OF_CLUSTERS = 1
         split_idx = split_idx[START_IDX_OF_CLUSTERS:]
         clusters = []

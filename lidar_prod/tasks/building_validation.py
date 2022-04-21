@@ -130,16 +130,18 @@ class BuildingValidator:
         `{self.data_format.las_dimensions.candidate_buildings_flag}`, to ignore them in later
         buildings identification.
 
-        Dimension classification should not be modified here, as optimization step needs unmo
+        Dimension classification should not be modified here, as optimization step needs to
+        do this step once before testing multiple decision parameters on the same prepared data.
 
         """
 
         _candidate_flag = self.data_format.las_dimensions.candidate_buildings_flag
-        _cluster_id = self.data_format.las_dimensions.cluster_id
-        _groups = self.data_format.las_dimensions.ClusterID_candidate_building
+        _cluster_id_pdal = self.data_format.las_dimensions.cluster_id
+        _cluster_id_candidates = (
+            self.data_format.las_dimensions.ClusterID_candidate_building
+        )
         _overlay = self.data_format.las_dimensions.uni_db_overlay
 
-        # We use a temporary directory to clean intermediary files automatically
         with TemporaryDirectory() as td:
             pipeline = pdal.Pipeline()
             pipeline |= pdal.Reader.las(
@@ -147,6 +149,7 @@ class BuildingValidator:
                 nosrs=True,
                 override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
             )
+            # Identify candidates buildings points with a boolean flag
             pipeline |= pdal.Filter.ferry(dimensions=f"=>{_candidate_flag}")
             _is_candidate_building = (
                 "("
@@ -159,16 +162,22 @@ class BuildingValidator:
             pipeline |= pdal.Filter.assign(
                 value=f"{_candidate_flag} = 1 WHERE {_is_candidate_building}"
             )
+            # Cluster candidates buildings points. This creates a ClusterID dimension (int)
+            # in which unclustered points have index 0.
             pipeline |= pdal.Filter.cluster(
                 min_points=self.cluster.min_points,
                 tolerance=self.cluster.tolerance,
                 where=f"{_candidate_flag} == 1",
             )
-            # Always move and reset ClusterID to avoid conflict with later tasks.
-            pipeline |= pdal.Filter.ferry(dimensions=f"{_cluster_id}=>{_groups}")
-            pipeline |= pdal.Filter.assign(value=f"{_cluster_id} = 0")
+
+            # Copy ClusterID into a new dim and reset it to 0 to avoid conflict with later tasks.
+            pipeline |= pdal.Filter.ferry(
+                dimensions=f"{_cluster_id_pdal}=>{_cluster_id_candidates}"
+            )
+            pipeline |= pdal.Filter.assign(value=f"{_cluster_id_pdal} = 0")
 
             # TODO: extract coordinates from LAS directly using pdal.
+            # Request BDUni to get a shapefile of the known buildings in the LAS
             _shp_p = os.path.join(td, "temp.shp")
             buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
                 self.bd_uni_connection_params,
@@ -182,7 +191,9 @@ class BuildingValidator:
                 _shp_p,
             )
 
-            # Channel is always created even if there are no buildings in database.
+            # Create overlay dim
+            # If there are some building in the database, create a BDTopoOverlay boolean
+            # dimension to reflect it.
             pipeline |= pdal.Filter.ferry(dimensions=f"=>{_overlay}")
             if buildings_in_bd_topo:
                 pipeline |= pdal.Filter.overlay(
@@ -203,35 +214,44 @@ class BuildingValidator:
         """Update point cloud classification channel."""
 
         las = laspy.read(prepared_f)
-        # 1) Map all points to a single class in case there was multiple codes to flag candidate buildings.
-        # TODO: perform this at preparation step.
+
+        # 1) Map all points to a single "not_building" class
+        # to be sure that they will all be modified.
 
         _clf = self.data_format.las_dimensions.classification
         _flag = self.data_format.las_dimensions.candidate_buildings_flag
-        candidates_idx = las[_flag] == 1
-        las[_clf][candidates_idx] = self.codes.detailed.unclustered
+        candidates_mask = las[_flag] == 1
+        las[_clf][candidates_mask] = self.codes.final.not_building
 
         # 2) Decide at the group-level
         # TODO: check if this can be moved somewhere else. WARNING: use_final_classification_codes may be modified in
         # an unsafe manner during optimization. Consider using a setter that will change decision_func alongside.
 
+        # Decide level of details of classification codes
         decision_func = self._make_detailed_group_decision
         if self.use_final_classification_codes:
             decision_func = self._make_group_decision
 
-        split_idx = split_idx_by_dim(
-            las[self.data_format.las_dimensions.ClusterID_candidate_building]
-        )
-        START_IDX_OF_CLUSTERS = 1
-        split_idx = split_idx[
-            START_IDX_OF_CLUSTERS:
-        ]  # removes unclustered group that have ClusterID = 0
+        # Get the index of points of each cluster
+        # Remove unclustered group that have ClusterID = 0 (i.e. the first "group")
+        cluster_id_dim = las[
+            self.data_format.las_dimensions.ClusterID_candidate_building
+        ]
+        split_idx = split_idx_by_dim(cluster_id_dim)
+        split_idx = split_idx[1:]
+
+        # Iterate over groups and update their classification
         for pts_idx in tqdm(
             split_idx, desc="Update cluster classification", unit="clusters"
         ):
             infos = self._extract_cluster_info_by_idx(las, pts_idx)
             las[_clf][pts_idx] = decision_func(infos)
 
+        # Candidate that were not clustered get their "candidate flag" set back to 0 so that they are considered
+        # in building completion/identification steps.
+        unclustered_mask = cluster_id_dim == 0
+        unclustered_candidates_mask = candidates_mask & (unclustered_mask)
+        las[_flag][unclustered_candidates_mask] = 0
         os.makedirs(osp.dirname(out_f), exist_ok=True)
         las.write(out_f)
 
