@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class BuildingValidationClusterInfo:
-    """Elements needed to either confirm, refute, or be uncertain about a cluster of cnadidate building points."""
+    """Elements needed to confirm, refute, or be uncertain about a cluster of candidate building points."""
 
     probabilities: np.ndarray
     overlays: np.ndarray
