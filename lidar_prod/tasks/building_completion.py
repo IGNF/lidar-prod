@@ -144,6 +144,10 @@ class BuildingCompletor:
         split_idx = split_idx_by_dim(las[_cid])
         # Isolated/confirmed groups have a cluster index > 0
         split_idx = split_idx[1:]
+        # For each group of isolated|confirmed points,
+        # Assess if the group already contains confirmed points.
+        # If it does, set all points to confirmed building class so that
+        # the isolated points they may contain are also confirmed.
         for pts_idx in tqdm(
             split_idx, desc="Complete buildings with isolated points", unit="grp"
         ):
