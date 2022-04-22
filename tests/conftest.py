@@ -1,4 +1,5 @@
 import os
+from typing import Any, Iterable
 import numpy as np
 import pdal
 import pytest
@@ -21,6 +22,7 @@ def assert_las_invariance(las1, las2):
         assert pytest.approx(np.mean(a2[d]), TOLERANCE) == np.mean(a1[d])
         assert pytest.approx(np.sum(a2[d]), TOLERANCE) == np.sum(a1[d])
 
+
 def assert_las_contains_dims(las1, dims_to_check=[]):
     a1 = pdal_read_las_array(las1)
     for d in dims_to_check:
@@ -38,3 +40,33 @@ def pdal_read_las_array(in_f):
     p1 = pdal.Pipeline() | pdal.Reader.las(in_f)
     p1.execute()
     return p1.arrays[0]
+
+
+# TODO: this could be used in code to avoid pdal boilerplate
+def get_a_format_preserving_pdal_pipeline(in_f: str, out_f: str, ops: Iterable[Any]):
+    """Create a pdal pipeline, preserving format, forwarding every dimension.
+
+    Args:
+        in_f (str): input LAS path
+        out_f (str): output LAS path
+        ops (Iterable[Any]): list of pdal operation (e.g. Filter.assign(...))
+
+    """
+    pipeline = pdal.Pipeline()
+    pipeline |= pdal.Reader.las(
+        filename=in_f,
+        nosrs=True,
+        override_srs="EPSG:2154",
+    )
+
+    for op in ops:
+        pipeline |= op
+
+    pipeline |= pdal.Writer.las(
+        filename=out_f,
+        forward="all",
+        extra_dims="all",
+        minor_version=4,
+        dataformat_id=8,
+    )
+    return pipeline

@@ -1,5 +1,6 @@
 import tempfile
 import numpy as np
+import pdal
 import pytest
 import shutil
 import os.path as osp
@@ -9,6 +10,7 @@ from lidar_prod.tasks.utils import get_las_metadata
 from tests.conftest import (
     assert_las_contains_dims,
     assert_las_invariance,
+    get_a_format_preserving_pdal_pipeline,
     pdal_read_las_array,
 )
 
@@ -29,8 +31,22 @@ def las_identity(in_f: str):
     return isolated_f_copy
 
 
-@pytest.mark.parametrize("las_prior_transformation", [las_identity])
-def test_apply_on_subset(default_hydra_cfg, las_prior_transformation):
+def las_nullify_classification_dim(in_f: str):
+    """Set Classification to 0 for all points.
+
+    Args:
+        in_f (str): input LAS path
+    """
+    # TODO: WARNING: this will not work until get_bbox is used !!
+    isolated_f_copy = tempfile.NamedTemporaryFile().name
+    ops = [pdal.Filter.assign(value=f"Classification = 0")]
+    pipeline = get_a_format_preserving_pdal_pipeline(in_f, isolated_f_copy, ops)
+    pipeline.execute()
+    return isolated_f_copy
+
+
+@pytest.mark.parametrize("las_mutation", [las_nullify_classification_dim, las_identity])
+def test_apply_on_subset(default_hydra_cfg, las_mutation):
     # Expected classification codes after application run.
     _fc = default_hydra_cfg.data_format.codes.building.final
     expected_codes = {
@@ -41,9 +57,9 @@ def test_apply_on_subset(default_hydra_cfg, las_prior_transformation):
         _fc.unsure,
     }
     # Run application on the input data
-    default_hydra_cfg.paths.src_las = IN_F
     with tempfile.TemporaryDirectory() as default_hydra_cfg.paths.output_dir:
-        in_f_isolated_copy = las_prior_transformation(IN_F)
+        in_f_isolated_copy = las_mutation(IN_F)
+        default_hydra_cfg.paths.src_las = in_f_isolated_copy
         out_f = apply(default_hydra_cfg)
         assert_las_invariance(in_f_isolated_copy, out_f)
         assert_format_of_application_output_las(out_f, expected_codes)

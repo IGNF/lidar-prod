@@ -1,18 +1,15 @@
 import os
-from typing import Any, Iterable
 import hydra
 import numpy as np
 
 import pdal
-from lidar_prod.optimization import optimize
-import shutil
 import os.path as osp
 import tempfile
 
 from lidar_prod.tasks.building_validation_optimization import (
     BuildingValidationOptimizer,
 )
-from tests.conftest import pdal_read_las_array
+from tests.conftest import get_a_format_preserving_pdal_pipeline, pdal_read_las_array
 
 
 IN_F = "tests/files/870000_6618000.subset.postIA.las"
@@ -28,7 +25,7 @@ def test_optimize_on_subset(default_hydra_cfg):
         # We copy it into Classification channel to use it in this test.
         ops = [pdal.Filter.assign(value=f"Classification = ClassificationCorrected")]
         in_f_isolated_copy = osp.join(td, osp.basename(IN_F))
-        pipeline = get_pdal_format_preserving_pipeline(IN_F, in_f_isolated_copy, ops)
+        pipeline = get_a_format_preserving_pdal_pipeline(IN_F, in_f_isolated_copy, ops)
         pipeline.execute()
 
         default_hydra_cfg.building_validation.optimization.paths.input_las_dir = td
@@ -67,33 +64,6 @@ def test_optimize_on_subset(default_hydra_cfg):
         expected_codes = {1, 2, final_codes.building, final_codes.not_building}
         actual_codes = {*np.unique(arr["Classification"])}
         assert expected_codes == actual_codes
-
-
-def get_pdal_format_preserving_pipeline(in_f: str, out_f: str, ops: Iterable[Any]):
-    """Create a pdal pipeline, preserving format, forwarding every dimension.
-
-    Args:
-        in_f (str): input LAS path
-        out_f (str): output LAS path
-        ops (Iterable[Any]): list of pdal operation (e.g. Filter.assign(...))
-
-    """
-    pipeline = pdal.Pipeline()
-    pipeline |= pdal.Reader.las(
-        filename=in_f,
-        nosrs=True,
-        override_srs="EPSG:2154",
-    )
-    for op in ops:
-        pipeline |= op
-    pipeline |= pdal.Writer.las(
-        filename=out_f,
-        forward="all",
-        extra_dims="all",
-        minor_version=4,
-        dataformat_id=8,
-    )
-    return pipeline
 
 
 # We may want to use a large las if we manage to download it. we cannot version it with git.
