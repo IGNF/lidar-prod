@@ -1,6 +1,8 @@
 import tempfile
 import numpy as np
 import pytest
+import shutil
+import os.path as osp
 
 from lidar_prod.application import apply
 from lidar_prod.tasks.utils import get_las_metadata
@@ -20,9 +22,15 @@ IN_F = "tests/files/870000_6618000.subset.postIA.las"
 # Classification = 0 everywhere
 # Classification = candidate code everywhere
 # With another file of country area without any building <50m.
+def las_identity(in_f: str):
+    """Copy this file to be sure that the test is isolated."""
+    isolated_f_copy = tempfile.NamedTemporaryFile().name
+    shutil.copy(in_f, isolated_f_copy)
+    return isolated_f_copy
 
 
-def test_apply_on_subset(default_hydra_cfg):
+@pytest.mark.parametrize("las_prior_transformation", [las_identity])
+def test_apply_on_subset(default_hydra_cfg, las_prior_transformation):
     # Expected classification codes after application run.
     _fc = default_hydra_cfg.data_format.codes.building.final
     expected_codes = {
@@ -35,8 +43,9 @@ def test_apply_on_subset(default_hydra_cfg):
     # Run application on the input data
     default_hydra_cfg.paths.src_las = IN_F
     with tempfile.TemporaryDirectory() as default_hydra_cfg.paths.output_dir:
+        in_f_isolated_copy = las_prior_transformation(IN_F)
         out_f = apply(default_hydra_cfg)
-        assert_las_invariance(IN_F, out_f)
+        assert_las_invariance(in_f_isolated_copy, out_f)
         assert_format_of_application_output_las(out_f, expected_codes)
 
 

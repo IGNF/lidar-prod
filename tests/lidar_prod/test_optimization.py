@@ -1,11 +1,10 @@
-from fileinput import filename
 import os
-import shutil
 import hydra
 import numpy as np
 
 import pdal
 from lidar_prod.optimization import optimize
+import shutil
 import os.path as osp
 import tempfile
 
