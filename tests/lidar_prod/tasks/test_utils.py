@@ -1,24 +1,44 @@
+import tempfile
 import numpy as np
+import pdal
 import pytest
 
-from lidar_prod.tasks.utils import split_idx_by_dim
+from lidar_prod.tasks.utils import get_bbox, split_idx_by_dim
 
 
-# @pytest.mark.parametrize(
-#     "las_name, x_span, y_span, buffer, x_min, y_min, x_max, y_max",
-#     [
-#         ("922000_6307000.las", 1000, 1000, 50, 921950, 6305950, 923050, 6307050),
-#         ("5000_4000_stupid_lasname.las", 1000, 1000, 50, 4950, 2950, 6050, 4050),
-#     ],
-# )
-# def test_get_bbox():
+def create_synthetic_las_data_within_bouds(
+    out_f,
+    bbox,
+):
+    bounds = (
+        f'([{bbox["x_min"]},{bbox["x_max"]}],[{bbox["y_min"]},{bbox["y_max"]}],[0,100])'
+    )
+    pipeline = pdal.Pipeline()
+    pipeline |= pdal.Reader.faux(
+        filename="no_file.las", mode="ramp", count=100, bounds=bounds
+    )
+    pipeline |= pdal.Writer.las(
+        filename=out_f,
+        dataformat_id=8,
+        forward="all",
+        minor_version=4,
+        extra_dims="all",
+    )
+    pipeline.execute()
 
-#     assert get_bbox(las_name) == (
-#         "x_min",
-#         "y_min",
-#         "x_max",
-#         "y_max",
-#     )
+
+@pytest.mark.parametrize(
+    "x_min, y_min, x_max, y_max",
+    [(921950, 6305950, 923050, 6307050), (4950, 2950, 6050, 4050), (-1, -5, 1, 5)],
+)
+def test_get_bbox(x_min, y_min, x_max, y_max):
+    tmp_las = tempfile.NamedTemporaryFile().name
+    desired_bbox = {"x_min": x_min, "y_min": y_min, "x_max": x_max, "y_max": y_max}
+    create_synthetic_las_data_within_bouds(tmp_las, desired_bbox)
+    assert get_bbox(tmp_las) == desired_bbox
+    # Buffer argument is taken into account, and absent by default
+    assert get_bbox(tmp_las) == get_bbox(tmp_las, buffer=0)
+    assert get_bbox(tmp_las, buffer=1) != desired_bbox
 
 
 def test_split_idx_by_dim():
