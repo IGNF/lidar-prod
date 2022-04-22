@@ -3,6 +3,9 @@ nohup.out
 inputs/
 outputs/
 
+# large file for tests
+tests/files/V0.5_792000_6272000.las
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
