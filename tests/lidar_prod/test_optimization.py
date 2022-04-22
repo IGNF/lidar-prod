@@ -49,9 +49,10 @@ IN_F_LARGE_EXPECTED = {
 @pytest.mark.parametrize(
     "in_f, expected_metrics",
     [
-        pytest.param(
-            IN_F_LARGE, IN_F_LARGE_EXPECTED, marks=pytest.mark.skip(reason="some bug")
-        ),
+        # pytest.param(
+        #     IN_F_LARGE, IN_F_LARGE_EXPECTED, marks=pytest.mark.skip(reason="some bug")
+        # ),
+        (IN_F_LARGE, IN_F_LARGE_EXPECTED),
         (IN_F, IN_F_EXPECTED),
     ],
 )
