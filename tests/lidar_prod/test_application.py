@@ -3,7 +3,6 @@ import numpy as np
 import pdal
 import pytest
 import shutil
-import os.path as osp
 
 from lidar_prod.application import apply
 from lidar_prod.tasks.utils import get_las_metadata
@@ -17,35 +16,52 @@ from tests.conftest import (
 
 IN_F = "tests/files/870000_6618000.subset.postIA.las"
 
-# TODO: apply on 870000_6618000.subset.postIA
-# Raw, and test output for invariance and classification codes.
-# After transforming its channel :
-# building = 0 everywhere
-# Classification = 0 everywhere
-# Classification = candidate code everywhere
 # With another file of country area without any building <50m.
-def las_identity(in_f: str):
+def _isolate_and_copy(in_f: str):
     """Copy this file to be sure that the test is isolated."""
     isolated_f_copy = tempfile.NamedTemporaryFile().name
     shutil.copy(in_f, isolated_f_copy)
     return isolated_f_copy
 
 
-def las_nullify_classification_dim(in_f: str):
-    """Set Classification to 0 for all points.
+def _isolate_and_remove_all_candidate_buildings_points(in_f: str):
+    """Set Classification to 1 for all points, thus mimicking a LAS without candidates
+    Consequence: no candidate groups. Nothing to update. No building completion.
 
     Args:
         in_f (str): input LAS path
+
     """
-    # TODO: WARNING: this will not work until get_bbox is used !!
     isolated_f_copy = tempfile.NamedTemporaryFile().name
-    ops = [pdal.Filter.assign(value=f"Classification = 0")]
+    ops = [pdal.Filter.assign(value=f"Classification = 1")]
     pipeline = get_a_format_preserving_pdal_pipeline(in_f, isolated_f_copy, ops)
     pipeline.execute()
     return isolated_f_copy
 
 
-@pytest.mark.parametrize("las_mutation", [las_nullify_classification_dim, las_identity])
+def _isolate_and_have_null_probability_everywhere(in_f: str):
+    """Set building probability to 0 for all points, thus mimicking a low confidence everywhere.
+    Consequences : no building in building identification. Only refuted or unsure elements.
+
+    Args:
+        in_f (str): input LAS path
+
+    """
+    isolated_f_copy = tempfile.NamedTemporaryFile().name
+    ops = [pdal.Filter.assign(value=f"building = 0.0")]
+    pipeline = get_a_format_preserving_pdal_pipeline(in_f, isolated_f_copy, ops)
+    pipeline.execute()
+    return isolated_f_copy
+
+
+@pytest.mark.parametrize(
+    "las_mutation",
+    [
+        _isolate_and_have_null_probability_everywhere,
+        _isolate_and_remove_all_candidate_buildings_points,
+        _isolate_and_copy,
+    ],
+)
 def test_apply_on_subset(default_hydra_cfg, las_mutation):
     # Expected classification codes after application run.
     _fc = default_hydra_cfg.data_format.codes.building.final

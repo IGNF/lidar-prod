@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import logging
 import os
 import os.path as osp
-from typing import Optional
+from typing import Dict, Optional
 import pickle
 import subprocess
 import numpy as np
@@ -11,7 +11,11 @@ from tempfile import TemporaryDirectory
 import geopandas
 import laspy
 from tqdm import tqdm
-from lidar_prod.tasks.utils import BDUniConnectionParams, extract_coor, split_idx_by_dim
+from lidar_prod.tasks.utils import (
+    BDUniConnectionParams,
+    get_bbox,
+    split_idx_by_dim,
+)
 
 log = logging.getLogger(__name__)
 
@@ -136,7 +140,7 @@ class BuildingValidator:
             pipeline |= pdal.Reader.las(
                 in_f,
                 nosrs=True,
-                override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
+                override_srs="EPSG:2154",
             )
             # Identify candidates buildings points with a boolean flag
             pipeline |= pdal.Filter.ferry(dimensions=f"=>{_candidate_flag}")
@@ -168,16 +172,9 @@ class BuildingValidator:
             # TODO: extract coordinates from LAS directly using pdal.
             # Request BDUni to get a shapefile of the known buildings in the LAS
             _shp_p = os.path.join(td, "temp.shp")
+            bbox = get_bbox(in_f, buffer=self.bd_uni_request.buffer)
             buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
-                self.bd_uni_connection_params,
-                *extract_coor(
-                    os.path.basename(in_f),
-                    self.data_format.tile_size_meters,
-                    self.data_format.tile_size_meters,
-                    self.bd_uni_request.buffer,
-                ),
-                self.data_format.crs,
-                _shp_p,
+                self.bd_uni_connection_params, _shp_p, bbox
             )
 
             # Create overlay dim
@@ -352,12 +349,8 @@ class BuildingValidator:
 
 def request_bd_uni_for_building_shapefile(
     bd_params: BDUniConnectionParams,
-    xmin: float,
-    ymin: float,
-    xmax: float,
-    ymax: float,
-    srid: int,
     shapefile_path: str,
+    bbox: Dict[str, int],
 ):
     """BD Uni request.
 
@@ -366,7 +359,16 @@ def request_bd_uni_for_building_shapefile(
     Also add a "PRESENCE" column filled with 1 for later use by pdal.
 
     """
-    sql_request = f"SELECT st_setsrid(batiment.geometrie,{srid}) AS geometry, 1 as presence  FROM batiment WHERE batiment.geometrie && ST_MakeEnvelope({xmin}, {ymin}, {xmax}, {ymax}, {srid}) and not gcms_detruit"
+    Lambert_93_SRID = 2154
+    sql_request = f'SELECT \
+        st_setsrid(batiment.geometrie,{Lambert_93_SRID}) AS geometry, \
+        1 as presence \
+        FROM batiment \
+        WHERE batiment.geometrie \
+            && \
+        ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
+        and \
+        not gcms_detruit'
     cmd = [
         "pgsql2shp",
         "-f",

@@ -1,23 +1,24 @@
 import numpy as np
 import pytest
 
-from lidar_prod.tasks.utils import extract_coor, split_idx_by_dim
+from lidar_prod.tasks.utils import split_idx_by_dim
 
 
-@pytest.mark.parametrize(
-    "las_name, x_span, y_span, buffer, x_min, y_min, x_max, y_max",
-    [
-        ("922000_6307000.las", 1000, 1000, 50, 921950, 6305950, 923050, 6307050),
-        ("5000_4000_stupid_lasname.las", 1000, 1000, 50, 4950, 2950, 6050, 4050),
-    ],
-)
-def test_extract_coor(las_name, x_span, y_span, buffer, x_min, y_min, x_max, y_max):
-    assert extract_coor(las_name, x_span, y_span, buffer) == (
-        x_min,
-        y_min,
-        x_max,
-        y_max,
-    )
+# @pytest.mark.parametrize(
+#     "las_name, x_span, y_span, buffer, x_min, y_min, x_max, y_max",
+#     [
+#         ("922000_6307000.las", 1000, 1000, 50, 921950, 6305950, 923050, 6307050),
+#         ("5000_4000_stupid_lasname.las", 1000, 1000, 50, 4950, 2950, 6050, 4050),
+#     ],
+# )
+# def test_get_bbox():
+
+#     assert get_bbox(las_name) == (
+#         "x_min",
+#         "y_min",
+#         "x_max",
+#         "y_max",
+#     )
 
 
 def test_split_idx_by_dim():
@@ -31,8 +32,8 @@ def test_split_idx_by_dim():
 
     assert len(group_idx) == 3
     for i, group in enumerate(group_idx):
-        assert (group == expected_groups[i]).all()
-        assert (group == expected_groups[i]).all()
+        assert np.array_equal(group, expected_groups[i])
+        assert np.array_equal(dim_array[group, 1], expected_values[i])
 
 
 def test_split_idx_by_dim_unordered():
@@ -50,5 +51,5 @@ def test_split_idx_by_dim_unordered():
 
     assert len(group_idx) == 3
     for i, group in enumerate(group_idx):
-        assert (group == expected_groups[i]).all()
-        assert (group == expected_groups[i]).all()
+        assert np.array_equal(group, expected_groups[i])
+        assert np.array_equal(dim_array[group, 1], expected_values[i])

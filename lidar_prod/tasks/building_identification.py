@@ -66,7 +66,7 @@ class BuildingIdentifier:
             in_f,
             type="readers.las",
             nosrs=True,
-            override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
+            override_srs="EPSG:2154",
         )
         non_candidates = (
             f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
