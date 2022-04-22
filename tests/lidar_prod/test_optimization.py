@@ -37,26 +37,14 @@ IN_F_LARGE_EXPECTED = {
         "group_building": 0.847,
     },
     "min": {
-        "p_auto": 889,
+        "p_auto": 0.889,
         "recall": 0.98,
         "precision": 0.98,
     },
 }
 
 
-# TODO: unskip when big file is available easily ?
-# Before that, check that this test passes.
-@pytest.mark.parametrize(
-    "in_f, expected_metrics",
-    [
-        # pytest.param(
-        #     IN_F_LARGE, IN_F_LARGE_EXPECTED, marks=pytest.mark.skip(reason="some bug")
-        # ),
-        (IN_F_LARGE, IN_F_LARGE_EXPECTED),
-        (IN_F, IN_F_EXPECTED),
-    ],
-)
-def test_BVOptimization(default_hydra_cfg, in_f, expected_metrics):
+def test_BVOptimization_on_subset(default_hydra_cfg):
     with tempfile.TemporaryDirectory() as td:
         # Optimization output (thresholds and prepared/updated LASfiles) saved to td
         default_hydra_cfg.building_validation.optimization.paths.results_output_dir = td
@@ -68,7 +56,7 @@ def test_BVOptimization(default_hydra_cfg, in_f, expected_metrics):
         )
         os.makedirs(input_las_dir, exist_ok=False)
         in_f_copy = osp.join(input_las_dir, "copy.las")
-        pipeline = get_a_format_preserving_pdal_pipeline(in_f, in_f_copy, [])
+        pipeline = get_a_format_preserving_pdal_pipeline(IN_F, in_f_copy, [])
         pipeline.execute()
 
         # Check that a full optimization run can pass successfully
@@ -85,9 +73,8 @@ def test_BVOptimization(default_hydra_cfg, in_f, expected_metrics):
         # Check the output of the evaluate method. Note that it uses the
         # prepared data obtained from the full run just above
         metrics_dict = bvo.evaluate()
-        # TODO: replace with an approx >= with ~5% margin ?
-        assert expected_metrics["exact"].items() <= metrics_dict.items()
-        for k, v in expected_metrics["min"].items():
+        assert IN_F_EXPECTED["exact"].items() <= metrics_dict.items()
+        for k, v in IN_F_EXPECTED["min"].items():
             assert (
                 (1 - RELATIVE_MIN_TOLERANCE_FOR_MIN_EXPECTED_METRICS) * v
             ) <= metrics_dict[k]
@@ -110,10 +97,43 @@ def test_BVOptimization(default_hydra_cfg, in_f, expected_metrics):
         assert actual_codes.issubset(expected_codes)
 
 
-# We may want to use a large las if we manage to download it. we cannot version it with git.
-# Here are the perfs for reference, on
-# /home/CGaydon/repositories/Validation_Module/lidar-prod-quality-control/inputs/evaluation_las/V0.5_792000_6272000.las
+@pytest.mark.slow()
+def test_BVOptimization_on_large_file(default_hydra_cfg):
+    with tempfile.TemporaryDirectory() as td:
+        # Optimization output (thresholds and prepared/updated LASfiles) saved to td
+        default_hydra_cfg.building_validation.optimization.paths.results_output_dir = td
 
+        # We isolate the input file in a subdir, and prepare it for optimization
+        input_las_dir = osp.join(td, "inputs/")
+        default_hydra_cfg.building_validation.optimization.paths.input_las_dir = (
+            input_las_dir
+        )
+        os.makedirs(input_las_dir, exist_ok=False)
+        in_f_copy = osp.join(input_las_dir, "copy.las")
+        pipeline = get_a_format_preserving_pdal_pipeline(IN_F_LARGE, in_f_copy, [])
+        pipeline.execute()
+
+        # Be sure that we use default thresholds and not previous ones
+        default_hydra_cfg.building_validation.optimization
+        # Check that a full optimization run can pass successfully
+        bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
+            default_hydra_cfg.building_validation.optimization
+        )
+        bvo.prepare()
+        metrics_dict = bvo.evaluate()
+
+        exact_expected_val = IN_F_LARGE_EXPECTED["exact"]
+        for k in exact_expected_val:
+            assert pytest.approx(exact_expected_val[k], 0.01) == metrics_dict[k]
+        min_expected_val = IN_F_LARGE_EXPECTED["min"]
+        for k in min_expected_val:
+            assert (
+                (1 - RELATIVE_MIN_TOLERANCE_FOR_MIN_EXPECTED_METRICS)
+                * min_expected_val[k]
+            ) <= metrics_dict[k]
+
+
+# Expected metrics for reference until test is stable.
 # """
 # groups_count=1493
 # group_unsure=0.00402
@@ -136,5 +156,3 @@ def test_BVOptimization(default_hydra_cfg, in_f, expected_metrics):
 # [0.332 0.556 0.112]
 # [0.07  0.01  0.919]]
 # """
-
-# REFERENCE_METRICS = {"precision": 0.98, "recall":0.98,"p_auto":0.889,}

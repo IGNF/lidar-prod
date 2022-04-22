@@ -119,9 +119,11 @@ class BuildingValidationOptimizer:
         clusters = self._load_clusters()
         objective = functools.partial(self._objective, clusters=clusters)
         self.study.optimize(objective, n_trials=self.design.n_trials)
-        best_rules = self._select_best_rules(self.study)
-        log.info(f"Best_trial thresholds: \n{best_rules}")
-        self._dump_best_rules(best_rules)
+        best_thresholds = self._select_best_rules(self.study)
+        log.info(f"Best_trial thresholds: \n{best_thresholds}")
+        self._dump_best_rules(best_thresholds)
+        # Save it as attribute for later evaluate/update steps
+        self.thresholds: thresholds = best_thresholds
 
     def evaluate(self):
         """Evaluation step
@@ -131,9 +133,13 @@ class BuildingValidationOptimizer:
 
         """
         clusters = self._load_clusters()
-        self.bv._set_thresholds_from_pickle(
-            self.paths.building_validation_thresholds_pickle
-        )
+        # We use dumped thresholds only if provided: we only need them
+        # when we are performing an evaluation on test data after an optimization
+        # on validation data.
+        if os.path.isfile(self.paths.building_validation_thresholds_pickle):
+            self.bv._set_thresholds_from_pickle(
+                self.paths.building_validation_thresholds_pickle
+            )
         decisions = np.array([self.bv._make_group_decision(c) for c in clusters])
         mts_gt = np.array([c.target for c in clusters])
         metrics_dict = self._evaluate_decisions(mts_gt, decisions)
@@ -147,9 +153,13 @@ class BuildingValidationOptimizer:
 
         """
         log.info(f"Updated las will be saved in {self.paths.results_output_dir}")
-        self.bv._set_thresholds_from_pickle(
-            self.paths.building_validation_thresholds_pickle
-        )
+        # We use dumped thresholds only if provided: we only need them
+        # when we are performing an evaluation on test data after an optimization
+        # on validation data.
+        if os.path.isfile(self.paths.building_validation_thresholds_pickle):
+            self.bv._set_thresholds_from_pickle(
+                self.paths.building_validation_thresholds_pickle
+            )
         for prep_f, out_f in tqdm(
             zip(self.prepared_las_filepaths, self.out_las_filepaths),
             total=len(self.prepared_las_filepaths),
