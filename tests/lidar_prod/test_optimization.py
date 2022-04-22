@@ -1,4 +1,5 @@
 import os
+from typing import Any, Iterable
 import hydra
 import numpy as np
 
@@ -23,17 +24,12 @@ def test_optimize_on_subset(default_hydra_cfg):
     with tempfile.TemporaryDirectory() as td:
         # Copy this file into a clean, temporary dir, to be sure that it is the only one considered
         # during optimization even if we add new files in its folde later.
-        IN_F_ISOLATED_COPY = osp.join(td, osp.basename(IN_F))
-        shutil.copy(IN_F, IN_F_ISOLATED_COPY)
-
         # In ClassificationCorrected we put a corrected version of the classification
         # We copy it into Classification channel to use it in this test.
-        crs_str = default_hydra_cfg.data_format.crs_prefix + str(
-            default_hydra_cfg.data_format.crs
-        )
-        copy_las_dimension_inplace(
-            IN_F_ISOLATED_COPY, crs_str, "ClassificationCorrected", "Classification"
-        )
+        ops = [pdal.Filter.assign(value=f"Classification = ClassificationCorrected")]
+        in_f_isolated_copy = osp.join(td, osp.basename(IN_F))
+        pipeline = get_pdal_format_preserving_pipeline(IN_F, in_f_isolated_copy, ops)
+        pipeline.execute()
 
         default_hydra_cfg.building_validation.optimization.paths.input_las_dir = td
         default_hydra_cfg.building_validation.optimization.paths.results_output_dir = td
@@ -73,31 +69,31 @@ def test_optimize_on_subset(default_hydra_cfg):
         assert expected_codes == actual_codes
 
 
-def copy_las_dimension_inplace(in_f: str, crs_str: str, src_dim: str, target_dim: str):
-    """Copy src_dim to target_dim, preserving las format.
+def get_pdal_format_preserving_pipeline(in_f: str, out_f: str, ops: Iterable[Any]):
+    """Create a pdal pipeline, preserving format, forwarding every dimension.
 
     Args:
-        crs_str (str): ESPG:XXXX string
-        in_f (str): input las path
-        src_dim (str): source dimensio to copy to target dimension
-        target_dim (str): target dimension
+        in_f (str): input LAS path
+        out_f (str): output LAS path
+        ops (Iterable[Any]): list of pdal operation (e.g. Filter.assign(...))
 
     """
     pipeline = pdal.Pipeline()
     pipeline |= pdal.Reader.las(
         filename=in_f,
         nosrs=True,
-        override_srs=crs_str,
+        override_srs="EPSG:2154",
     )
-    pipeline |= pdal.Filter.assign(value=f"{target_dim} = {src_dim}")
+    for op in ops:
+        pipeline |= op
     pipeline |= pdal.Writer.las(
-        filename=in_f,
+        filename=out_f,
         forward="all",
         extra_dims="all",
         minor_version=4,
         dataformat_id=8,
     )
-    pipeline.execute()
+    return pipeline
 
 
 # We may want to use a large las if we manage to download it. we cannot version it with git.
