@@ -44,12 +44,15 @@ IN_F_LARGE_EXPECTED = {
 }
 
 
-# TODO: uncomment when big file is available.
+# TODO: unskip when big file is available easily ?
+# Before that, check that this test passes.
 @pytest.mark.parametrize(
     "in_f, expected_metrics",
     [
+        pytest.param(
+            IN_F_LARGE, IN_F_LARGE_EXPECTED, marks=pytest.mark.skip(reason="some bug")
+        ),
         (IN_F, IN_F_EXPECTED),
-        # (IN_F_LARGE, IN_F_LARGE_EXPECTED),
     ],
 )
 def test_BVOptimization(default_hydra_cfg, in_f, expected_metrics):
