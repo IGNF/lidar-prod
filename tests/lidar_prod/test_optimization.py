@@ -12,24 +12,23 @@ from lidar_prod.tasks.building_validation_optimization import (
 from tests.conftest import get_a_format_preserving_pdal_pipeline, pdal_read_las_array
 
 
-IN_F = "tests/files/870000_6618000.subset.postIA.las"
+IN_F = "tests/files/870000_6618000.subset.postIA.corrected.las"
 
 
-def test_optimize_on_subset(default_hydra_cfg):
-    default_hydra_cfg.paths.src_las = IN_F
-    # TODO: ignore the warning here.
+def test_BVOptimization(default_hydra_cfg):
     with tempfile.TemporaryDirectory() as td:
-        # Copy this file into a clean, temporary dir, to be sure that it is the only one considered
-        # during optimization even if we add new files in its folde later.
-        # In ClassificationCorrected we put a corrected version of the classification
-        # We copy it into Classification channel to use it in this test.
-        ops = [pdal.Filter.assign(value=f"Classification = ClassificationCorrected")]
-        in_f_isolated_copy = osp.join(td, osp.basename(IN_F))
-        pipeline = get_a_format_preserving_pdal_pipeline(IN_F, in_f_isolated_copy, ops)
-        pipeline.execute()
-
-        default_hydra_cfg.building_validation.optimization.paths.input_las_dir = td
+        # Optimization output (thresholds and prepared/updated LASfiles) saved to td
         default_hydra_cfg.building_validation.optimization.paths.results_output_dir = td
+
+        # We isolate the input file in a subdir, and prepare it for optimization
+        input_las_dir = osp.join(td, "inputs/")
+        default_hydra_cfg.building_validation.optimization.paths.input_las_dir = (
+            input_las_dir
+        )
+        os.makedirs(input_las_dir, exist_ok=False)
+        in_f_copy = osp.join(input_las_dir, "copy.las")
+        pipeline = get_a_format_preserving_pdal_pipeline(IN_F, in_f_copy, [])
+        pipeline.execute()
 
         # Check that a full optimization run can pass successfully
         bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
@@ -37,9 +36,9 @@ def test_optimize_on_subset(default_hydra_cfg):
         )
         bvo.run()
 
-        # Assert that an prepared and an updated file are generated in td
-        assert os.path.isfile(osp.join(td, "prepared", osp.basename(IN_F)))
-        out_f = osp.join(td, "updated", osp.basename(IN_F))
+        # Assert that a prepared and an updated file are generated in td
+        assert os.path.isfile(osp.join(td, "prepared", osp.basename(in_f_copy)))
+        out_f = osp.join(td, "updated", osp.basename(in_f_copy))
         assert os.path.isfile(out_f)
 
         # Check the output of the evaluate method. Note that it uses the
