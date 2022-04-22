@@ -401,6 +401,17 @@ def request_bd_uni_for_building_shapefile(
             == b"Initializing... \nERROR: Could not determine table metadata (empty table)\n"
         ):
             return False
+        # Error can be due to something else entirely, like
+        # an inability to translate host name to an address.
+        # e.g. "could not translate host name "serveurbdudiff.ign.fr" to address: System error"
+        raise e
+    except ConnectionRefusedError as e:
+        log.error(
+            "ConnectionRefusedError when requesting BDUni.  \
+            This means that the Database cannot be accessed (e.g. due to vpn/proxy reasons, \
+            or bad credentials)"
+        )
+        raise e
 
     # read & write to avoid unnacepted 3D shapefile format.
     gdf = geopandas.read_file(shapefile_path)
