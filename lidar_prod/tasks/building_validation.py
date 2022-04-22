@@ -74,15 +74,8 @@ class BuildingValidator:
                 "to use thresholds of an ad-hoc optimization step"
             )
 
-        self.detailed_to_final = {
-            self.codes.detailed.unclustered: self.codes.final.not_building,
-            self.codes.detailed.ia_refuted: self.codes.final.not_building,
-            self.codes.detailed.ia_refuted_but_under_db_uni: self.codes.final.unsure,
-            self.codes.detailed.both_unsure: self.codes.final.unsure,
-            self.codes.detailed.unsure_by_entropy: self.codes.final.unsure,
-            self.codes.detailed.ia_confirmed_only: self.codes.final.building,
-            self.codes.detailed.db_overlayed_only: self.codes.final.building,
-            self.codes.detailed.both_confirmed: self.codes.final.building,
+        self.detailed_to_final_map: dict = {
+            det: fin for det, fin in self.codes.detailed_to_final
         }
 
     def run(
@@ -279,7 +272,7 @@ class BuildingValidator:
             int: final classification code for the considered group.
         """
         detailed_code = self._make_detailed_group_decision(*args, **kwargs)
-        return self.detailed_to_final[detailed_code]
+        return self.detailed_to_final_map[detailed_code]
 
     def _make_detailed_group_decision(self, infos: BuildingValidationClusterInfo):
         """Decision process at the cluster level.

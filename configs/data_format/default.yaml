@@ -55,3 +55,12 @@ codes:
       unsure: 214  # unsure
       not_building: 208  # refuted
       building: 6  # confirmed
+    detailed_to_final:
+      - ["${data_format.codes.building.detailed.unclustered}","${data_format.codes.building.final.not_building}"]
+      - ["${data_format.codes.building.detailed.ia_refuted}","${data_format.codes.building.final.not_building}"]
+      - ["${data_format.codes.building.detailed.ia_refuted_but_under_db_uni}","${data_format.codes.building.final.unsure}"]
+      - ["${data_format.codes.building.detailed.both_unsure}","${data_format.codes.building.final.unsure}"]
+      - ["${data_format.codes.building.detailed.unsure_by_entropy}","${data_format.codes.building.final.unsure}"]
+      - ["${data_format.codes.building.detailed.ia_confirmed_only}","${data_format.codes.building.final.building}"]
+      - ["${data_format.codes.building.detailed.db_overlayed_only}","${data_format.codes.building.final.building}"]
+      - ["${data_format.codes.building.detailed.both_confirmed}","${data_format.codes.building.final.building}"]
