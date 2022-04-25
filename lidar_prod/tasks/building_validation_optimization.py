@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import functools
 from glob import glob
 import logging

@@ -4,7 +4,6 @@ import os.path as osp
 from tempfile import TemporaryDirectory
 import hydra
 from omegaconf import DictConfig
-from typing import Optional
 from lidar_prod.tasks.building_completion import BuildingCompletor
 from lidar_prod.tasks.cleaning import Cleaner
 
