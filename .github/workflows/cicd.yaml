@@ -21,10 +21,10 @@ jobs:
       run: docker run lidar_prod_im flake8
 
     - name: Run tests
-      run: docker run lidar_prod_imp ython -m pytest -v -m "not slow" --ignore=actions-runner
+      run: docker run lidar_prod_im python -m pytest -v -m "not slow" --ignore=actions-runner
 
     - name: Run slow tests last
-      run: docker run lidar_prod_imp ython -m pytest -v -m slow --ignore=actions-runner
+      run: docker run lidar_prod_im python -m pytest -v -m slow --ignore=actions-runner
 
     - name: Full module run on LAS subset
       run: >
