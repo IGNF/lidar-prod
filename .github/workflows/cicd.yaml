@@ -31,6 +31,7 @@ jobs:
         python -m
         pytest -v -m slow
         --ignore=actions-runner
+        --no-cov
 
     - name: Full module run on LAS subset using CLI.
       run: >
