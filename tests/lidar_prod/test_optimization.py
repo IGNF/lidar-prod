@@ -10,11 +10,15 @@ import pytest
 from lidar_prod.tasks.building_validation_optimization import (
     BuildingValidationOptimizer,
 )
-from tests.conftest import get_a_format_preserving_pdal_pipeline, pdal_read_las_array
+from tests.conftest import (
+    get_a_copy_pdal_pipeline,
+    get_a_format_preserving_pdal_pipeline,
+    pdal_read_las_array,
+)
 
+"""We test the building validation optimizer against
+"""
 
-# Metric m must be above tolerance * expected value.
-RELATIVE_MIN_TOLERANCE_FOR_MIN_EXPECTED_METRICS = 0.01
 
 IN_F = "tests/files/870000_6618000.subset.postIA.corrected.las"
 IN_F_EXPECTED = {
@@ -28,7 +32,6 @@ IN_F_EXPECTED = {
         "precision": 1.0,
     },
 }
-# TODO: enable downloading of this data from elsewhere.
 IN_F_LARGE = "tests/files/V0.5_792000_6272000.las"
 IN_F_LARGE_EXPECTED = {
     "exact": {
@@ -42,6 +45,9 @@ IN_F_LARGE_EXPECTED = {
         "precision": 0.98,
     },
 }
+
+# Metric m must be above 1-0.01 = 99% times the expected value.
+RELATIVE_MIN_TOLERANCE_FOR_MIN_EXPECTED_METRICS = 0.01
 
 
 def test_BVOptimization_on_subset(default_hydra_cfg):
@@ -99,6 +105,10 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
 
 @pytest.mark.slow()
 def test_BVOptimization_on_large_file(default_hydra_cfg):
+
+    if not os.path.isfile(IN_F_LARGE):
+        pytest.xfail(reason=f"File {IN_F_LARGE} is not present in environment.")
+
     with tempfile.TemporaryDirectory() as td:
         # Optimization output (thresholds and prepared/updated LASfiles) saved to td
         default_hydra_cfg.building_validation.optimization.paths.results_output_dir = td
@@ -110,7 +120,7 @@ def test_BVOptimization_on_large_file(default_hydra_cfg):
         )
         os.makedirs(input_las_dir, exist_ok=False)
         in_f_copy = osp.join(input_las_dir, "copy.las")
-        pipeline = get_a_format_preserving_pdal_pipeline(IN_F_LARGE, in_f_copy, [])
+        pipeline = get_a_copy_pdal_pipeline(IN_F_LARGE, in_f_copy)
         pipeline.execute()
 
         # Be sure that we use default thresholds and not previous ones

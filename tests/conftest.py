@@ -70,3 +70,8 @@ def get_a_format_preserving_pdal_pipeline(in_f: str, out_f: str, ops: Iterable[A
         dataformat_id=8,
     )
     return pipeline
+
+
+def get_a_copy_pdal_pipeline(in_f: str, out_f: str):
+    """Get a pipeline that will copy in_f to out_f, preserving format."""
+    return get_a_format_preserving_pdal_pipeline(in_f, out_f, [])
