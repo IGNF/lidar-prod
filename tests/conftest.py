@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 from typing import Any, Iterable
 import numpy as np
 import pdal
@@ -75,3 +77,40 @@ def get_a_format_preserving_pdal_pipeline(in_f: str, out_f: str, ops: Iterable[A
 def get_a_copy_pdal_pipeline(in_f: str, out_f: str):
     """Get a pipeline that will copy in_f to out_f, preserving format."""
     return get_a_format_preserving_pdal_pipeline(in_f, out_f, [])
+
+
+def _isolate_and_copy(in_f: str):
+    """Copy this file to be sure that the test is isolated."""
+    isolated_f_copy = tempfile.NamedTemporaryFile().name
+    shutil.copy(in_f, isolated_f_copy)
+    return isolated_f_copy
+
+
+def _isolate_and_remove_all_candidate_buildings_points(in_f: str):
+    """Set Classification to 1 for all points, thus mimicking a LAS without candidates
+    Consequence: no candidate groups. Nothing to update. No building completion.
+
+    Args:
+        in_f (str): input LAS path
+
+    """
+    isolated_f_copy = tempfile.NamedTemporaryFile().name
+    ops = [pdal.Filter.assign(value=f"Classification = 1")]
+    pipeline = get_a_format_preserving_pdal_pipeline(in_f, isolated_f_copy, ops)
+    pipeline.execute()
+    return isolated_f_copy
+
+
+def _isolate_and_have_null_probability_everywhere(in_f: str):
+    """Set building probability to 0 for all points, thus mimicking a low confidence everywhere.
+    Consequences : no building in building identification. Only refuted or unsure elements.
+
+    Args:
+        in_f (str): input LAS path
+
+    """
+    isolated_f_copy = tempfile.NamedTemporaryFile().name
+    ops = [pdal.Filter.assign(value=f"building = 0.0")]
+    pipeline = get_a_format_preserving_pdal_pipeline(in_f, isolated_f_copy, ops)
+    pipeline.execute()
+    return isolated_f_copy

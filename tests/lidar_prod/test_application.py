@@ -1,57 +1,24 @@
+import pytest
 import tempfile
 import numpy as np
-import pdal
-import pytest
-import shutil
 
 from lidar_prod.application import apply
 from lidar_prod.tasks.utils import get_las_metadata
 from tests.conftest import (
+    _isolate_and_copy,
+    _isolate_and_have_null_probability_everywhere,
+    _isolate_and_remove_all_candidate_buildings_points,
     assert_las_contains_dims,
-    assert_las_invariance,
-    get_a_format_preserving_pdal_pipeline,
+    check_las_invariance,
     pdal_read_las_array,
 )
 
+"""We test 
 
-IN_F = "tests/files/870000_6618000.subset.postIA.las"
-
-# With another file of country area without any building <50m.
-def _isolate_and_copy(in_f: str):
-    """Copy this file to be sure that the test is isolated."""
-    isolated_f_copy = tempfile.NamedTemporaryFile().name
-    shutil.copy(in_f, isolated_f_copy)
-    return isolated_f_copy
-
-
-def _isolate_and_remove_all_candidate_buildings_points(in_f: str):
-    """Set Classification to 1 for all points, thus mimicking a LAS without candidates
-    Consequence: no candidate groups. Nothing to update. No building completion.
-
-    Args:
-        in_f (str): input LAS path
-
-    """
-    isolated_f_copy = tempfile.NamedTemporaryFile().name
-    ops = [pdal.Filter.assign(value=f"Classification = 1")]
-    pipeline = get_a_format_preserving_pdal_pipeline(in_f, isolated_f_copy, ops)
-    pipeline.execute()
-    return isolated_f_copy
-
-
-def _isolate_and_have_null_probability_everywhere(in_f: str):
-    """Set building probability to 0 for all points, thus mimicking a low confidence everywhere.
-    Consequences : no building in building identification. Only refuted or unsure elements.
-
-    Args:
-        in_f (str): input LAS path
-
-    """
-    isolated_f_copy = tempfile.NamedTemporaryFile().name
-    ops = [pdal.Filter.assign(value=f"building = 0.0")]
-    pipeline = get_a_format_preserving_pdal_pipeline(in_f, isolated_f_copy, ops)
-    pipeline.execute()
-    return isolated_f_copy
+Returns:
+    _type_: _description_
+"""
+LAS_SUBSET_FILE = "tests/files/870000_6618000.subset.postIA.las"
 
 
 @pytest.mark.parametrize(
@@ -62,8 +29,9 @@ def _isolate_and_have_null_probability_everywhere(in_f: str):
         _isolate_and_copy,
     ],
 )
-def test_apply_on_subset(default_hydra_cfg, las_mutation):
-    # Expected classification codes after application run.
+def test_application_data_invariance_and_data_format(default_hydra_cfg, las_mutation):
+    # Expected classification codes after application run are either default=0, unclassified=1, or
+    # one of the decision codes.
     _fc = default_hydra_cfg.data_format.codes.building.final
     expected_codes = {
         1,
@@ -72,21 +40,23 @@ def test_apply_on_subset(default_hydra_cfg, las_mutation):
         _fc.not_building,
         _fc.unsure,
     }
-    # Run application on the input data
+    # Run application on the data subset
     with tempfile.TemporaryDirectory() as default_hydra_cfg.paths.output_dir:
-        in_f_isolated_copy = las_mutation(IN_F)
-        default_hydra_cfg.paths.src_las = in_f_isolated_copy
+        # We copy the data, and in the process we apply a "mutation" in order
+        # to test for multiple scenarii.
+        mutated_copy = las_mutation(LAS_SUBSET_FILE)
+        default_hydra_cfg.paths.src_las = mutated_copy
         out_f = apply(default_hydra_cfg)
-        assert_las_invariance(in_f_isolated_copy, out_f)
-        assert_format_of_application_output_las(out_f, expected_codes)
+        check_las_invariance(mutated_copy, out_f)
+        check_format_of_application_output_las(out_f, expected_codes)
 
 
-def assert_format_of_application_output_las(out_f: str, expected_codes: dict):
+def check_format_of_application_output_las(out_f: str, expected_codes: dict):
     """Check LAS format, dimensions, and classification codes of output
 
     Args:
         out_f (str): path of output LAS
-        expected_codes (dict): expected classification codes.
+        expected_codes (dict): set of expected classification codes.
 
     """
     # Check that we contain extra_dims that production needs
