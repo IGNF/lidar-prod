@@ -25,12 +25,12 @@ jobs:
 
     - name: Run slow tests last.
       run: >
-      docker run 
-      -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/lidar/lidar-prod-quality-control/tests/files/large/
-      lidar_prod_im
-      python -m
-      pytest -v -m slow
-      --ignore=actions-runner
+        docker run 
+        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/lidar/lidar-prod-quality-control/tests/files/large/
+        lidar_prod_im
+        python -m
+        pytest -v -m slow
+        --ignore=actions-runner
 
     - name: Full module run on LAS subset using CLI.
       run: >
