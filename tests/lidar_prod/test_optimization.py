@@ -18,12 +18,14 @@ from tests.conftest import (
 """We test the building validation optimizer against two LAS:
 
 These datasets must have the right classification codes, i.e. the ones defined in labels_from_20211001_building_val.
-The large LAS cannot be versionned by git. If it is absent from environment, the test is expected to fail.
+
+WARNING: The large LAS cannot be versionned by git. If it is absent from environment, pytest expects the test to fail.
+This is to enable a shallower run of these tests without the file.
 
 """
 
-# Small LAS, for which we optimize thresholds and reach perfect validation, 
-# to quickly check optimization logic. 
+# Small LAS, for which we optimize thresholds and reach perfect validation,
+# to quickly check optimization logic.
 IN_F = "tests/files/870000_6618000.subset.postIA.corrected.las"
 IN_F_EXPECTED = {
     "exact": {
@@ -139,7 +141,12 @@ def test_BVOptimization_on_large_file(default_hydra_cfg):
 
         exact_expected_val = IN_F_LARGE_EXPECTED["exact"]
         for k in exact_expected_val:
-            assert pytest.approx(exact_expected_val[k], RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS) == metrics_dict[k]
+            assert (
+                pytest.approx(
+                    exact_expected_val[k], RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS
+                )
+                == metrics_dict[k]
+            )
         min_expected_val = IN_F_LARGE_EXPECTED["min"]
         for k in min_expected_val:
             assert (
