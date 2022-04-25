@@ -1,5 +1,4 @@
 import os.path as osp
-from re import A
 import tempfile
 import pytest
 

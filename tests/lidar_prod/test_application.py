@@ -24,9 +24,9 @@ LAS_SUBSET_FILE = "tests/files/870000_6618000.subset.postIA.las"
     "las_mutation",
     [
         [],  # identity
-        [pdal.Filter.assign(value=f"building = 0.0")],  # low proba everywhere
-        [pdal.Filter.assign(value=f"Classification = 1")],  # no candidate buildings
-        [pdal.Filter.assign(value=f"Classification = 202")],  # only candidate buildings
+        [pdal.Filter.assign(value="building = 0.0")],  # low proba everywhere
+        [pdal.Filter.assign(value="Classification = 1")],  # no candidate buildings
+        [pdal.Filter.assign(value="Classification = 202")],  # only candidate buildings
     ],
 )
 def test_application_data_invariance_and_data_format(default_hydra_cfg, las_mutation):

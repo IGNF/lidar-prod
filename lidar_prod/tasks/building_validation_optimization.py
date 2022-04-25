@@ -426,12 +426,15 @@ class BuildingValidationOptimizer:
         )
         final_true_positives = cm[2, 0] + cm[2, 2]  # Yu + Yc
         final_false_positives = cm[1, 2]  # Nc
+
+        #  precision = (Yu + Yc) / (Yu + Yc + Nc)
         precision = final_true_positives / (
             final_true_positives + final_false_positives
-        )  #  (Yu + Yc) / (Yu + Yc + Nc)
+        )
 
+        # recall = (Yu + Yc) / (Yu + Yn + Yc)
         positives = cm[2, :].sum()
-        recall = final_true_positives / positives  # (Yu + Yc) / (Yu + Yn + Yc)
+        recall = final_true_positives / positives
 
         metrics_dict.update(
             {
