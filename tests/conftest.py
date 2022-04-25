@@ -72,31 +72,3 @@ def get_a_las_to_las_pdal_pipeline(in_f: str, out_f: str, ops: Iterable[Any]):
         dataformat_id=8,
     )
     return pipeline
-
-
-# def remove_all_candidate_buildings_points(in_f: str, out_f: str):
-#     """Set Classification to 1 for all points, thus mimicking a LAS without candidates
-#     Consequence: no candidate groups. Nothing to update. No building completion.
-
-#     Args:
-#         in_f (str): input LAS path
-
-#     """
-#     ops = [pdal.Filter.assign(value=f"Classification = 1")]
-#     pipeline = get_a_las_to_las_pdal_pipeline(in_f, out_f, ops)
-#     pipeline.execute()
-#     return out_f
-
-
-# def isolate_and_have_null_probability_everywhere(in_f: str, out_f: str):
-#     """Set building probability to 0 for all points, thus mimicking a low confidence everywhere.
-#     Consequences : no building in building identification. Only refuted or unsure elements.
-
-#     Args:
-#         in_f (str): input LAS path
-
-#     """
-#     ops = [pdal.Filter.assign(value=f"building = 0.0")]
-#     pipeline = get_a_las_to_las_pdal_pipeline(in_f, out_f, ops)
-#     pipeline.execute()
-#     return out_f
