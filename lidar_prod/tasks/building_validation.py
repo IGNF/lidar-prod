@@ -14,6 +14,8 @@ from tqdm import tqdm
 from lidar_prod.tasks.utils import (
     BDUniConnectionParams,
     get_bbox,
+    get_pdal_reader,
+    get_pdal_writer,
     split_idx_by_dim,
 )
 
@@ -137,11 +139,7 @@ class BuildingValidator:
 
         with TemporaryDirectory() as td:
             pipeline = pdal.Pipeline()
-            pipeline |= pdal.Reader.las(
-                in_f,
-                nosrs=True,
-                override_srs="EPSG:2154",
-            )
+            pipeline |= get_pdal_reader(in_f)
             # Identify candidates buildings points with a boolean flag
             pipeline |= pdal.Filter.ferry(dimensions=f"=>{_candidate_flag}")
             _is_candidate_building = (
@@ -185,14 +183,7 @@ class BuildingValidator:
                 pipeline |= pdal.Filter.overlay(
                     column="PRESENCE", datasource=_shp_p, dimension=_overlay
                 )
-            pipeline |= pdal.Writer(
-                type="writers.las",
-                filename=out_f,
-                forward="all",
-                extra_dims="all",
-                minor_version=4,
-                dataformat_id=8,
-            )
+            pipeline |= get_pdal_writer(out_f)
             os.makedirs(osp.dirname(out_f), exist_ok=True)
             pipeline.execute()
 

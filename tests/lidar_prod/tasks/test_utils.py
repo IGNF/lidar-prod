@@ -3,7 +3,7 @@ import numpy as np
 import pdal
 import pytest
 
-from lidar_prod.tasks.utils import get_bbox, split_idx_by_dim
+from lidar_prod.tasks.utils import get_bbox, get_pdal_writer, split_idx_by_dim
 
 
 def create_synthetic_las_data_within_bouds(
@@ -17,13 +17,7 @@ def create_synthetic_las_data_within_bouds(
     pipeline |= pdal.Reader.faux(
         filename="no_file.las", mode="ramp", count=100, bounds=bounds
     )
-    pipeline |= pdal.Writer.las(
-        filename=out_f,
-        dataformat_id=8,
-        forward="all",
-        minor_version=4,
-        extra_dims="all",
-    )
+    pipeline |= get_pdal_writer(out_f)
     pipeline.execute()
 
 

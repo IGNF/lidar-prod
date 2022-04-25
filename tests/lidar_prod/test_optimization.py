@@ -10,10 +10,7 @@ import numpy as np
 from lidar_prod.tasks.building_validation_optimization import (
     BuildingValidationOptimizer,
 )
-from tests.conftest import (
-    get_a_las_to_las_pdal_pipeline,
-    pdal_read_las_array,
-)
+from tests.conftest import pdal_read_las_array
 
 """We test the building validation optimizer against two LAS:
 
@@ -40,7 +37,7 @@ SUBSET_EXPECTED_METRICS = {
 }
 # Large LAS, for which we evaluate performance, to control that there was no regression in terms of
 # automation/precision/recall of building validation.
-LAS_LARGE_FILE = "tests/files/V0.5_792000_6272000.las"
+LAS_LARGE_FILE = "tests/files/large/V0.5_792000_6272000.las"
 LARGE_EXPECTED_METRICS = {
     "exact": {
         "groups_count": 1493,

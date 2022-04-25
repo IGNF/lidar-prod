@@ -4,9 +4,8 @@ import tempfile
 import numpy as np
 
 from lidar_prod.application import apply
-from lidar_prod.tasks.utils import get_las_metadata
+from lidar_prod.tasks.utils import get_a_las_to_las_pdal_pipeline, get_las_metadata
 from tests.conftest import (
-    get_a_las_to_las_pdal_pipeline,
     check_las_contains_dims,
     check_las_invariance,
     pdal_read_las_array,

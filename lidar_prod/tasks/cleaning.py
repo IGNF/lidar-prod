@@ -4,6 +4,8 @@ import os.path as osp
 from typing import Iterable, Optional, Union
 import pdal
 
+from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer
+
 log = logging.getLogger(__name__)
 
 
@@ -15,6 +17,7 @@ class Cleaner:
 
         Args:
             extra_dims (Optional[Union[Iterable[str], str]]): each dim should have format dim_name:pdal_type.
+            If a string, used directly; if an iterable, dimensions are joined together.
 
         """
 
@@ -25,27 +28,16 @@ class Cleaner:
                 self.extra_dims = ",".join(extra_dims)
 
     def run(self, in_f: str, out_f: str):
-        self.setup(out_f)
-        self.update(in_f, out_f)
-
-    def setup(self, out_f):
-        """Creates output dir.
+        """Clean out LAS extra dimensions.
 
         Args:
-            out_f (_type_): outputh file path.
-
+            in_f (str): input LAS path
+            out_f (str): output LAS path, with specified extra dims.
         """
-        os.makedirs(osp.dirname(out_f), exist_ok=True)
 
-    def update(self, in_f: str, out_f: str):
         pipeline = pdal.Pipeline()
-        pipeline |= pdal.Reader.las(in_f)
-        pipeline |= pdal.Writer.las(
-            filename=out_f,
-            forward="all",
-            extra_dims=self.extra_dims,
-            minor_version=4,
-            dataformat_id=8,
-        )
+        pipeline |= get_pdal_reader(in_f)
+        pipeline |= get_pdal_writer(out_f, extra_dims=self.extra_dims)
         pipeline.execute()
+        os.makedirs(osp.dirname(out_f), exist_ok=True)
         log.info(f"Saved to {out_f}")

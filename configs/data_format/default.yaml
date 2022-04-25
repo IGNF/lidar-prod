@@ -1,7 +1,3 @@
-tile_size_meters: 1000
-crs_prefix: "EPSG:"
-crs: 2154
-
 # Those names connect the logics between successive tasks
 las_dimensions:
   # input
@@ -21,23 +17,6 @@ las_dimensions:
 
   # Additionnal output channel
   ai_building_identified: Group
-
-cleaning:
-    # Extra dims that are kept when application starts. Others are removed to lighten the LAS.
-  input:
-    _target_: lidar_prod.tasks.cleaning.Cleaner
-    extra_dims:
-      - "${data_format.las_dimensions.ai_building_proba}=float"
-      - "${data_format.las_dimensions.entropy}=float"
-  output:
-    # Extra dims that are kept before final saving.
-    # You can override with "all" to keep all extra dimensions at development time.
-    _target_: lidar_prod.tasks.cleaning.Cleaner
-    extra_dims:
-      - "${data_format.las_dimensions.ai_building_proba}=float"
-      - "${data_format.las_dimensions.entropy}=float"
-      - "${data_format.las_dimensions.ai_building_identified}=uint"
-
 
 codes:
   building:
@@ -64,3 +43,20 @@ codes:
       - ["${data_format.codes.building.detailed.ia_confirmed_only}","${data_format.codes.building.final.building}"]
       - ["${data_format.codes.building.detailed.db_overlayed_only}","${data_format.codes.building.final.building}"]
       - ["${data_format.codes.building.detailed.both_confirmed}","${data_format.codes.building.final.building}"]
+
+
+cleaning:
+    # Extra dims that are kept when application starts. Others are removed to lighten the LAS.
+  input:
+    _target_: lidar_prod.tasks.cleaning.Cleaner
+    extra_dims:
+      - "${data_format.las_dimensions.ai_building_proba}=float"
+      - "${data_format.las_dimensions.entropy}=float"
+  output:
+    # Extra dims that are kept before final saving.
+    # You can override with "all" to keep all extra dimensions at development time.
+    _target_: lidar_prod.tasks.cleaning.Cleaner
+    extra_dims:
+      - "${data_format.las_dimensions.ai_building_proba}=float"
+      - "${data_format.las_dimensions.entropy}=float"
+      - "${data_format.las_dimensions.ai_building_identified}=uint"

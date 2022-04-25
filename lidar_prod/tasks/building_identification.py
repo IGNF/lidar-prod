@@ -4,6 +4,8 @@ import os
 import os.path as osp
 import pdal
 
+from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer
+
 log = logging.getLogger(__name__)
 
 
@@ -62,12 +64,7 @@ class BuildingIdentifier:
             out_f (str): output LAS
         """
         pipeline = pdal.Pipeline()
-        pipeline |= pdal.Reader(
-            in_f,
-            type="readers.las",
-            nosrs=True,
-            override_srs="EPSG:2154",
-        )
+        pipeline |= get_pdal_reader(in_f)
         non_candidates = (
             f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
         )
@@ -90,13 +87,6 @@ class BuildingIdentifier:
             value=f"{self.data_format.las_dimensions.cluster_id} = 0"
         )
 
-        pipeline |= pdal.Writer(
-            type="writers.las",
-            filename=out_f,
-            forward="all",
-            extra_dims="all",
-            minor_version=4,
-            dataformat_id=8,
-        )
+        pipeline |= get_pdal_writer(out_f)
         os.makedirs(osp.dirname(out_f), exist_ok=True)
         pipeline.execute()
