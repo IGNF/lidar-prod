@@ -1,3 +1,4 @@
+import pdal
 import pytest
 import tempfile
 import numpy as np
@@ -5,18 +6,17 @@ import numpy as np
 from lidar_prod.application import apply
 from lidar_prod.tasks.utils import get_las_metadata
 from tests.conftest import (
-    _isolate_and_copy,
-    _isolate_and_have_null_probability_everywhere,
-    _isolate_and_remove_all_candidate_buildings_points,
-    assert_las_contains_dims,
+    get_a_las_to_las_pdal_pipeline,
+    check_las_contains_dims,
     check_las_invariance,
     pdal_read_las_array,
 )
 
-"""We test 
+"""We test the application against a LAS subset (~50m²) with a few buildings and a few
+classification mistakes. The data contains the necessary fields (building probability, entropy)
+for validation.
+We apply different "mutations" to the data in order to test for multiple scenarii.
 
-Returns:
-    _type_: _description_
 """
 LAS_SUBSET_FILE = "tests/files/870000_6618000.subset.postIA.las"
 
@@ -24,9 +24,10 @@ LAS_SUBSET_FILE = "tests/files/870000_6618000.subset.postIA.las"
 @pytest.mark.parametrize(
     "las_mutation",
     [
-        _isolate_and_have_null_probability_everywhere,
-        _isolate_and_remove_all_candidate_buildings_points,
-        _isolate_and_copy,
+        [],  # identity
+        [pdal.Filter.assign(value=f"building = 0.0")],  # low proba everywhere
+        [pdal.Filter.assign(value=f"Classification = 1")],  # no candidate buildings
+        [pdal.Filter.assign(value=f"Classification = 202")],  # only candidate buildings
     ],
 )
 def test_application_data_invariance_and_data_format(default_hydra_cfg, las_mutation):
@@ -42,11 +43,14 @@ def test_application_data_invariance_and_data_format(default_hydra_cfg, las_muta
     }
     # Run application on the data subset
     with tempfile.TemporaryDirectory() as default_hydra_cfg.paths.output_dir:
-        # We copy the data, and in the process we apply a "mutation" in order
-        # to test for multiple scenarii.
-        mutated_copy = las_mutation(LAS_SUBSET_FILE)
+        # Copy the data and apply the "mutation"
+        mutated_copy: str = tempfile.NamedTemporaryFile().name
+        get_a_las_to_las_pdal_pipeline(
+            LAS_SUBSET_FILE, mutated_copy, las_mutation
+        ).execute()
         default_hydra_cfg.paths.src_las = mutated_copy
-        out_f = apply(default_hydra_cfg)
+        out_f: str = apply(default_hydra_cfg)
+        # Check output
         check_las_invariance(mutated_copy, out_f)
         check_format_of_application_output_las(out_f, expected_codes)
 
@@ -60,7 +64,7 @@ def check_format_of_application_output_las(out_f: str, expected_codes: dict):
 
     """
     # Check that we contain extra_dims that production needs
-    assert_las_contains_dims(out_f, dims_to_check=["Group", "building", "entropy"])
+    check_las_contains_dims(out_f, dims_to_check=["Group", "building", "entropy"])
 
     # Ensure that the format versions are as expected
     metadata = get_las_metadata(out_f)

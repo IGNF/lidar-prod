@@ -1,3 +1,4 @@
+import shutil
 import pytest
 import os
 import os.path as osp
@@ -10,8 +11,7 @@ from lidar_prod.tasks.building_validation_optimization import (
     BuildingValidationOptimizer,
 )
 from tests.conftest import (
-    get_a_copy_pdal_pipeline,
-    get_a_format_preserving_pdal_pipeline,
+    get_a_las_to_las_pdal_pipeline,
     pdal_read_las_array,
 )
 
@@ -26,8 +26,8 @@ This is to enable a shallower run of these tests without the file.
 
 # Small LAS, for which we optimize thresholds and reach perfect validation,
 # to quickly check optimization logic.
-IN_F = "tests/files/870000_6618000.subset.postIA.corrected.las"
-IN_F_EXPECTED = {
+LAS_SUBSET_FILE = "tests/files/870000_6618000.subset.postIA.corrected.las"
+SUBSET_EXPECTED_METRICS = {
     "exact": {
         "groups_count": 15,
         "group_no_buildings": 0.4,
@@ -40,8 +40,8 @@ IN_F_EXPECTED = {
 }
 # Large LAS, for which we evaluate performance, to control that there was no regression in terms of
 # automation/precision/recall of building validation.
-IN_F_LARGE = "tests/files/V0.5_792000_6272000.las"
-IN_F_LARGE_EXPECTED = {
+LAS_LARGE_FILE = "tests/files/V0.5_792000_6272000.las"
+LARGE_EXPECTED_METRICS = {
     "exact": {
         "groups_count": 1493,
         "group_no_buildings": 0.149,
@@ -70,9 +70,8 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
             input_las_dir
         )
         os.makedirs(input_las_dir, exist_ok=False)
-        in_f_copy = osp.join(input_las_dir, "copy.las")
-        pipeline = get_a_format_preserving_pdal_pipeline(IN_F, in_f_copy, [])
-        pipeline.execute()
+        f_copy = osp.join(input_las_dir, "copy.las")
+        shutil.copy(LAS_SUBSET_FILE, f_copy)
 
         # Check that a full optimization run can pass successfully
         bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
@@ -80,20 +79,23 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
         )
         bvo.run()
 
-        # Assert that a prepared and an updated file are generated in td
-        assert os.path.isfile(osp.join(td, "prepared", osp.basename(in_f_copy)))
-        out_f = osp.join(td, "updated", osp.basename(in_f_copy))
+        # Assert that a prepared and an updated file are generated in the temporary dir
+        # in subfolders.
+        assert os.path.isfile(osp.join(td, "prepared", osp.basename(f_copy)))
+        out_f = osp.join(td, "updated", osp.basename(f_copy))
         assert os.path.isfile(out_f)
 
         # Check the output of the evaluate method. Note that it uses the
-        # prepared data obtained from the full run just above
+        # prepared data and the threshold from previous run
         metrics_dict = bvo.evaluate()
-        assert IN_F_EXPECTED["exact"].items() <= metrics_dict.items()
-        for k, v in IN_F_EXPECTED["min"].items():
+        # Assert inclusion
+        assert SUBSET_EXPECTED_METRICS["exact"].items() <= metrics_dict.items()
+        # Assert <= with a relative tolerance
+        for k, v in SUBSET_EXPECTED_METRICS["min"].items():
             assert (
                 (1 - RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS) * v
             ) <= metrics_dict[k]
-        # Update with final codes and check if they are the right ones.
+        # Update classification dimension and check if the codes are the expected ones.
         bvo.bv.use_final_classification_codes = True
         bvo.update()
         assert os.path.isfile(out_f)
@@ -115,8 +117,8 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
 @pytest.mark.slow()
 def test_BVOptimization_on_large_file(default_hydra_cfg):
 
-    if not os.path.isfile(IN_F_LARGE):
-        pytest.xfail(reason=f"File {IN_F_LARGE} is not present in environment.")
+    if not os.path.isfile(LAS_LARGE_FILE):
+        pytest.xfail(reason=f"File {LAS_LARGE_FILE} is not present in environment.")
 
     with tempfile.TemporaryDirectory() as td:
         # Optimization output (thresholds and prepared/updated LASfiles) saved to td
@@ -128,9 +130,8 @@ def test_BVOptimization_on_large_file(default_hydra_cfg):
             input_las_dir
         )
         os.makedirs(input_las_dir, exist_ok=False)
-        in_f_copy = osp.join(input_las_dir, "copy.las")
-        pipeline = get_a_copy_pdal_pipeline(IN_F_LARGE, in_f_copy)
-        pipeline.execute()
+        f_copy = osp.join(input_las_dir, "copy.las")
+        shutil.copy(LAS_LARGE_FILE, f_copy)
 
         # Check that a full optimization run can pass successfully
         bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
@@ -139,7 +140,7 @@ def test_BVOptimization_on_large_file(default_hydra_cfg):
         bvo.prepare()
         metrics_dict = bvo.evaluate()
 
-        exact_expected_val = IN_F_LARGE_EXPECTED["exact"]
+        exact_expected_val = LARGE_EXPECTED_METRICS["exact"]
         for k in exact_expected_val:
             assert (
                 pytest.approx(
@@ -147,7 +148,7 @@ def test_BVOptimization_on_large_file(default_hydra_cfg):
                 )
                 == metrics_dict[k]
             )
-        min_expected_val = IN_F_LARGE_EXPECTED["min"]
+        min_expected_val = LARGE_EXPECTED_METRICS["min"]
         for k in min_expected_val:
             assert (
                 (1 - RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS) * min_expected_val[k]
