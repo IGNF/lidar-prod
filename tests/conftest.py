@@ -45,6 +45,13 @@ def pdal_read_las_array(in_f):
 
 
 # TODO: this could be used in code to avoid pdal boilerplate
+def read_as_array_with_pdal(out_f):
+    pipeline = pdal.pipeline() | pdal.Reader.las(
+            filename=out_f, nosrs=True, override_srs="EPSG:2154"
+        )
+    a = pipeline.execute().arrays[0]
+    return a
+
 def get_a_las_to_las_pdal_pipeline(in_f: str, out_f: str, ops: Iterable[Any]):
     """Create a pdal pipeline, preserving format, forwarding every dimension.
 

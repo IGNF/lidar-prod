@@ -1,10 +1,16 @@
 import os.path as osp
+from re import A
 import tempfile
+import pdal
 import pytest
 
 from lidar_prod.tasks.cleaning import Cleaner
 from lidar_prod.tasks.utils import get_las_metadata
-from tests.conftest import check_las_invariance, pdal_read_las_array
+from tests.conftest import (
+    check_las_invariance,
+    pdal_read_las_array,
+    read_as_array_with_pdal,
+)
 
 IN_F = "tests/files/870000_6618000.subset.postIA.las"
 
@@ -17,15 +23,23 @@ def test_cleaning_no_extra_dims(extra_dims):
         out_f = osp.join(td, "no_extra_dims.las")
         cl.run(IN_F, out_f)
         check_las_invariance(IN_F, out_f)
+        a = read_as_array_with_pdal(out_f)
+        las_dimensions = a.dtype.fields.keys()
+        assert all(
+            dim not in las_dimensions for dim in ["building", "entropy"]
+        )  # key dims were cleaned out
 
 
-@pytest.mark.parametrize("extra_dims", ("entropy=float", "building=float"))
-def test_cleaning_float_extra_dim(extra_dims):
-    cl = Cleaner(extra_dims=extra_dims)
+def test_cleaning_float_extra_dim():
+    cl = Cleaner(extra_dims="entropy=float")
     with tempfile.TemporaryDirectory() as td:
         out_f = osp.join(td, "float_extra_dim.las")
         cl.run(IN_F, out_f)
         check_las_invariance(IN_F, out_f)
+        a = read_as_array_with_pdal(out_f)
+        las_dimensions = a.dtype.fields.keys()
+        assert "entropy" in las_dimensions
+        assert "building" not in las_dimensions
 
 
 def test_cleaning_two_float_extra_dims():
