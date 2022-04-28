@@ -1,5 +1,5 @@
 import hydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 import sys
 import os.path as osp
 
@@ -9,7 +9,7 @@ def main(config: DictConfig):
 
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934
-    from lidar_prod.utils.utils import extras
+    from lidar_prod.commons.commons import extras
     from lidar_prod.application import apply
     from lidar_prod.optimization import optimize
 
@@ -23,5 +23,5 @@ def main(config: DictConfig):
 
 if __name__ == "__main__":
     sys.path.append(osp.dirname(osp.dirname(__file__)))
-    OmegaConf.register_new_resolver("get_method", hydra.utils.get_method)
+    # OmegaConf.register_new_resolver("get_method", hydra.utils.get_method)
     main()

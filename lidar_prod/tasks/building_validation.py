@@ -2,8 +2,7 @@ from dataclasses import dataclass
 import logging
 import os
 import os.path as osp
-from typing import Optional
-import pickle
+from typing import Dict, Optional
 import subprocess
 import numpy as np
 import pdal
@@ -11,14 +10,20 @@ from tempfile import TemporaryDirectory
 import geopandas
 import laspy
 from tqdm import tqdm
-from lidar_prod.tasks.utils import BDUniConnectionParams, extract_coor, split_idx_by_dim
+from lidar_prod.tasks.utils import (
+    BDUniConnectionParams,
+    get_integer_bbox,
+    get_pdal_reader,
+    get_pdal_writer,
+    split_idx_by_dim,
+)
 
 log = logging.getLogger(__name__)
 
 
 @dataclass
 class BuildingValidationClusterInfo:
-    """Elements needed to either confirm, refute, or be uncertain about a cluster of cnadidate building points."""
+    """Elements needed to confirm, refute, or be uncertain about a cluster of candidate building points."""
 
     probabilities: np.ndarray
     overlays: np.ndarray
@@ -58,67 +63,45 @@ class BuildingValidator:
         self.codes = data_format.codes.building
         self.candidate_buildings_codes = data_format.codes.building.candidates
 
-        self.setup(building_validation_thresholds_pickle)
+        self.setup()
 
-    def setup(self, building_validation_thresholds_pickle):
-        """Setup, loading optimized thresholds if available."""
-        if osp.exists(building_validation_thresholds_pickle):
-            self._set_thresholds_from_pickle(building_validation_thresholds_pickle)
-            log.info(
-                f"Using optimized thresholds from: {building_validation_thresholds_pickle}"
-            )
-        else:
-            log.warning(
-                "Using default decision thresholds - specify "
-                "'building_validation.application.building_validation_thresholds_pickle' "
-                "to use thresholds of an ad-hoc optimization step"
-            )
+    def setup(self):
+        """Setup. Defines useful variables."""
 
-        self.detailed_to_final = {
-            self.codes.detailed.unclustered: self.codes.final.not_building,
-            self.codes.detailed.ia_refuted: self.codes.final.not_building,
-            self.codes.detailed.ia_refuted_but_under_db_uni: self.codes.final.unsure,
-            self.codes.detailed.both_unsure: self.codes.final.unsure,
-            self.codes.detailed.unsure_by_entropy: self.codes.final.unsure,
-            self.codes.detailed.ia_confirmed_only: self.codes.final.building,
-            self.codes.detailed.db_overlayed_only: self.codes.final.building,
-            self.codes.detailed.both_confirmed: self.codes.final.building,
+        self.detailed_to_final_map: dict = {
+            detailed: final for detailed, final in self.codes.detailed_to_final
         }
-        self.detailed_to_final_mapper = np.vectorize(
-            lambda detailed_code: self.detailed_to_final.get(detailed_code),
-            otypes=[np.int],
-        )
 
     def run(
         self,
-        in_f: str,
-        out_f: str,
-    ):
-        """Application.
+        src_las_path: str,
+        target_las_path: str,
+    ) -> str:
+        """Runs application.
 
-        Transform cloud at `in_f` following building validation logic,
-        and save it to `out_f`
+        Transforms cloud at `src_las_path` following building validation logic,
+        and saves it to `target_las_path`
 
         Args:
-            in_f (str): path to input LAS file with a building probability channel
-            out_f (str): path for saving updated LAS file.
+            src_las_path (str): path to input LAS file with a building probability channel
+            target_las_path (str): path for saving updated LAS file.
 
         Returns:
-            _type_: returns `out_f` for potential terminal piping.
+            str: returns `target_las_path`
 
         """
         with TemporaryDirectory() as td:
-            log.info(f"Applying Building Validation to file \n{in_f}")
+            log.info(f"Applying Building Validation to file \n{src_las_path}")
             log.info(
                 "Preparation : Clustering of candidates buildings & Requesting BDUni"
             )
-            temp_f = osp.join(td, osp.basename(in_f))
-            self.prepare(in_f, temp_f)
+            temp_f = osp.join(td, osp.basename(src_las_path))
+            self.prepare(src_las_path, temp_f)
             log.info("Using AI and Databases to update cloud Classification")
-            self.update(temp_f, out_f)
-        return out_f
+            self.update(temp_f, target_las_path)
+        return target_las_path
 
-    def prepare(self, in_f: str, out_f: str):
+    def prepare(self, src_las_path: str, prepared_las_path: str) -> None:
         f"""
         Prepare las for later decision process. .
         1. Cluster candidates points, in a new `{self.data_format.las_dimensions.ClusterID_candidate_building}`
@@ -130,25 +113,27 @@ class BuildingValidator:
         `{self.data_format.las_dimensions.candidate_buildings_flag}`, to ignore them in later
         buildings identification.
 
-        Dimension classification should not be modified here, as optimization step needs unmo
+        Dimension classification should not be modified here, as optimization step needs to
+        do this step once before testing multiple decision parameters on the same prepared data.
+
+        Args:
+            src_las_path (str): path to input LAS file with a building probability channel
+            target_las_path (str): path for saving prepared LAS file.
 
         """
 
-        _candidate_flag = self.data_format.las_dimensions.candidate_buildings_flag
-        _cluster_id = self.data_format.las_dimensions.cluster_id
-        _groups = self.data_format.las_dimensions.ClusterID_candidate_building
-        _overlay = self.data_format.las_dimensions.uni_db_overlay
+        dim_candidate_flag = self.data_format.las_dimensions.candidate_buildings_flag
+        dim_cluster_id_pdal = self.data_format.las_dimensions.cluster_id
+        dim_cluster_id_candidates = (
+            self.data_format.las_dimensions.ClusterID_candidate_building
+        )
+        dim_overlay = self.data_format.las_dimensions.uni_db_overlay
 
-        # We use a temporary directory to clean intermediary files automatically
         with TemporaryDirectory() as td:
             pipeline = pdal.Pipeline()
-            pipeline |= pdal.Reader(
-                in_f,
-                type="readers.las",
-                nosrs=True,
-                override_srs=self.data_format.crs_prefix + str(self.data_format.crs),
-            )
-            pipeline |= pdal.Filter.ferry(dimensions=f"=>{_candidate_flag}")
+            pipeline |= get_pdal_reader(src_las_path)
+            # Identify candidates buildings points with a boolean flag
+            pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_candidate_flag}")
             _is_candidate_building = (
                 "("
                 + " || ".join(
@@ -158,95 +143,99 @@ class BuildingValidator:
                 + ")"
             )
             pipeline |= pdal.Filter.assign(
-                value=f"{_candidate_flag} = 1 WHERE {_is_candidate_building}"
+                value=f"{dim_candidate_flag} = 1 WHERE {_is_candidate_building}"
             )
+            # Cluster candidates buildings points. This creates a ClusterID dimension (int)
+            # in which unclustered points have index 0.
             pipeline |= pdal.Filter.cluster(
                 min_points=self.cluster.min_points,
                 tolerance=self.cluster.tolerance,
-                where=f"{_candidate_flag} == 1",
+                where=f"{dim_candidate_flag} == 1",
             )
-            # Always move and reset ClusterID to avoid conflict with later tasks.
-            pipeline |= pdal.Filter.ferry(dimensions=f"{_cluster_id}=>{_groups}")
-            pipeline |= pdal.Filter.assign(value=f"{_cluster_id} = 0")
+
+            # Copy ClusterID into a new dim and reset it to 0 to avoid conflict with later tasks.
+            pipeline |= pdal.Filter.ferry(
+                dimensions=f"{dim_cluster_id_pdal}=>{dim_cluster_id_candidates}"
+            )
+            pipeline |= pdal.Filter.assign(value=f"{dim_cluster_id_pdal} = 0")
 
             # TODO: extract coordinates from LAS directly using pdal.
+            # Request BDUni to get a shapefile of the known buildings in the LAS
             _shp_p = os.path.join(td, "temp.shp")
+            bbox = get_integer_bbox(src_las_path, buffer=self.bd_uni_request.buffer)
             buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
-                self.bd_uni_connection_params,
-                *extract_coor(
-                    os.path.basename(in_f),
-                    self.data_format.tile_size_meters,
-                    self.data_format.tile_size_meters,
-                    self.bd_uni_request.buffer,
-                ),
-                self.data_format.crs,
-                _shp_p,
+                self.bd_uni_connection_params, _shp_p, bbox
             )
 
-            # Channel is always created even if there are no buildings in database.
-            pipeline |= pdal.Filter.ferry(dimensions=f"=>{_overlay}")
+            # Create overlay dim
+            # If there are some buildings in the database, create a BDTopoOverlay boolean
+            # dimension to reflect it.
+            pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_overlay}")
             if buildings_in_bd_topo:
                 pipeline |= pdal.Filter.overlay(
-                    column="PRESENCE", datasource=_shp_p, dimension=_overlay
+                    column="PRESENCE", datasource=_shp_p, dimension=dim_overlay
                 )
-            pipeline |= pdal.Writer(
-                type="writers.las",
-                filename=out_f,
-                forward="all",
-                extra_dims="all",
-                minor_version=4,
-                dataformat_id=8,
-            )
-            os.makedirs(osp.dirname(out_f), exist_ok=True)
+            pipeline |= get_pdal_writer(prepared_las_path)
+            os.makedirs(osp.dirname(prepared_las_path), exist_ok=True)
             pipeline.execute()
 
-    def update(self, prepared_f: str, out_f: str):
-        """Update point cloud classification channel."""
+    def update(self, prepared_las_path: str, target_las_path: str) -> None:
+        """Updates point cloud classification channel."""
 
-        las = laspy.read(prepared_f)
-        # 1) Map all points to a single class in case there was multiple codes to flag candidate buildings.
-        # TODO: perform this at preparation step.
+        las = laspy.read(prepared_las_path)
 
-        _clf = self.data_format.las_dimensions.classification
-        _flag = self.data_format.las_dimensions.candidate_buildings_flag
-        candidates_idx = las[_flag] == 1
-        las[_clf][candidates_idx] = self.codes.detailed.unclustered
+        # 1) Map all points to a single "not_building" class
+        # to be sure that they will all be modified.
+
+        dim_clf = self.data_format.las_dimensions.classification
+        dim_flag = self.data_format.las_dimensions.candidate_buildings_flag
+        candidates_mask = las[dim_flag] == 1
+        las[dim_clf][candidates_mask] = self.codes.final.not_building
 
         # 2) Decide at the group-level
         # TODO: check if this can be moved somewhere else. WARNING: use_final_classification_codes may be modified in
         # an unsafe manner during optimization. Consider using a setter that will change decision_func alongside.
 
+        # Decide level of details of classification codes
         decision_func = self._make_detailed_group_decision
         if self.use_final_classification_codes:
             decision_func = self._make_group_decision
 
-        split_idx = split_idx_by_dim(
-            las[self.data_format.las_dimensions.ClusterID_candidate_building]
-        )
-        START_IDX_OF_CLUSTERS = 1
-        split_idx = split_idx[
-            START_IDX_OF_CLUSTERS:
-        ]  # removes unclustered group that have ClusterID = 0
+        # Get the index of points of each cluster
+        # Remove unclustered group that have ClusterID = 0 (i.e. the first "group")
+        cluster_id_dim = las[
+            self.data_format.las_dimensions.ClusterID_candidate_building
+        ]
+        split_idx = split_idx_by_dim(cluster_id_dim)
+        split_idx = split_idx[1:]
+
+        # Iterate over groups and update their classification
         for pts_idx in tqdm(
             split_idx, desc="Update cluster classification", unit="clusters"
         ):
             infos = self._extract_cluster_info_by_idx(las, pts_idx)
-            las[_clf][pts_idx] = decision_func(infos)
+            las[dim_clf][pts_idx] = decision_func(infos)
 
-        os.makedirs(osp.dirname(out_f), exist_ok=True)
-        las.write(out_f)
+        # Candidate that were not clustered get their "candidate flag" set back to 0 so that they are considered
+        # in building completion/identification steps.
+        unclustered_mask = cluster_id_dim == 0
+        unclustered_candidates_mask = candidates_mask & (unclustered_mask)
+        las[dim_flag][unclustered_candidates_mask] = 0
+        os.makedirs(osp.dirname(target_las_path), exist_ok=True)
+        las.write(target_las_path)
 
     def _extract_cluster_info_by_idx(
         self, las: laspy.LasData, pts_idx: np.ndarray
     ) -> BuildingValidationClusterInfo:
-        """Extract all necessary information to make a decision based on points indices.
+        """Extracts all necessary information to make a decision based on points indices.
 
         Args:
             las (laspy.LasData): point cloud of interest
             pts_idx (np.ndarray): indices of points in considered clusters
 
         Returns:
-            _type_: _description_
+            BuildingValidationClusterInfo: data necessary to make a decision at cluster level.
+
         """
         pts = las.points[pts_idx]
         probabilities = pts[self.data_format.las_dimensions.ai_building_proba]
@@ -264,9 +253,11 @@ class BuildingValidator:
             int: final classification code for the considered group.
         """
         detailed_code = self._make_detailed_group_decision(*args, **kwargs)
-        return self.detailed_to_final[detailed_code]
+        return self.detailed_to_final_map[detailed_code]
 
-    def _make_detailed_group_decision(self, infos: BuildingValidationClusterInfo):
+    def _make_detailed_group_decision(
+        self, infos: BuildingValidationClusterInfo
+    ) -> int:
         """Decision process at the cluster level.
 
         Confirm or refute candidate building groups based on fraction of confirmed/refuted points and
@@ -279,6 +270,7 @@ class BuildingValidator:
 
         Returns:
             int: detailed classification code for the considered group.
+
         """
         # HIGH ENTROPY
 
@@ -331,25 +323,11 @@ class BuildingValidator:
             return self.codes.detailed.db_overlayed_only
         return self.codes.detailed.both_unsure
 
-    def _set_thresholds_from_pickle(self, building_validation_thresholds_pickle: str):
-        """Specifiy all thresholds from serialized rules.
-        This is used in thresholds optimization.
-
-        Args:
-            building_validation_thresholds_pickle (str): _description_
-        """
-        with open(building_validation_thresholds_pickle, "rb") as f:
-            self.thresholds: thresholds = pickle.load(f)
-
 
 def request_bd_uni_for_building_shapefile(
     bd_params: BDUniConnectionParams,
-    xmin: float,
-    ymin: float,
-    xmax: float,
-    ymax: float,
-    srid: int,
     shapefile_path: str,
+    bbox: Dict[str, int],
 ):
     """BD Uni request.
 
@@ -358,7 +336,16 @@ def request_bd_uni_for_building_shapefile(
     Also add a "PRESENCE" column filled with 1 for later use by pdal.
 
     """
-    sql_request = f"SELECT st_setsrid(batiment.geometrie,{srid}) AS geometry, 1 as presence  FROM batiment WHERE batiment.geometrie && ST_MakeEnvelope({xmin}, {ymin}, {xmax}, {ymax}, {srid}) and not gcms_detruit"
+    Lambert_93_SRID = 2154
+    sql_request = f'SELECT \
+        st_setsrid(batiment.geometrie,{Lambert_93_SRID}) AS geometry, \
+        1 as presence \
+        FROM batiment \
+        WHERE batiment.geometrie \
+            && \
+        ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
+        and \
+        not gcms_detruit'
     cmd = [
         "pgsql2shp",
         "-f",
@@ -382,6 +369,17 @@ def request_bd_uni_for_building_shapefile(
             == b"Initializing... \nERROR: Could not determine table metadata (empty table)\n"
         ):
             return False
+        # Error can be due to something else entirely, like
+        # an inability to translate host name to an address.
+        # e.g. "could not translate host name "serveurbdudiff.ign.fr" to address: System error"
+        raise e
+    except ConnectionRefusedError as e:
+        log.error(
+            "ConnectionRefusedError when requesting BDUni.  \
+            This means that the Database cannot be accessed (e.g. due to vpn/proxy reasons, \
+            or bad credentials)"
+        )
+        raise e
 
     # read & write to avoid unnacepted 3D shapefile format.
     gdf = geopandas.read_file(shapefile_path)
@@ -392,7 +390,7 @@ def request_bd_uni_for_building_shapefile(
 
 @dataclass
 class thresholds:
-    """The deciison threshold for cluser-level decisions."""
+    """The decision thresholds for a cluser-level decisions."""
 
     min_confidence_confirmation: float
     min_frac_confirmation: float

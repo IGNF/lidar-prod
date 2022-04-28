@@ -1,8 +1,10 @@
 from dataclasses import dataclass
-import re
-from functools import wraps
-from tempfile import TemporaryDirectory
-from typing import List, Union
+import json
+import math
+from numbers import Number
+import subprocess
+import tempfile
+from typing import Any, Dict, Iterable
 import numpy as np
 import pdal
 
@@ -28,17 +30,122 @@ def split_idx_by_dim(dim_array):
     return group_idx
 
 
-def extract_coor(las_name: str, x_span: float, y_span: float, buffer: float):
-    """
-    Extract the X-Y coordinates from standard LAS name, and returns
-    a bounding box with a specified spans plus a buffer.
-    """
-    # get the values with [4,10] digits in the file name
-    x_min, y_max = re.findall(r"[0-9]{4,10}", las_name)
-    x_min, y_max = int(x_min), int(y_max)
-    return (
-        x_min - buffer,
-        y_max - y_span - buffer,
-        x_min + x_span + buffer,
-        y_max + buffer,
+def run_pdal_info(in_las: str, out_stats_json: str):
+    command = (
+        f"pdal info {in_las}"
+        " --metadata"
+        " --driver readers.las"
+        f" > {out_stats_json}"
     )
+    subprocess.run(command, shell=True, check=True)
+
+
+def get_las_metadata(in_las):
+    _tmp = tempfile.NamedTemporaryFile().name
+    run_pdal_info(in_las, _tmp)
+    with open(_tmp) as mtd:
+        metadata = json.load(mtd)["metadata"]
+    return metadata
+
+
+def get_bbox(las_path: str, buffer: int = 0) -> Dict[str, int]:
+    """Get XY bounding box of a cloud using pdal info --metadata.
+
+    Args:
+        las_path (str): path to input LAS cloud.
+        buffer (int): expand bbox with a buffer. Default: no buffer.
+
+    Returns:
+        float: coordinates of bounding box : xmin, ymin, xmax, ymax
+
+    """
+
+    metadata = get_las_metadata(las_path)
+    return {
+        "x_min": math.floor(metadata["minx"] - buffer),
+        "y_min": math.floor(metadata["miny"] - buffer),
+        "x_max": math.ceil(metadata["maxx"] + buffer),
+        "y_max": math.ceil(metadata["maxy"] + buffer),
+    }
+
+
+def get_integer_bbox(las_path: str, buffer: Number = 0) -> Dict[str, int]:
+    """Get XY bounding box of a cloud, cast x/y min/max to integers."""
+
+    bbox = get_bbox(las_path, buffer=buffer)
+    return {
+        "x_min": math.floor(bbox["x_min"]),
+        "y_min": math.floor(bbox["y_min"]),
+        "x_max": math.ceil(bbox["x_max"]),
+        "y_max": math.ceil(bbox["y_max"]),
+    }
+
+
+def get_pdal_reader(las_path: str) -> pdal.Reader.las:
+    """Standard Reader which imposes Lamber 93 SRS.
+
+    Args:
+        las_path (str): input LAS path to read.
+
+    Returns:
+        pdal.Reader.las: reader to use in a pipeline.
+
+    """
+    return pdal.Reader.las(
+        filename=las_path,
+        nosrs=True,
+        override_srs="EPSG:2154",
+    )
+
+
+def get_pdal_writer(target_las_path: str, extra_dims: str = "all") -> pdal.Writer.las:
+    """Standard LAS Writer which imposes LAS 1.4 specification and dataformat 8.
+
+    Args:
+        target_las_path (str): output LAS path to write.
+        extra_dims (str): extra dimensions to keep, in the format expected by pdal.Writer.las.
+
+    Returns:
+        pdal.Writer.las: writer to use in a pipeline.
+
+    """
+    return pdal.Writer.las(
+        filename=target_las_path,
+        minor_version=4,
+        dataformat_id=8,
+        forward="all",
+        extra_dims=extra_dims,
+    )
+
+
+def get_a_las_to_las_pdal_pipeline(
+    src_las_path: str, target_las_path: str, ops: Iterable[Any]
+):
+    """Create a pdal pipeline, preserving format, forwarding every dimension.
+
+    Args:
+        src_las_path (str): input LAS path
+        target_las_path (str): output LAS path
+        ops (Iterable[Any]): list of pdal operation (e.g. Filter.assign(...))
+
+    """
+    pipeline = pdal.Pipeline()
+    pipeline |= get_pdal_reader(src_las_path)
+    for op in ops:
+        pipeline |= op
+    pipeline |= get_pdal_writer(target_las_path)
+    return pipeline
+
+
+def pdal_read_las_array(las_path: str):
+    """Read LAS as a named array.
+
+    Args:
+        las_path (str): input LAS path
+
+    Returns:
+        np.ndarray: named array with all LAS dimensions, including extra ones, with dict-like access.
+    """
+    p1 = pdal.Pipeline() | get_pdal_reader(las_path)
+    p1.execute()
+    return p1.arrays[0]
