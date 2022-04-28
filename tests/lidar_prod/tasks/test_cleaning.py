@@ -3,7 +3,7 @@ import tempfile
 import pytest
 
 from lidar_prod.tasks.cleaning import Cleaner
-from lidar_prod.tasks.utils import get_las_metadata, pdal_read_las_array
+from lidar_prod.tasks.utils import pdal_read_las_array
 from tests.conftest import check_las_invariance
 from tests.lidar_prod.test_application import check_las_format_versions_and_srs
 
