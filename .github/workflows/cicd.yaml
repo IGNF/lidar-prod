@@ -2,7 +2,9 @@ name: CICD
 
 on:
   pull_request:
-    branches: [dev, main]
+    # branches: [dev, main]
+    # TODO/ UNCOMMENT TO REENABLE
+    branches: []  
 
 
 jobs:
