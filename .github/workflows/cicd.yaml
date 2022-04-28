@@ -39,7 +39,8 @@ jobs:
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
         -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/
         lidar_prod_im
-        python lidar_prod/run.py
+        python 
+        lidar_prod/run.py
         print_config=true
         paths.src_las=/inputs/730000_6360000.subset.prototype_format202.las
         paths.output_dir=/outputs/
