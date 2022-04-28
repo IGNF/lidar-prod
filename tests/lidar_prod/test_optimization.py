@@ -14,7 +14,7 @@ from tests.conftest import pdal_read_las_array
 
 """We test the building validation optimizer against two LAS:
 
-These datasets must have the right classification codes, i.e. the ones defined in labels_from_20211001_building_val.
+These datasets must have the right classification codes, i.e. the ones defined in buildings_correction_labels.
 
 WARNING: The large LAS cannot be versionned by git. If it is absent from environment, pytest expects the test to fail.
 This is to enable a shallower run of these tests without the file.

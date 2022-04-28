@@ -36,7 +36,7 @@ class BuildingValidationOptimizer:
         building_validator: BuildingValidator,
         study: optuna.Study,
         design: Any,
-        labels_from_20211001_building_val: Any,
+        buildings_correction_labels: Any,
         use_final_classification_codes: bool = False,
         debug=False,
     ):
@@ -46,7 +46,7 @@ class BuildingValidationOptimizer:
         self.bv = building_validator
         self.study = study
         self.design = design
-        self.labels_from_20211001_building_val = labels_from_20211001_building_val
+        self.buildings_correction_labels = buildings_correction_labels
         self.use_final_classification_codes = use_final_classification_codes
         self.setup()
 
@@ -85,8 +85,8 @@ class BuildingValidationOptimizer:
 
         # We must adapt BuildingValidator to corrected data by specifying the codes to use as candidates
         self.bv.candidate_buildings_codes = (
-            self.labels_from_20211001_building_val.codes.true_positives
-            + self.labels_from_20211001_building_val.codes.false_positives
+            self.buildings_correction_labels.codes.true_positives
+            + self.buildings_correction_labels.codes.false_positives
         )
         # We also specify if, when updating corrected data (for inspection) we want final codes or detailed ones.
         self.bv.use_final_classification_codes = self.use_final_classification_codes
@@ -212,12 +212,12 @@ class BuildingValidationOptimizer:
         tp_frac = np.mean(
             np.isin(
                 targets,
-                self.labels_from_20211001_building_val.codes.true_positives,
+                self.buildings_correction_labels.codes.true_positives,
             )
         )
-        if tp_frac >= self.labels_from_20211001_building_val.min_frac.true_positives:
+        if tp_frac >= self.buildings_correction_labels.min_frac.true_positives:
             return self.bv.codes.final.building
-        elif tp_frac < self.labels_from_20211001_building_val.min_frac.false_positives:
+        elif tp_frac < self.buildings_correction_labels.min_frac.false_positives:
             return self.bv.codes.final.not_building
         return self.bv.codes.final.unsure
 

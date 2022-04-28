@@ -16,16 +16,19 @@ paths:
   building_validation_thresholds_pickle: ${.results_output_dir}/optimized_thresholds.pickle # Wher
 
 
-# CLASSIFICATION CODES of dataset 20211001_building_val, which was inspected and labeled post TerraSolid macro
+# CLASSIFICATION CODES of a dataset which was inspected 
+# and labeled post TerraSolid macro
 # Those are used to override the app default codes.
-labels_from_20211001_building_val:
+buildings_correction_labels:
   codes:
     true_positives: [19] # building that was found by the macro
     false_positives: [20, 110, 112, 114, 115] # e.g. trees, hedge, trucks
     false_negatives: [21]  # e.g. buildings under vegetation, low building
+  # Sometimes a cluster will be ambiguous and we need
+  # thresholds to decice if it is a TP or FP.
   min_frac:
-    true_positives: 0.95 # >=x% of confirmed points --> a building
-    false_positives: 0.05 # <x% of confirmed points --> not a building
+    true_positives: 0.95 # >=x% of confirmed points --> cluster is a building
+    false_positives: 0.05 # <x% of confirmed points --> cluster is not a building
 
 
 study:

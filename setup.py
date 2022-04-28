@@ -1,12 +1,17 @@
 from setuptools import find_packages, setup
+import yaml
+
+with open("package_metadata.yaml", "r") as f:
+    pm = yaml.safe_load(f)
 
 setup(
-    name="lidar_prod",
-    version="1.5.0",
-    description="A 3D semantic segmentation production tool to augment rules-based Lidar classification with AI and databases.",
-    author="Charles GAYDON",
-    author_email="charles.gaydon@gmail.com",
-    url="https://github.com/IGNF/lidar-prod-quality-control",
-    install_requires=[],  # env should match the one in bash/setup_environment/setup_env.sh
+    name=pm["__name__"],
+    version=pm["__version__"],
+    url=pm["__url__"],
+    description=pm["__description__"],
+    author=pm["__author__"],
+    install_requires=[
+        # assume an environment as described in ./bash/setup_env.sh
+    ],
     packages=find_packages(),
 )
