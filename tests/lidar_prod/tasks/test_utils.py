@@ -6,10 +6,14 @@ import pytest
 from lidar_prod.tasks.utils import get_bbox, get_pdal_writer, split_idx_by_dim
 
 
-def create_synthetic_las_data_within_bouds(
-    out_f,
-    bbox,
-):
+def create_synthetic_las_data_within_bounds(synthetic_las_path: str, bbox) -> None:
+    """Creates a synthetic LAS contained within given bbox.
+
+    Args:
+        synthetic_las_path (str): path to save the synthetic LAS.
+        bbox (_type_): bounding box (example key: `x_min`).
+
+    """
     bounds = (
         f'([{bbox["x_min"]},{bbox["x_max"]}],[{bbox["y_min"]},{bbox["y_max"]}],[0,100])'
     )
@@ -17,7 +21,7 @@ def create_synthetic_las_data_within_bouds(
     pipeline |= pdal.Reader.faux(
         filename="no_file.las", mode="ramp", count=100, bounds=bounds
     )
-    pipeline |= get_pdal_writer(out_f)
+    pipeline |= get_pdal_writer(synthetic_las_path)
     pipeline.execute()
 
 
@@ -28,7 +32,7 @@ def create_synthetic_las_data_within_bouds(
 def test_get_bbox(x_min, y_min, x_max, y_max):
     tmp_las = tempfile.NamedTemporaryFile().name
     desired_bbox = {"x_min": x_min, "y_min": y_min, "x_max": x_max, "y_max": y_max}
-    create_synthetic_las_data_within_bouds(tmp_las, desired_bbox)
+    create_synthetic_las_data_within_bounds(tmp_las, desired_bbox)
     assert get_bbox(tmp_las) == desired_bbox
     # Buffer argument is taken into account, and absent by default
     assert get_bbox(tmp_las) == get_bbox(tmp_las, buffer=0)

@@ -11,21 +11,23 @@ def default_hydra_cfg():
         return compose(config_name="config")
 
 
-def check_las_invariance(las1, las2):
+def check_las_invariance(las_path1, las_path2):
     TOLERANCE = 0.0001
 
-    a1 = pdal_read_las_array(las1)
-    a2 = pdal_read_las_array(las2)
+    array1 = pdal_read_las_array(las_path1)
+    array2 = pdal_read_las_array(las_path2)
     key_dims = ["X", "Y", "Z", "Infrared", "Red", "Blue", "Green", "Intensity"]
-    assert a1.shape == a2.shape  # no loss of points
-    assert all(d in a2.dtype.fields.keys() for d in key_dims)  # key dims are here
+    assert array1.shape == array2.shape  # no loss of points
+    assert all(
+        dim in array2.dtype.fields.keys() for dim in key_dims
+    )  # key dimensions are here
 
     # order of points is allowed to change, so we assess a relaxed equality.
-    for d in key_dims:
-        assert pytest.approx(np.min(a2[d]), TOLERANCE) == np.min(a1[d])
-        assert pytest.approx(np.max(a2[d]), TOLERANCE) == np.max(a1[d])
-        assert pytest.approx(np.mean(a2[d]), TOLERANCE) == np.mean(a1[d])
-        assert pytest.approx(np.sum(a2[d]), TOLERANCE) == np.sum(a1[d])
+    for dim in key_dims:
+        assert pytest.approx(np.min(array2[dim]), TOLERANCE) == np.min(array1[dim])
+        assert pytest.approx(np.max(array2[dim]), TOLERANCE) == np.max(array1[dim])
+        assert pytest.approx(np.mean(array2[dim]), TOLERANCE) == np.mean(array1[dim])
+        assert pytest.approx(np.sum(array2[dim]), TOLERANCE) == np.sum(array1[dim])
 
 
 def check_las_contains_dims(las1, dims_to_check=[]):

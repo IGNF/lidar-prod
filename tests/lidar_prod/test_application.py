@@ -48,32 +48,38 @@ def test_application_data_invariance_and_data_format(default_hydra_cfg, las_muta
             LAS_SUBSET_FILE, mutated_copy, las_mutation
         ).execute()
         default_hydra_cfg.paths.src_las = mutated_copy
-        out_f: str = apply(default_hydra_cfg)
+        updated_las_path: str = apply(default_hydra_cfg)
         # Check output
-        check_las_invariance(mutated_copy, out_f)
-        check_format_of_application_output_las(out_f, expected_codes)
+        check_las_invariance(mutated_copy, updated_las_path)
+        check_format_of_application_output_las(updated_las_path, expected_codes)
 
 
-def check_format_of_application_output_las(out_f: str, expected_codes: dict):
+def check_format_of_application_output_las(output_las_path: str, expected_codes: dict):
     """Check LAS format, dimensions, and classification codes of output
 
     Args:
-        out_f (str): path of output LAS
+        output_las_path (str): path of output LAS
         expected_codes (dict): set of expected classification codes.
 
     """
     # Check that we contain extra_dims that production needs
-    check_las_contains_dims(out_f, dims_to_check=["Group", "building", "entropy"])
+    check_las_contains_dims(
+        output_las_path, dims_to_check=["Group", "building", "entropy"]
+    )
 
     # Ensure that the format versions are as expected
-    metadata = get_las_metadata(out_f)
+    check_las_format_versions_and_srs(output_las_path)
+
+    # Check that we have either 1/2 (ground/unclassified),
+    # or one of the three final classification code of the module
+    arr1 = pdal_read_las_array(output_las_path)
+    actual_codes = {*np.unique(arr1["Classification"])}
+    assert actual_codes.issubset(expected_codes)
+
+
+def check_las_format_versions_and_srs(las_path):
+    metadata = get_las_metadata(las_path)
     assert metadata["minor_version"] == 4
     assert metadata["dataformat_id"] == 8
     # Ensure that the final spatial reference is French CRS Lambert-93
     assert "Lambert-93" in metadata["spatialreference"]
-
-    # Check that we have either 1/2 (ground/unclassified),
-    # or one of the three final classification code of the module
-    arr1 = pdal_read_las_array(out_f)
-    actual_codes = {*np.unique(arr1["Classification"])}
-    assert actual_codes.issubset(expected_codes)

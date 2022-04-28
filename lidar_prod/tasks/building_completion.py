@@ -38,31 +38,33 @@ class BuildingCompletor:
         self.data_format = data_format
         self.codes = data_format.codes.building  # easier access
 
-    def run(self, in_f: str, out_f: str):
+    def run(self, src_las_path: str, target_las_path: str):
         """Application.
 
-        Transform cloud at `in_f` following building completion logic, and save it to
-        `out_f`
+        Transform cloud at `src_las_path` following building completion logic, and save it to
+        `target_las_path`
 
         Args:
-            in_f (str): path to input LAS file, output of BuildingValidator
-            out_f (str): path for saving updated LAS file.
+            src_las_path (str): path to input LAS file, output of BuildingValidator
+            target_las_path (str): path for saving updated LAS file.
 
         Returns:
-            _type_: returns `out_f` for potential terminal piping.
+            str: returns `target_las_path` for potential terminal piping.
 
         """
-        log.info(f"Applying Building Completion to file \n{in_f}")
+        log.info(f"Applying Building Completion to file \n{src_las_path}")
         log.info(
             "Completion of building with relatively distant points that have high enough probability"
         )
         with TemporaryDirectory() as td:
-            temp_f = osp.join(td, osp.basename(in_f))
-            self.prepare(in_f, temp_f)
-            self.update(temp_f, out_f)
-        return out_f
+            tmp_las_path = osp.join(td, osp.basename(src_las_path))
+            self.prepare_for_building_completion(src_las_path, tmp_las_path)
+            self.update_classification(tmp_las_path, target_las_path)
+        return target_las_path
 
-    def prepare(self, in_f: str, out_f: str):
+    def prepare_for_building_completion(
+        self, src_las_path: str, target_las_path: str
+    ) -> None:
         f"""Prepare for building completion.
 
         Identify candidates that were not clustered together by the BuildingValidator, but that
@@ -72,12 +74,12 @@ class BuildingCompletor:
         and they will be confirmed as well.
 
         Args:
-            in_f (str): input LAS
-            out_f (str): output, prepared LAS with a new `{self.data_format.las_dimensions.ClusterID_isolated_plus_confirmed}`
+            src_las_path (str): input LAS
+            target_las_path (str): output, prepared LAS with a new `{self.data_format.las_dimensions.ClusterID_isolated_plus_confirmed}`
             dimension.
         """
         pipeline = pdal.Pipeline()
-        pipeline |= get_pdal_reader(in_f)
+        pipeline |= get_pdal_reader(src_las_path)
         candidates = (
             f"({self.data_format.las_dimensions.candidate_buildings_flag} == 1)"
         )
@@ -114,18 +116,20 @@ class BuildingCompletor:
         pipeline |= pdal.Filter.assign(
             value=f"{self.data_format.las_dimensions.cluster_id} = 0"
         )
-        pipeline |= get_pdal_writer(out_f)
-        os.makedirs(osp.dirname(out_f), exist_ok=True)
+        pipeline |= get_pdal_writer(target_las_path)
+        os.makedirs(osp.dirname(target_las_path), exist_ok=True)
         pipeline.execute()
 
-    def update(self, prepared_f: str, out_f: str):
-        """
+    def update_classification(
+        self, prepared_las_path: str, target_las_path: str
+    ) -> None:
+        """Updates Classification dimension by completing buildings with high probability points.
 
         Args:
-            in_f (str): input, prepared LAS
-            out_f (str): output LAS, with updated Classification dimension.
+            prepared_las_path (str): input, prepared LAS
+            target_las_path (str): output LAS, with updated Classification dimension.
         """
-        las = laspy.read(prepared_f)
+        las = laspy.read(prepared_las_path)
         _clf = self.data_format.las_dimensions.classification
         _cid = self.data_format.las_dimensions.ClusterID_isolated_plus_confirmed
         # 2) Decide at the group-level
@@ -142,5 +146,5 @@ class BuildingCompletor:
             pts = las.points[pts_idx]
             if self.codes.final.building in pts[_clf]:
                 las[_clf][pts_idx] = self.codes.final.building
-        os.makedirs(osp.dirname(out_f), exist_ok=True)
-        las.write(out_f)
+        os.makedirs(osp.dirname(target_las_path), exist_ok=True)
+        las.write(target_las_path)

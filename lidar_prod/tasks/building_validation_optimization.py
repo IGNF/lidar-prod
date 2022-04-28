@@ -3,6 +3,7 @@ from glob import glob
 import logging
 import os
 import pickle
+import warnings
 import numpy as np
 from sklearn.metrics import confusion_matrix
 from typing import Any, Dict, List
@@ -82,7 +83,7 @@ class BuildingValidationOptimizer:
             for f in self.las_filepaths
         ]
 
-        # We must adapt BuildingValidator to corrected data by specifyinbg the codes to use as candidates
+        # We must adapt BuildingValidator to corrected data by specifying the codes to use as candidates
         self.bv.candidate_buildings_codes = (
             self.labels_from_20211001_building_val.codes.true_positives
             + self.labels_from_20211001_building_val.codes.false_positives
@@ -103,14 +104,14 @@ class BuildingValidationOptimizer:
 
         """
         clusters = []
-        for in_f, out_f in tqdm(
+        for src_las_path, prepared_las_path in tqdm(
             zip(self.las_filepaths, self.prepared_las_filepaths),
             desc="Preparation.",
             total=len(self.las_filepaths),
             unit="tiles",
         ):
-            self.bv.prepare(in_f, out_f)
-            clusters += self._extract_clusters_from_las(out_f)
+            self.bv.prepare(src_las_path, prepared_las_path)
+            clusters += self._extract_clusters_from_las(prepared_las_path)
         self._dump_clusters(clusters)
 
     def optimize(self):
@@ -124,26 +125,36 @@ class BuildingValidationOptimizer:
         # Save it as attribute for later evaluate/update steps
         self.thresholds: thresholds = best_thresholds
 
-    def evaluate(self):
-        """Evaluation step
+    def evaluate(self) -> dict:
+        """Evaluates application on prepared clusters and computes performance metrics.
+
+        The optimization step results in optimized thresholds, stored in a pickle object.
+        To use them,specify parameter `building_validation.optimization.paths.building_validation_thresholds_pickle`.
+        Elsewise, default thresholds will be used.
 
         Returns:
-            dict: a name: value dict of metrics.
+            dict: a dictionnary of metrics of schema {metric_name:metric_value}.
 
         """
         clusters = self._load_clusters()
-        # We use dumped thresholds only if provided: we only need them
-        # when we are performing an evaluation on test data after an optimization
-        # on validation data.
-        if os.path.isfile(self.paths.building_validation_thresholds_pickle):
-            self.bv._set_thresholds_from_pickle(
-                self.paths.building_validation_thresholds_pickle
-            )
+        self.set_thresholds_from_pickle_if_available()
         decisions = np.array([self.bv._make_group_decision(c) for c in clusters])
         mts_gt = np.array([c.target for c in clusters])
         metrics_dict = self._evaluate_decisions(mts_gt, decisions)
         log.info(f"\n Results:\n{self._get_results_logs_str(metrics_dict)}")
         return metrics_dict
+
+    def set_thresholds_from_pickle_if_available(self):
+        try:
+            with open(self.paths.building_validation_thresholds_pickle, "rb") as f:
+                self.bv.thresholds = pickle.load(f)
+        except FileNotFoundError:
+            warnings.warn(
+                "Using default thresholds from hydra config to perform decisions."
+                "You may want to specify different thresholds via a pickled object by"
+                "specifying building_validation.optimization.paths.building_validation_thresholds_pickle",
+                UserWarning,
+            )
 
     def update(self):
         """Update step.
@@ -152,24 +163,18 @@ class BuildingValidationOptimizer:
 
         """
         log.info(f"Updated las will be saved in {self.paths.results_output_dir}")
-        # We use dumped thresholds only if provided: we only need them
-        # when we are performing an evaluation on test data after an optimization
-        # on validation data.
-        if os.path.isfile(self.paths.building_validation_thresholds_pickle):
-            self.bv._set_thresholds_from_pickle(
-                self.paths.building_validation_thresholds_pickle
-            )
-        for prep_f, out_f in tqdm(
+        self.set_thresholds_from_pickle_if_available()
+        for prepared_las_path, target_las_path in tqdm(
             zip(self.prepared_las_filepaths, self.out_las_filepaths),
             total=len(self.prepared_las_filepaths),
             desc="Update.",
             unit="tiles",
         ):
-            self.bv.update(prep_f, out_f)
-            log.info(f"Saved to {out_f}")
+            self.bv.update(prepared_las_path, target_las_path)
+            log.info(f"Saved to {target_las_path}")
 
     def _extract_clusters_from_las(
-        self, prepared_las: str
+        self, prepared_las_path: str
     ) -> List[BuildingValidationClusterInfo]:
         """Extract a cluster information object  in a prepared LAS.
 
@@ -179,7 +184,7 @@ class BuildingValidationOptimizer:
         Returns:
             List[BuildingValidationClusterInfo]: cluster information for each cluster of candidate buildings
         """
-        las = laspy.read(prepared_las)
+        las: laspy.LasData = laspy.read(prepared_las_path)
         dim_cluster_id = las[
             self.bv.data_format.las_dimensions.ClusterID_candidate_building
         ]

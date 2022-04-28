@@ -22,14 +22,14 @@ def ignore_warnings():
 
 
 def print_config(
-    config: DictConfig, resolve: bool = True, out_f: str = "config_tree.txt"
+    config: DictConfig, resolve: bool = True, cfg_print_path: str = "config_tree.txt"
 ) -> None:
     """Prints content of DictConfig using Rich library and its tree structure.
 
     Args:
         config (DictConfig): Configuration composed by Hydra.
         resolve (bool, optional): Whether to resolve reference fields of DictConfig.
-        out_f (str, optional): where to save the printed config.
+        cfg_print_path (str, optional): where to save the printed config.
 
     """
 
@@ -48,7 +48,7 @@ def print_config(
 
     rich.print(tree)
 
-    with open(out_f, "w") as fp:
+    with open(cfg_print_path, "w") as fp:
         rich.print(tree, file=fp)
 
 

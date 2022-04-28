@@ -67,8 +67,8 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
             input_las_dir
         )
         os.makedirs(input_las_dir, exist_ok=False)
-        f_copy = osp.join(input_las_dir, "copy.las")
-        shutil.copy(LAS_SUBSET_FILE, f_copy)
+        src_las_copy_path = osp.join(input_las_dir, "copy.las")
+        shutil.copy(LAS_SUBSET_FILE, src_las_copy_path)
 
         # Check that a full optimization run can pass successfully
         bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
@@ -78,9 +78,9 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
 
         # Assert that a prepared and an updated file are generated in the temporary dir
         # in subfolders.
-        assert os.path.isfile(osp.join(td, "prepared", osp.basename(f_copy)))
-        out_f = osp.join(td, "updated", osp.basename(f_copy))
-        assert os.path.isfile(out_f)
+        assert os.path.isfile(osp.join(td, "prepared", osp.basename(src_las_copy_path)))
+        updated_las_path = osp.join(td, "updated", osp.basename(src_las_copy_path))
+        assert os.path.isfile(updated_las_path)
 
         # Check the output of the evaluate method. Note that it uses the
         # prepared data and the threshold from previous run
@@ -95,8 +95,8 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
         # Update classification dimension and check if the codes are the expected ones.
         bvo.bv.use_final_classification_codes = True
         bvo.update()
-        assert os.path.isfile(out_f)
-        arr = pdal_read_las_array(out_f)
+        assert os.path.isfile(updated_las_path)
+        arr = pdal_read_las_array(updated_las_path)
         # Check that we have either 1/2 (ground/unclassified), or one of
         # the final classification code of the module.
         final_codes = default_hydra_cfg.data_format.codes.building.final
@@ -127,8 +127,8 @@ def test_BVOptimization_on_large_file(default_hydra_cfg):
             input_las_dir
         )
         os.makedirs(input_las_dir, exist_ok=False)
-        f_copy = osp.join(input_las_dir, "copy.las")
-        shutil.copy(LAS_LARGE_FILE, f_copy)
+        src_las_copy_path = osp.join(input_las_dir, "copy.las")
+        shutil.copy(LAS_LARGE_FILE, src_las_copy_path)
 
         # Check that a full optimization run can pass successfully
         bvo: BuildingValidationOptimizer = hydra.utils.instantiate(

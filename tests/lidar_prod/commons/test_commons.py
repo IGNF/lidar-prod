@@ -55,10 +55,10 @@ def test_eval_time(caplog):
 
 def test_file_existence(default_hydra_cfg):
     with tempfile.TemporaryDirectory() as td:
-        out_f = os.path.join(td, "config_tree.txt")
+        cfg_print_path = os.path.join(td, "config_tree.txt")
         print_config(
             default_hydra_cfg,
             resolve=False,
-            out_f=out_f,
+            cfg_print_path=cfg_print_path,
         )
-        assert os.path.exists(out_f)
+        assert os.path.exists(cfg_print_path)

@@ -27,17 +27,17 @@ class Cleaner:
             if not isinstance(extra_dims, str):
                 self.extra_dims = ",".join(extra_dims)
 
-    def run(self, in_f: str, out_f: str):
+    def run(self, src_las_path: str, target_las_path: str):
         """Clean out LAS extra dimensions.
 
         Args:
-            in_f (str): input LAS path
-            out_f (str): output LAS path, with specified extra dims.
+            src_las_path (str): input LAS path
+            target_las_path (str): output LAS path, with specified extra dims.
         """
 
         pipeline = pdal.Pipeline()
-        pipeline |= get_pdal_reader(in_f)
-        pipeline |= get_pdal_writer(out_f, extra_dims=self.extra_dims)
+        pipeline |= get_pdal_reader(src_las_path)
+        pipeline |= get_pdal_writer(target_las_path, extra_dims=self.extra_dims)
         pipeline.execute()
-        os.makedirs(osp.dirname(out_f), exist_ok=True)
-        log.info(f"Saved to {out_f}")
+        os.makedirs(osp.dirname(target_las_path), exist_ok=True)
+        log.info(f"Saved to {target_las_path}")
