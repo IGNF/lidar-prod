@@ -26,7 +26,7 @@ jobs:
     - name: Run slow tests last.
       run: >
         docker run 
-        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/lidar-prod-quality-control/tests/files/large/
+        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
         lidar_prod_im
         python -m
         pytest -v -m slow

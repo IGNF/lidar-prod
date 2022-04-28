@@ -22,9 +22,9 @@ RUN /bin/bash ~/anaconda.sh -b -p /opt/conda && \
     rm ~/anaconda.sh
 ENV PATH /opt/conda/bin:$PATH
 
-WORKDIR /lidar
 
-# copy all the data now (because the requirements files are needed for anaconda)
+# /lidar becomes the working directory, where the repo content is copied.
+WORKDIR /lidar
 COPY . .
 
 # install the python packages via anaconda
@@ -46,6 +46,6 @@ ENTRYPOINT ["conda", \
 # cmd for a normal run (non evaluate)
 CMD  ["python", \
     "lidar_prod/run.py", \
-    "print_config=true",    \
+    "print_config=true", \
     "paths.src_las=your_las.las", \
     "paths.output_dir=./path/to/outputs/"]
