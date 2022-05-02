@@ -31,7 +31,7 @@ jobs:
       # Packages that depend on torch need need to be installed afterwards, 
       # hence the "requirements_torch_deps.txt file.
       - name: "Install Python dependencies"
-        run: source bash/setup_environment/setup_env.sh
+        run: conda env create -f bash/setup_environment/requirements.yml --force
 
       - name: "Build Sphinx Doc"
         working-directory: ./docs/
