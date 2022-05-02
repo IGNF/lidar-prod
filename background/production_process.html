@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Production process: how are point clouds transformed by the app? &mdash; lidar_prod 1.5.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Installation and usage [TODO]" href="../tutorials/install_and_use.html" />
+    <link rel="prev" title="Lidar-Prod &gt; Documentation" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> lidar_prod
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Background</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Production process: how are point clouds transformed by the app?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#a-building-validation">A) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#b-building-completion">B) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#c-building-identification">C) Building Identification</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/install_and_use.html">Installation and usage [TODO]</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/install_and_use.html#install-dependencies">Install dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/install_and_use.html#use-application-as-a-package">Use application as a package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/install_and_use.html#run-sequentialy-on-multiple-files">Run sequentialy on multiple files</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/thresholds_optimization.html">Optimization and evaluation of building validation decision thresholds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/development.html">Developer’s guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#use-application-from-source">Use application from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#cicd-and-versions">CICD and versions</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_completion">building_completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_identification">building_identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.cleaning">cleaning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.utils">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.commons.html">lidar_prod.commons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.commons.html#module-lidar_prod.commons.commons">lidar_prod.commons.commons module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configs.html">Default configuration</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lidar_prod</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Production process: how are point clouds transformed by the app?</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/background/production_process.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="production-process-how-are-point-clouds-transformed-by-the-app">
+<h1>Production process: how are point clouds transformed by the app?<a class="headerlink" href="#production-process-how-are-point-clouds-transformed-by-the-app" title="Permalink to this headline"></a></h1>
+<p>The end goal of the tool is to edit the input (rules-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for human inspection.</p>
+<p><strong>Input</strong>: point cloud that went through a first geometric algorithm that identified <code class="docutils literal notranslate"><span class="pre">candidates</span> <span class="pre">building</span> <span class="pre">points</span></code> based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building. The default name for this extra dimension is <code class="docutils literal notranslate"><span class="pre">building</span></code>. You can leverage this <a class="reference external" href="https://github.com/IGNF/lidar-deep-segmentation">package for aerial lidar deep learning segmentation</a>.</p>
+<section id="a-building-validation">
+<h2>A) Building Validation<a class="headerlink" href="#a-building-validation" title="Permalink to this headline"></a></h2>
+<p><strong>Goal</strong>: Confirm or refute groups of candidate building points when possible, mark them as unsure elsewise.</p>
+<ol class="arabic simple">
+<li><p>Clustering of <em>candidate buildings points</em> into connected components.</p></li>
+<li><p>Point-level decision</p>
+<ol class="arabic simple">
+<li><p>Identification of points with ambiguous probability: <code class="docutils literal notranslate"><span class="pre">high</span> <span class="pre">entropy</span></code> if entropy &gt;= E1</p></li>
+<li><p>Identification of points that are <code class="docutils literal notranslate"><span class="pre">overlayed</span></code> by a building vector from the database.</p></li>
+<li><p>Decision at the point-level based on probabilities :</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">confirmed</span></code> if:</p>
+<ol class="arabic simple">
+<li><p>p&gt;=<code class="docutils literal notranslate"><span class="pre">C1</span></code>, or</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">overlayed</span></code> and p&gt;= (<code class="docutils literal notranslate"><span class="pre">C1</span></code> * <code class="docutils literal notranslate"><span class="pre">Cr</span></code>), where <code class="docutils literal notranslate"><span class="pre">Cr</span></code> is a relaxation factor that reduces the confidence we require to confirm when a point overlayed by a building vector.</p></li>
+</ol>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">refuted</span></code> if (1-p) &gt;= <code class="docutils literal notranslate"><span class="pre">R1</span></code></p></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>Group-level decision :</p>
+<ol class="arabic simple">
+<li><p>Uncertain due to high entropy: if proportion of <code class="docutils literal notranslate"><span class="pre">high</span> <span class="pre">entropy</span></code> points &gt;=  <code class="docutils literal notranslate"><span class="pre">E2</span></code></p></li>
+<li><p>Confirmation: if proportion of <code class="docutils literal notranslate"><span class="pre">confirmed</span></code> points &gt;= <code class="docutils literal notranslate"><span class="pre">C2</span></code> OR if proportion of <code class="docutils literal notranslate"><span class="pre">overlayed</span></code> points &gt;= <code class="docutils literal notranslate"><span class="pre">O1</span></code></p></li>
+<li><p>Refutation: if proportion of <code class="docutils literal notranslate"><span class="pre">refuted</span></code> points &gt;= <code class="docutils literal notranslate"><span class="pre">R2</span></code> AND proportion of <code class="docutils literal notranslate"><span class="pre">overlayed</span></code> points &lt; <code class="docutils literal notranslate"><span class="pre">O1</span></code></p></li>
+<li><p>Uncertainty: elsewise (this is a safeguard: uncertain groups are supposed to be already captured via their entropy)</p></li>
+</ol>
+</li>
+<li><p>Update of the point cloud classification</p></li>
+</ol>
+<p>Decision thresholds <code class="docutils literal notranslate"><span class="pre">E1</span></code>, <code class="docutils literal notranslate"><span class="pre">E2</span></code> , <code class="docutils literal notranslate"><span class="pre">C1</span></code>, <code class="docutils literal notranslate"><span class="pre">C2</span></code>, <code class="docutils literal notranslate"><span class="pre">R1</span></code>, <code class="docutils literal notranslate"><span class="pre">R2</span></code>, <code class="docutils literal notranslate"><span class="pre">O1</span></code> are chosen via a multi-objective hyperparameter optimization that aims to maximize automation, precision, and recall of the decisions.
+Current performances on a 15km² validation dataset, expressed as percentages of clusters, are:</p>
+<ul class="simple">
+<li><p>Automation=91%</p></li>
+<li><p>Precision=98.5%</p></li>
+<li><p>Recall=98.1%.</p></li>
+</ul>
+<p><img alt="" src="../_images/LidarBati-BuildingValidationM7.1V2.0.png" /></p>
+</section>
+<section id="b-building-completion">
+<h2>B) Building Completion<a class="headerlink" href="#b-building-completion" title="Permalink to this headline"></a></h2>
+<p><strong>Goal</strong>: Confirm points that were too isolated to make up a group but have high-enough probability nevertheless (e.g. walls)</p>
+<p>Among  <em>candidate buildings points</em> that have not been clustered in previous step due, identify those which nevertheless meet the requirement to be <code class="docutils literal notranslate"><span class="pre">confirmed</span></code>.
+Cluster them together with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
+For each cluster, if some points were confirmed, the others are considered to belong to the same building, and are
+therefore confirmed as well.</p>
+<p><img alt="" src="../_images/LidarBati-BuildingCompletion.png" /></p>
+</section>
+<section id="c-building-identification">
+<h2>C) Building Identification<a class="headerlink" href="#c-building-identification" title="Permalink to this headline"></a></h2>
+<p><strong>Goal</strong>: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection.</p>
+<p>Among points that were <strong>not</strong> <em>candidate buildings points</em> identify those which meet the requirement to be <code class="docutils literal notranslate"><span class="pre">confirmed</span></code>, and cluster them.</p>
+<p>This clustering defines a LAS extra dimensions (<code class="docutils literal notranslate"><span class="pre">Group</span></code>) which indexes newly found cluster that may be some missed buildings.</p>
+<p><img alt="" src="../_images/LidarBati-BuildingIdentification.png" /></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Lidar-Prod &gt; Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../tutorials/install_and_use.html" class="btn btn-neutral float-right" title="Installation and usage [TODO]" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Institut National de l&#39;Information Géographique et Forestière.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

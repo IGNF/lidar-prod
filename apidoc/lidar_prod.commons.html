@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lidar_prod.commons &mdash; lidar_prod 1.5.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Default configuration" href="../configs.html" />
+    <link rel="prev" title="lidar_prod.tasks" href="lidar_prod.tasks.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> lidar_prod
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../background/production_process.html">Production process: how are point clouds transformed by the app?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#a-building-validation">A) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-building-completion">B) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#c-building-identification">C) Building Identification</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/install_and_use.html">Installation and usage [TODO]</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/install_and_use.html#install-dependencies">Install dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/install_and_use.html#use-application-as-a-package">Use application as a package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/install_and_use.html#run-sequentialy-on-multiple-files">Run sequentialy on multiple files</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/thresholds_optimization.html">Optimization and evaluation of building validation decision thresholds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/development.html">Developer’s guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#use-application-from-source">Use application from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#cicd-and-versions">CICD and versions</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_completion">building_completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_identification">building_identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.cleaning">cleaning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.utils">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">lidar_prod.commons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-lidar_prod.commons.commons">lidar_prod.commons.commons module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../configs.html">Default configuration</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lidar_prod</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>lidar_prod.commons</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/apidoc/lidar_prod.commons.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lidar-prod-commons">
+<h1>lidar_prod.commons<a class="headerlink" href="#lidar-prod-commons" title="Permalink to this headline"></a></h1>
+<section id="module-lidar_prod.commons.commons">
+<span id="lidar-prod-commons-commons-module"></span><h2>lidar_prod.commons.commons module<a class="headerlink" href="#module-lidar_prod.commons.commons" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="lidar_prod.commons.commons.eval_time">
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">eval_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.10)"><span class="pre">Callable</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#eval_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.eval_time" title="Permalink to this definition"></a></dt>
+<dd><p>decorator to log the duration of the decorated method</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lidar_prod.commons.commons.extras">
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">extras</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#extras"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.extras" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lidar_prod.commons.commons.ignore_warnings">
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">ignore_warnings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#ignore_warnings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.ignore_warnings" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lidar_prod.commons.commons.print_config">
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">print_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_print_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'config_tree.txt'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#print_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.print_config" title="Permalink to this definition"></a></dt>
+<dd><p>Prints content of DictConfig using Rich library and its tree structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="lidar_prod.commons.commons.print_config.params.config"></span><strong>config</strong><a class="paramlink headerlink reference internal" href="#lidar_prod.commons.commons.print_config.params.config">¶</a> (<em>DictConfig</em>) – Configuration composed by Hydra.</p></li>
+<li><p><span class="target" id="lidar_prod.commons.commons.print_config.params.resolve"></span><strong>resolve</strong><a class="paramlink headerlink reference internal" href="#lidar_prod.commons.commons.print_config.params.resolve">¶</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to resolve reference fields of DictConfig.</p></li>
+<li><p><span class="target" id="lidar_prod.commons.commons.print_config.params.cfg_print_path"></span><strong>cfg_print_path</strong><a class="paramlink headerlink reference internal" href="#lidar_prod.commons.commons.print_config.params.cfg_print_path">¶</a> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>, </em><em>optional</em>) – where to save the printed config.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lidar_prod.tasks.html" class="btn btn-neutral float-left" title="lidar_prod.tasks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../configs.html" class="btn btn-neutral float-right" title="Default configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Institut National de l&#39;Information Géographique et Forestière.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

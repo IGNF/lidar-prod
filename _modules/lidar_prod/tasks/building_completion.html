@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lidar_prod.tasks.building_completion &mdash; lidar_prod 1.5.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> lidar_prod
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../background/production_process.html">Production process: how are point clouds transformed by the app?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-building-validation">A) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-building-completion">B) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#c-building-identification">C) Building Identification</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/install_and_use.html">Installation and usage [TODO]</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/install_and_use.html#install-dependencies">Install dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/install_and_use.html#use-application-as-a-package">Use application as a package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/install_and_use.html#run-sequentialy-on-multiple-files">Run sequentialy on multiple files</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/thresholds_optimization.html">Optimization and evaluation of building validation decision thresholds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/development.html">Developer’s guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../guides/development.html#use-application-from-source">Use application from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../guides/development.html#cicd-and-versions">CICD and versions</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_completion">building_completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_identification">building_identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.cleaning">cleaning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.utils">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.commons.html">lidar_prod.commons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.commons.html#module-lidar_prod.commons.commons">lidar_prod.commons.commons module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configs.html">Default configuration</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">lidar_prod</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>lidar_prod.tasks.building_completion</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lidar_prod.tasks.building_completion</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
+<span class="kn">import</span> <span class="nn">pdal</span>
+<span class="kn">import</span> <span class="nn">laspy</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">lidar_prod.tasks.utils</span> <span class="kn">import</span> <span class="n">get_pdal_reader</span><span class="p">,</span> <span class="n">get_pdal_writer</span><span class="p">,</span> <span class="n">split_idx_by_dim</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BuildingCompletor"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor">[docs]</a><span class="k">class</span> <span class="nc">BuildingCompletor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Logic of building completion.</span>
+
+<span class="sd">    Some points were too isolated for BuildingValidator to consider them.</span>
+<span class="sd">    We will update their classification based on their probability as well as their surrounding:</span>
+<span class="sd">    - We select points that have p&gt;=0.5</span>
+<span class="sd">    - We perform vertical (XY) clustering including these points as well as confirmed buildings.</span>
+<span class="sd">    - In the resulting groups, if there are some confirmed buildings, previously isolated points are</span>
+<span class="sd">    considered to be parts of the same building and their class is updated accordingly.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">min_building_proba</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.75</span><span class="p">,</span>
+        <span class="n">min_building_proba_relaxation_if_bd_uni_overlay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">cluster</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">data_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cluster</span> <span class="o">=</span> <span class="n">cluster</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_building_proba</span> <span class="o">=</span> <span class="n">min_building_proba</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_building_proba_relaxation_if_bd_uni_overlay</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">min_building_proba_relaxation_if_bd_uni_overlay</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span> <span class="o">=</span> <span class="n">data_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">codes</span> <span class="o">=</span> <span class="n">data_format</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">building</span>  <span class="c1"># easier access</span>
+
+<div class="viewcode-block" id="BuildingCompletor.run"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Application.</span>
+
+<span class="sd">        Transform cloud at `src_las_path` following building completion logic, and save it to</span>
+<span class="sd">        `target_las_path`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            src_las_path (str): path to input LAS file, output of BuildingValidator</span>
+<span class="sd">            target_las_path (str): path for saving updated LAS file.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: returns `target_las_path` for potential terminal piping.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applying Building Completion to file </span><span class="se">\n</span><span class="si">{</span><span class="n">src_las_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Completion of building with relatively distant points that have high enough probability&quot;</span>
+        <span class="p">)</span>
+        <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">td</span><span class="p">:</span>
+            <span class="n">tmp_las_path</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">td</span><span class="p">,</span> <span class="n">osp</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prepare_for_building_completion</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">,</span> <span class="n">tmp_las_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_classification</span><span class="p">(</span><span class="n">tmp_las_path</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">target_las_path</span></div>
+
+<div class="viewcode-block" id="BuildingCompletor.prepare_for_building_completion"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_for_building_completion</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Prepare for building completion.</span>
+
+<span class="s2">        Identify candidates that were not clustered together by the BuildingValidator, but that</span>
+<span class="s2">        have high enough probability. Then, cluster them together with previously confirmed buildings.</span>
+<span class="s2">        Cluster parameters are relaxed (2D, with high tolerance).</span>
+<span class="s2">        If a cluster contains some confirmed points, the others are considered to belong to the same building</span>
+<span class="s2">        and they will be confirmed as well.</span>
+
+<span class="s2">        Args:</span>
+<span class="s2">            src_las_path (str): input LAS</span>
+<span class="s2">            target_las_path (str): output, prepared LAS with a new `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_isolated_plus_confirmed</span><span class="si">}</span><span class="s2">`</span>
+<span class="s2">            dimension.</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">()</span>
+        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">get_pdal_reader</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">)</span>
+        <span class="n">candidates</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">candidate_buildings_flag</span><span class="si">}</span><span class="s2"> == 1)&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">where_not_clustered</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_candidate_building</span><span class="si">}</span><span class="s2"> == 0&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># P above threshold</span>
+        <span class="n">p_heq_threshold</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(building&gt;=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_building_proba</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+        <span class="c1"># P above relaxed threshold when under BDUni</span>
+        <span class="n">under_bd_uni</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">uni_db_overlay</span><span class="si">}</span><span class="s2"> &gt; 0)&quot;</span>
+        <span class="n">p_heq_relaxed_threshold</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(building&gt;=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_building_proba</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_building_proba_relaxation_if_bd_uni_overlay</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="n">p_heq_threshold_under_bd_uni</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">p_heq_relaxed_threshold</span><span class="si">}</span><span class="s2"> &amp;&amp; </span><span class="si">{</span><span class="n">under_bd_uni</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+        <span class="c1"># Candidates that where clustered by BuildingValidator but have high enough probability.</span>
+        <span class="n">not_clustered_but_with_high_p</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">candidates</span><span class="si">}</span><span class="s2"> &amp;&amp; </span><span class="si">{</span><span class="n">where_not_clustered</span><span class="si">}</span><span class="s2"> &amp;&amp; (</span><span class="si">{</span><span class="n">p_heq_threshold</span><span class="si">}</span><span class="s2"> || </span><span class="si">{</span><span class="n">p_heq_threshold_under_bd_uni</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="n">confirmed_buildings</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Classification == </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">building</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">where</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">not_clustered_but_with_high_p</span><span class="si">}</span><span class="s2"> || </span><span class="si">{</span><span class="n">confirmed_buildings</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span>
+            <span class="n">min_points</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">min_points</span><span class="p">,</span>
+            <span class="n">tolerance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span>
+            <span class="n">is3d</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">is3d</span><span class="p">,</span>
+            <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Always move and reset ClusterID to avoid conflict with later tasks.</span>
+        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span>
+            <span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2">=&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_isolated_plus_confirmed</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2"> = 0&quot;</span>
+        <span class="p">)</span>
+        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">get_pdal_writer</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BuildingCompletor.update_classification"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.update_classification">[docs]</a>    <span class="k">def</span> <span class="nf">update_classification</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">prepared_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Updates Classification dimension by completing buildings with high probability points.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prepared_las_path (str): input, prepared LAS</span>
+<span class="sd">            target_las_path (str): output LAS, with updated Classification dimension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">las</span> <span class="o">=</span> <span class="n">laspy</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">prepared_las_path</span><span class="p">)</span>
+        <span class="n">_clf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">classification</span>
+        <span class="n">_cid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_isolated_plus_confirmed</span>
+        <span class="c1"># 2) Decide at the group-level</span>
+        <span class="n">split_idx</span> <span class="o">=</span> <span class="n">split_idx_by_dim</span><span class="p">(</span><span class="n">las</span><span class="p">[</span><span class="n">_cid</span><span class="p">])</span>
+        <span class="c1"># Isolated/confirmed groups have a cluster index &gt; 0</span>
+        <span class="n">split_idx</span> <span class="o">=</span> <span class="n">split_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="c1"># For each group of isolated|confirmed points,</span>
+        <span class="c1"># Assess if the group already contains confirmed points.</span>
+        <span class="c1"># If it does, set all points to confirmed building class so that</span>
+        <span class="c1"># the isolated points they may contain are also confirmed.</span>
+        <span class="k">for</span> <span class="n">pts_idx</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="n">split_idx</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Complete buildings with isolated points&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;grp&quot;</span>
+        <span class="p">):</span>
+            <span class="n">pts</span> <span class="o">=</span> <span class="n">las</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="n">pts_idx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span> <span class="ow">in</span> <span class="n">pts</span><span class="p">[</span><span class="n">_clf</span><span class="p">]:</span>
+                <span class="n">las</span><span class="p">[</span><span class="n">_clf</span><span class="p">][</span><span class="n">pts_idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">las</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Institut National de l&#39;Information Géographique et Forestière.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

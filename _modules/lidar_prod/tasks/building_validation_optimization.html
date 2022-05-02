@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lidar_prod.tasks.building_validation_optimization &mdash; lidar_prod 1.5.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> lidar_prod
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../background/production_process.html">Production process: how are point clouds transformed by the app?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-building-validation">A) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-building-completion">B) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#c-building-identification">C) Building Identification</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/install_and_use.html">Installation and usage [TODO]</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/install_and_use.html#install-dependencies">Install dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/install_and_use.html#use-application-as-a-package">Use application as a package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/install_and_use.html#run-sequentialy-on-multiple-files">Run sequentialy on multiple files</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/thresholds_optimization.html">Optimization and evaluation of building validation decision thresholds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/development.html">Developer’s guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../guides/development.html#use-application-from-source">Use application from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../guides/development.html#cicd-and-versions">CICD and versions</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_completion">building_completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_identification">building_identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.cleaning">cleaning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.utils">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.commons.html">lidar_prod.commons</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.commons.html#module-lidar_prod.commons.commons">lidar_prod.commons.commons module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configs.html">Default configuration</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">lidar_prod</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>lidar_prod.tasks.building_validation_optimization</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lidar_prod.tasks.building_validation_optimization</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">optuna</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
+<span class="kn">import</span> <span class="nn">laspy</span>
+
+<span class="kn">from</span> <span class="nn">lidar_prod.tasks.building_validation</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BuildingValidator</span><span class="p">,</span>
+    <span class="n">BuildingValidationClusterInfo</span><span class="p">,</span>
+    <span class="n">thresholds</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">lidar_prod.tasks.utils</span> <span class="kn">import</span> <span class="n">split_idx_by_dim</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="constraints_func"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.constraints_func">[docs]</a><span class="k">def</span> <span class="nf">constraints_func</span><span class="p">(</span><span class="n">trial</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">trial</span><span class="o">.</span><span class="n">user_attrs</span><span class="p">[</span><span class="s2">&quot;constraint&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="BuildingValidationOptimizer"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer">[docs]</a><span class="k">class</span> <span class="nc">BuildingValidationOptimizer</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Optimization logic for the BuildingValidation decision thresholds.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">todo</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">paths</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+        <span class="n">building_validator</span><span class="p">:</span> <span class="n">BuildingValidator</span><span class="p">,</span>
+        <span class="n">study</span><span class="p">:</span> <span class="n">optuna</span><span class="o">.</span><span class="n">Study</span><span class="p">,</span>
+        <span class="n">design</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">buildings_correction_labels</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">use_final_classification_codes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">todo</span> <span class="o">=</span> <span class="n">todo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span> <span class="o">=</span> <span class="n">paths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bv</span> <span class="o">=</span> <span class="n">building_validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study</span> <span class="o">=</span> <span class="n">study</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">design</span> <span class="o">=</span> <span class="n">design</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buildings_correction_labels</span> <span class="o">=</span> <span class="n">buildings_correction_labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_final_classification_codes</span> <span class="o">=</span> <span class="n">use_final_classification_codes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BuildingValidationOptimizer.run"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run decision threshold optimization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;prepare&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">todo</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prepare</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;optimize&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">todo</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;evaluate&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">todo</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;update&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">todo</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BuildingValidationOptimizer.setup"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Setup step.</span>
+
+<span class="sd">        Setup a few attributes and override BuildingValidator classification</span>
+<span class="sd">        codes to adapt to those of the optimization dataset.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">input_las_dir</span><span class="p">,</span> <span class="s2">&quot;*.las&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prepared_las_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepared_las_filepaths</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prepared_las_dir</span><span class="p">,</span> <span class="n">osp</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span>
+        <span class="p">]</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">updated_las_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_las_filepaths</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">updated_las_dir</span><span class="p">,</span> <span class="n">osp</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span>
+        <span class="p">]</span>
+
+        <span class="c1"># We must adapt BuildingValidator to corrected data by specifying the codes to use as candidates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">candidate_buildings_codes</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buildings_correction_labels</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">true_positives</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildings_correction_labels</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">false_positives</span>
+        <span class="p">)</span>
+        <span class="c1"># We also specify if, when updating corrected data (for inspection) we want final codes or detailed ones.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">use_final_classification_codes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_final_classification_codes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">confusion_matrix_order</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">unsure</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">not_building</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span><span class="p">,</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="BuildingValidationOptimizer.prepare"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.prepare">[docs]</a>    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Preparation step.</span>
+
+<span class="sd">        Cluster clouds and cross with building vector database, then</span>
+<span class="sd">        extract cluster-level information.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">src_las_path</span><span class="p">,</span> <span class="n">prepared_las_path</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepared_las_filepaths</span><span class="p">),</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Preparation.&quot;</span><span class="p">,</span>
+            <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span><span class="p">),</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;tiles&quot;</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">,</span> <span class="n">prepared_las_path</span><span class="p">)</span>
+            <span class="n">clusters</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_clusters_from_las</span><span class="p">(</span><span class="n">prepared_las_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_clusters</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BuildingValidationOptimizer.optimize"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.optimize">[docs]</a>    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Optimization step&quot;&quot;&quot;</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_clusters</span><span class="p">()</span>
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_objective</span><span class="p">,</span> <span class="n">clusters</span><span class="o">=</span><span class="n">clusters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">n_trials</span><span class="p">)</span>
+        <span class="n">best_thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_best_rules</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">study</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best_trial thresholds: </span><span class="se">\n</span><span class="si">{</span><span class="n">best_thresholds</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dump_best_rules</span><span class="p">(</span><span class="n">best_thresholds</span><span class="p">)</span>
+        <span class="c1"># Save it as attribute for later evaluate/update steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="p">:</span> <span class="n">thresholds</span> <span class="o">=</span> <span class="n">best_thresholds</span></div>
+
+<div class="viewcode-block" id="BuildingValidationOptimizer.evaluate"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Evaluates application on prepared clusters and computes performance metrics.</span>
+
+<span class="sd">        The optimization step results in optimized thresholds, stored in a pickle object.</span>
+<span class="sd">        To use them,specify parameter `building_validation.optimization.paths.building_validation_thresholds_pickle`.</span>
+<span class="sd">        Elsewise, default thresholds will be used.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: a dictionnary of metrics of schema {metric_name:metric_value}.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_clusters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_thresholds_from_pickle_if_available</span><span class="p">()</span>
+        <span class="n">decisions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">_make_group_decision</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">])</span>
+        <span class="n">mts_gt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">target</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">])</span>
+        <span class="n">metrics_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_decisions</span><span class="p">(</span><span class="n">mts_gt</span><span class="p">,</span> <span class="n">decisions</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Results:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_results_logs_str</span><span class="p">(</span><span class="n">metrics_dict</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metrics_dict</span></div>
+
+<div class="viewcode-block" id="BuildingValidationOptimizer.set_thresholds_from_pickle_if_available"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.set_thresholds_from_pickle_if_available">[docs]</a>    <span class="k">def</span> <span class="nf">set_thresholds_from_pickle_if_available</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">building_validation_thresholds_pickle</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Using default thresholds from hydra config to perform decisions.&quot;</span>
+                <span class="s2">&quot;You may want to specify different thresholds via a pickled object by&quot;</span>
+                <span class="s2">&quot;specifying building_validation.optimization.paths.building_validation_thresholds_pickle&quot;</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="BuildingValidationOptimizer.update"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update step.</span>
+
+<span class="sd">        Update point cloud classification using optimized decision thresholds.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated las will be saved in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">results_output_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_thresholds_from_pickle_if_available</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">prepared_las_path</span><span class="p">,</span> <span class="n">target_las_path</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prepared_las_filepaths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_las_filepaths</span><span class="p">),</span>
+            <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prepared_las_filepaths</span><span class="p">),</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Update.&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;tiles&quot;</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">prepared_las_path</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved to </span><span class="si">{</span><span class="n">target_las_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_extract_clusters_from_las</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">prepared_las_path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BuildingValidationClusterInfo</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Extract a cluster information object  in a prepared LAS.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prepared_las (str): path to LAS prepared for building validation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[BuildingValidationClusterInfo]: cluster information for each cluster of candidate buildings</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">las</span><span class="p">:</span> <span class="n">laspy</span><span class="o">.</span><span class="n">LasData</span> <span class="o">=</span> <span class="n">laspy</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">prepared_las_path</span><span class="p">)</span>
+        <span class="n">dim_cluster_id</span> <span class="o">=</span> <span class="n">las</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_candidate_building</span>
+        <span class="p">]</span>
+        <span class="n">dim_classification</span> <span class="o">=</span> <span class="n">las</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">classification</span><span class="p">]</span>
+
+        <span class="n">split_idx</span> <span class="o">=</span> <span class="n">split_idx_by_dim</span><span class="p">(</span><span class="n">dim_cluster_id</span><span class="p">)</span>
+        <span class="c1"># removes the group of unclustered points, which has ClusterID = 0</span>
+        <span class="n">START_IDX_OF_CLUSTERS</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">split_idx</span> <span class="o">=</span> <span class="n">split_idx</span><span class="p">[</span><span class="n">START_IDX_OF_CLUSTERS</span><span class="p">:]</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">pts_idx</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="n">split_idx</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Extract cluster info from LAS&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;clusters&quot;</span>
+        <span class="p">):</span>
+            <span class="n">infos</span><span class="p">:</span> <span class="n">BuildingValidationClusterInfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">_extract_cluster_info_by_idx</span><span class="p">(</span>
+                <span class="n">las</span><span class="p">,</span> <span class="n">pts_idx</span>
+            <span class="p">)</span>
+            <span class="n">infos</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_define_MTS_ground_truth_flag</span><span class="p">(</span>
+                <span class="n">dim_classification</span><span class="p">[</span><span class="n">pts_idx</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">clusters</span> <span class="o">+=</span> <span class="p">[</span><span class="n">infos</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">clusters</span>
+
+    <span class="k">def</span> <span class="nf">_define_MTS_ground_truth_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Based on the fraction of confirmed building points, set the nature of the shape or declare an ambiguous case&quot;&quot;&quot;</span>
+        <span class="n">tp_frac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+                <span class="n">targets</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">buildings_correction_labels</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">true_positives</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">tp_frac</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildings_correction_labels</span><span class="o">.</span><span class="n">min_frac</span><span class="o">.</span><span class="n">true_positives</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span>
+        <span class="k">elif</span> <span class="n">tp_frac</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">buildings_correction_labels</span><span class="o">.</span><span class="n">min_frac</span><span class="o">.</span><span class="n">false_positives</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">not_building</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">unsure</span>
+
+    <span class="k">def</span> <span class="nf">_compute_penalty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auto</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Positive float indicative a solution violates the constraint of minimal auto/precision/metrics&quot;&quot;&quot;</span>
+        <span class="n">penalty</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">precision</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">min_precision_constraint</span><span class="p">:</span>
+            <span class="n">penalty</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">min_precision_constraint</span> <span class="o">-</span> <span class="n">precision</span>
+        <span class="k">if</span> <span class="n">recall</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">min_recall_constraint</span><span class="p">:</span>
+            <span class="n">penalty</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">min_recall_constraint</span> <span class="o">-</span> <span class="n">recall</span>
+        <span class="k">if</span> <span class="n">auto</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">min_automation_constraint</span><span class="p">:</span>
+            <span class="n">penalty</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">min_automation_constraint</span> <span class="o">-</span> <span class="n">auto</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">penalty</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">clusters</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BuildingValidationClusterInfo</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Objective function for optuna optimization.</span>
+<span class="sd">        Use prepared list to access group-level probas and targets.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            trial: optuna trial</span>
+<span class="sd">            clusters (List[BuildngValidationClusterInfo], optional): _description_. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float, float, float: automatisation, precision, recall</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;min_confidence_confirmation&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
+                <span class="s2">&quot;min_confidence_confirmation&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;min_frac_confirmation&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
+                <span class="s2">&quot;min_frac_confirmation&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;min_confidence_refutation&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
+                <span class="s2">&quot;min_confidence_refutation&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;min_frac_refutation&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span><span class="s2">&quot;min_frac_refutation&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="s2">&quot;min_uni_db_overlay_frac&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
+                <span class="s2">&quot;min_uni_db_overlay_frac&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;min_frac_confirmation_factor_if_bd_uni_overlay&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
+                <span class="s2">&quot;min_frac_confirmation_factor_if_bd_uni_overlay&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;min_entropy_uncertainty&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
+                <span class="s2">&quot;min_entropy_uncertainty&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;min_frac_entropy_uncertain&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
+                <span class="s2">&quot;min_frac_entropy_uncertain&quot;</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">,</span> <span class="mf">1.0</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="n">thresholds</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">decisions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">_make_group_decision</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">])</span>
+        <span class="n">mts_gt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">target</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">])</span>
+        <span class="n">metrics_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_decisions</span><span class="p">(</span><span class="n">mts_gt</span><span class="p">,</span> <span class="n">decisions</span><span class="p">)</span>
+
+        <span class="c1"># WARNING: order should always be automation, precision, recall</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">metrics_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">proportion_of_automated_decisions</span><span class="p">],</span>
+            <span class="n">metrics_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision</span><span class="p">],</span>
+            <span class="n">metrics_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">recall</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">auto</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">value</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span>
+        <span class="p">)</span>
+
+        <span class="c1"># This enables constrained optimization</span>
+        <span class="n">trial</span><span class="o">.</span><span class="n">set_user_attr</span><span class="p">(</span>
+            <span class="s2">&quot;constraint&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_penalty</span><span class="p">(</span><span class="n">auto</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">auto</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span>
+
+    <span class="k">def</span> <span class="nf">_select_best_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">study</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find the trial that meets constraints and that maximizes automation.&quot;&quot;&quot;</span>
+        <span class="n">trials</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">study</span><span class="o">.</span><span class="n">best_trials</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">TRIALS_BELOW_ZERO_ARE_VALID</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">respect_constraints</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">s</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">trials</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">user_attrs</span><span class="p">[</span><span class="s2">&quot;constraint&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">TRIALS_BELOW_ZERO_ARE_VALID</span>
+        <span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">best</span> <span class="o">=</span> <span class="n">respect_constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;No trial respecting constraints - returning best metrics-products.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">trials</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="n">study</span><span class="o">.</span><span class="n">best_trials</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">best</span> <span class="o">=</span> <span class="n">trials</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">best_rules</span> <span class="o">=</span> <span class="n">thresholds</span><span class="p">(</span><span class="o">**</span><span class="n">best</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">best_rules</span>
+
+    <span class="k">def</span> <span class="nf">_dump_best_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">best_trial_params</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">building_validation_thresholds_pickle</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">best_trial_params</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Pickled best params to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">building_validation_thresholds_pickle</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_dump_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">group_info_pickle_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pickled groups to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">group_info_pickle_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_load_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">group_info_pickle_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">clusters</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading pickled groups from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">group_info_pickle_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">clusters</span>
+
+    <span class="k">def</span> <span class="nf">_evaluate_decisions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mts_gt</span><span class="p">,</span> <span class="n">ia_decision</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate confirmation and refutation decisions.</span>
+
+<span class="sd">        Get dict of metrics to evaluate how good module decisions were in reference to ground truths.</span>
+<span class="sd">        Targets: U=Unsure, N=No (not a building), Y=Yes (building)</span>
+<span class="sd">        PRedictions : U=Unsure, C=Confirmation, R=Refutation</span>
+<span class="sd">        Confusion Matrix :</span>
+<span class="sd">                predictions</span>
+<span class="sd">                [Uu Ur Uc]</span>
+<span class="sd">        target  [Nu Nr Nc]</span>
+<span class="sd">                [Yu Yr Yc]</span>
+
+<span class="sd">        Maximization criteria:</span>
+<span class="sd">        Proportion of each decision among total of candidate groups.</span>
+<span class="sd">        We want to maximize it.</span>
+
+<span class="sd">        Accuracies:</span>
+<span class="sd">        Confirmation/Refutation Accuracy.</span>
+<span class="sd">        Accurate decision if either &quot;unsure&quot; or the same as the label.</span>
+
+<span class="sd">        Quality</span>
+<span class="sd">        Precision and Recall, assuming perfect posterior decision for unsure predictions.</span>
+<span class="sd">        Only candidate shapes with known ground truths are considered (ambiguous labels are ignored).</span>
+<span class="sd">        Precision : (Yu + Yc) / (Yu + Yc + Nc)</span>
+<span class="sd">        Recall : (Yu + Yc) / (Yu + Yn + Yc)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">metrics_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="c1"># VECTORS INFOS</span>
+        <span class="n">num_shapes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ia_decision</span><span class="p">)</span>
+        <span class="n">metrics_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">groups_count</span><span class="p">:</span> <span class="n">num_shapes</span><span class="p">})</span>
+
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span>
+            <span class="n">mts_gt</span><span class="p">,</span>
+            <span class="n">ia_decision</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">confusion_matrix_order</span><span class="p">,</span>
+            <span class="n">normalize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">metrics_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">confusion_matrix_no_norm</span><span class="p">:</span> <span class="n">cm</span><span class="o">.</span><span class="n">copy</span><span class="p">()})</span>
+
+        <span class="c1"># CRITERIA</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span>
+            <span class="n">mts_gt</span><span class="p">,</span>
+            <span class="n">ia_decision</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">confusion_matrix_order</span><span class="p">,</span>
+            <span class="n">normalize</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">P_MTS_U</span><span class="p">,</span> <span class="n">P_MTS_N</span><span class="p">,</span> <span class="n">P_MTS_C</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">metrics_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">group_unsure</span><span class="p">:</span> <span class="n">P_MTS_U</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">group_no_buildings</span><span class="p">:</span> <span class="n">P_MTS_N</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">group_building</span><span class="p">:</span> <span class="n">P_MTS_C</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">P_IA_u</span><span class="p">,</span> <span class="n">P_IA_r</span><span class="p">,</span> <span class="n">P_IA_c</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">PAD</span> <span class="o">=</span> <span class="n">P_IA_c</span> <span class="o">+</span> <span class="n">P_IA_r</span>
+        <span class="n">metrics_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">proportion_of_automated_decisions</span><span class="p">:</span> <span class="n">PAD</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">proportion_of_uncertainty</span><span class="p">:</span> <span class="n">P_IA_u</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">proportion_of_refutation</span><span class="p">:</span> <span class="n">P_IA_r</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">proportion_of_confirmation</span><span class="p">:</span> <span class="n">P_IA_c</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># ACCURACIES</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span>
+            <span class="n">mts_gt</span><span class="p">,</span>
+            <span class="n">ia_decision</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">confusion_matrix_order</span><span class="p">,</span>
+            <span class="n">normalize</span><span class="o">=</span><span class="s2">&quot;pred&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">RA</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">CA</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">metrics_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">refutation_accuracy</span><span class="p">:</span> <span class="n">RA</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">confirmation_accuracy</span><span class="p">:</span> <span class="n">CA</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># NORMALIZED CM</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span>
+            <span class="n">mts_gt</span><span class="p">,</span>
+            <span class="n">ia_decision</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">confusion_matrix_order</span><span class="p">,</span>
+            <span class="n">normalize</span><span class="o">=</span><span class="s2">&quot;true&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">metrics_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">confusion_matrix_norm</span><span class="p">:</span> <span class="n">cm</span><span class="o">.</span><span class="n">copy</span><span class="p">()})</span>
+
+        <span class="c1"># QUALITY</span>
+        <span class="n">non_ambiguous_idx</span> <span class="o">=</span> <span class="n">mts_gt</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">unsure</span>
+        <span class="n">ia_decision</span> <span class="o">=</span> <span class="n">ia_decision</span><span class="p">[</span><span class="n">non_ambiguous_idx</span><span class="p">]</span>
+        <span class="n">mts_gt</span> <span class="o">=</span> <span class="n">mts_gt</span><span class="p">[</span><span class="n">non_ambiguous_idx</span><span class="p">]</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span>
+            <span class="n">mts_gt</span><span class="p">,</span>
+            <span class="n">ia_decision</span><span class="p">,</span>
+            <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">confusion_matrix_order</span><span class="p">,</span>
+            <span class="n">normalize</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">final_true_positives</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cm</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>  <span class="c1"># Yu + Yc</span>
+        <span class="n">final_false_positives</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>  <span class="c1"># Nc</span>
+
+        <span class="c1">#  precision = (Yu + Yc) / (Yu + Yc + Nc)</span>
+        <span class="n">precision</span> <span class="o">=</span> <span class="n">final_true_positives</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">final_true_positives</span> <span class="o">+</span> <span class="n">final_false_positives</span>
+        <span class="p">)</span>
+
+        <span class="c1"># recall = (Yu + Yc) / (Yu + Yn + Yc)</span>
+        <span class="n">positives</span> <span class="o">=</span> <span class="n">cm</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">recall</span> <span class="o">=</span> <span class="n">final_true_positives</span> <span class="o">/</span> <span class="n">positives</span>
+
+        <span class="n">metrics_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">precision</span><span class="p">:</span> <span class="n">precision</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">recall</span><span class="p">:</span> <span class="n">recall</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">metrics_dict</span>
+
+    <span class="k">def</span> <span class="nf">_get_results_logs_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Format all metrics as a str for logging.&quot;&quot;&quot;</span>
+        <span class="n">results_logs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">:{</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span> <span class="k">else</span> <span class="s1">&#39;.3&#39;</span><span class="si">}}</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">metrics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">name</span>
+            <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">confusion_matrix_norm</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">confusion_matrix_no_norm</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">results_logs</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">results_logs</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Confusion Matrix</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">metrics_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">confusion_matrix_no_norm</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Confusion Matrix (normalized)</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">metrics_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">confusion_matrix_norm</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">results_logs</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Institut National de l&#39;Information Géographique et Forestière.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
