@@ -1,4 +1,4 @@
-# Production processus
+# Production process: how are point clouds transformed by the app?
 
 The end goal of the tool is to edit the input (rules-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for human inspection.
 
@@ -6,7 +6,7 @@ The end goal of the tool is to edit the input (rules-based) classification as mu
 
 ## A) Building Validation
 
-Goal: Confirm or refute groups of candidate building points when possible, mark them as unsure elsewise.
+**Goal**: Confirm or refute groups of candidate building points when possible, mark them as unsure elsewise.
 
 1) Clustering of _candidate buildings points_ into connected components.
 2) Point-level decision
@@ -24,13 +24,17 @@ Goal: Confirm or refute groups of candidate building points when possible, mark 
     4) Uncertainty: elsewise (this is a safeguard: uncertain groups are supposed to be already captured via their entropy)
 4) Update of the point cloud classification
 
-Decision thresholds `E1`, `E2` , `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a multi-objective hyperparameter optimization that aims to maximize automation, precision, and recall of the decisions. Right now we have automation=91%, precision=98.5%, recall=98.1% on a validation dataset. Illustration comes from older version.
+Decision thresholds `E1`, `E2` , `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a multi-objective hyperparameter optimization that aims to maximize automation, precision, and recall of the decisions. 
+Current performances on a 15km² validation dataset, expressed as percentages of clusters, are:
+- Automation=91%
+- Precision=98.5%
+- Recall=98.1%.
 
 ![](/img/LidarBati-BuildingValidationM7.1V2.0.png)
 
 ## B) Building Completion
 
-Goal: Confirm points that were too isolated to make up a group but have high-enough probability nevertheless (e.g. walls)
+**Goal**: Confirm points that were too isolated to make up a group but have high-enough probability nevertheless (e.g. walls)
 
 Among  _candidate buildings points_ that have not been clustered in previous step due, identify those which nevertheless meet the requirement to be `confirmed`.
 Cluster them together with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
@@ -42,7 +46,7 @@ therefore confirmed as well.
 
 ## C) Building Identification
 
-Goal: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection. 
+**Goal**: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection. 
 
 Among points that were **not** _candidate buildings points_ identify those which meet the requirement to be `confirmed`, and cluster them.
 

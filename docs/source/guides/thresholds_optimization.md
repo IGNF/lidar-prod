@@ -4,7 +4,10 @@ Run a multi-objectives hyperparameters optimization of the decision thresholds, 
 
 Those thresholds may depend on both the AI model you use and the rule-based classification you are working with.
 
-You need a set of LAS with 1) a channel with predicted building probability, 2) a classification with labels that distinguish false positive, false negative, and true positive from a rules-based building classification. You may specify those labels voa the 
+You need a set of LAS with :
+1) A channel with predicted building probability
+2) A classification with labels that distinguish false positive, false negative, and true positive from a rules-based building classification. 
+ 
 
 ```bash
 conda activate lidar_prod
