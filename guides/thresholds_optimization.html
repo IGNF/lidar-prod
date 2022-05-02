@@ -58,7 +58,14 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Optimization and evaluation of building validation decision thresholds</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Optimization and evaluation of building validation decision thresholds</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#motivations">Motivations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#strategy">Strategy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-optimization">Running the optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation-details">Implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Running the optimization</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer’s guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="development.html#use-application-from-source">Use application from source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="development.html#cicd-and-versions">CICD and versions</a></li>
@@ -110,24 +117,74 @@
              
   <section id="optimization-and-evaluation-of-building-validation-decision-thresholds">
 <h1>Optimization and evaluation of building validation decision thresholds<a class="headerlink" href="#optimization-and-evaluation-of-building-validation-decision-thresholds" title="Permalink to this headline"></a></h1>
-<p>Run a multi-objectives hyperparameters optimization of the decision thresholds, to maximize recall and precision directly while also maximizing automation.</p>
-<p>Those thresholds may depend on both the AI model you use and the rule-based classification you are working with.</p>
-<p>You need a set of LAS with :</p>
-<ol class="arabic simple">
-<li><p>A channel with predicted building probability</p></li>
-<li><p>A classification with labels that distinguish false positive, false negative, and true positive from a rules-based building classification.</p></li>
+<section id="motivations">
+<h2>Motivations<a class="headerlink" href="#motivations" title="Permalink to this headline"></a></h2>
+<p>As described in section <span class="xref myst"><code class="docutils literal notranslate"><span class="pre">Building</span> <span class="pre">Validation</span></code></span> of the production process, the decision to validate or not a group of candidate buildings is based on several decision thresholds. Those thresholds represents different levels of confidence, for different sources of data.</p>
+<p>They may depend the AI model which produces the probabilities as well as on the rule-based classification from which the clusters of candidates are derived. They are highly coupled. For instance, if a lower probability is required at the point level to be confirmed as a building (threshold <code class="docutils literal notranslate"><span class="pre">C1</span></code>), we might require a higher percentage of confirmed points in a cluster of candidates (thresholds <code class="docutils literal notranslate"><span class="pre">C2</span></code>) to validate it. There must therefore be optimized jointly.</p>
+<p>These thresholds define how much we automate decisions, but also the quantity of errors we may introduce: there is a balance to be found between <code class="docutils literal notranslate"><span class="pre">recall</span></code> (proportion of buildings group that were confirmed), <code class="docutils literal notranslate"><span class="pre">precision</span></code> (proportion of buildings among confirmed groups), and <code class="docutils literal notranslate"><span class="pre">automation</span></code> (proportion of groups for which a decision was made i.e. that are not flagged as “unsure”).</p>
+</section>
+<section id="strategy">
+<h2>Strategy<a class="headerlink" href="#strategy" title="Permalink to this headline"></a></h2>
+<p>We approach the choice of decisions thresholds as a constrained multi-objectives hyperparameters optimization.
+We use the <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/generated/optuna.samplers.NSGAIISampler.html#optuna.samplers.NSGAIISampler">NSGA-II</a> algorithm from the optuna optimization library.
+The constraints are defined empirically: recall&gt;=98% and precision&gt;=98%.
+The genetic algorithms search two maximize the three objectives, but focuses the search to solutions that meets these criteria.
+After a chosen number of generations, the genetic algorithms outputs the <a class="reference external" href="https://en.wikipedia.org/wiki/Pareto_front">Pareto front</a> i.e. the set of Pareto efficient solutions for which no objective criterion could be increased without another one being reduced.
+Among Pareto-efficient solutions compliant with the constraint, the final solution is the set of thresholds that maximizes the production of precision, recall, and automation.</p>
+</section>
+<section id="running-the-optimization">
+<h2>Running the optimization<a class="headerlink" href="#running-the-optimization" title="Permalink to this headline"></a></h2>
+<section id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline"></a></h3>
+<p>To optimize the decision thresholds you must be able to evaluate the level of automation that can be reached on data that matches production data. As a result, you need to have <em>corrected</em> data i.e. data of which a rule-based classification was corrected and for which you keep track of the corrections that were made. For building validation, the classification must have codes to distinguish false positive, false negative, and true positive. Theses codes may be configured with parameter <code class="docutils literal notranslate"><span class="pre">buildings_correction_labels</span></code> under configuration group <code class="docutils literal notranslate"><span class="pre">bulding_validation.optimization</span></code>.</p>
+<p>Furthermore, the point cloud data must include predictions from the deep learning model trained to detect buildings. This consists in two channels : a <code class="docutils literal notranslate"><span class="pre">building</span></code> channel with predicted probabilities and an <code class="docutils literal notranslate"><span class="pre">entropy</span></code> channel.</p>
+<p>A large validation dataset might help having a better sense of the app performances. We used 15km² of corrected data to optimize thresholds, but a larger set might provide more diversity. This being said, performance on an unseen test set was almost equal to performance on the validation set, which indicates a robust evaluation for such volume of data.</p>
+</section>
+</section>
+<section id="implementation-details">
+<h2>Implementation details<a class="headerlink" href="#implementation-details" title="Permalink to this headline"></a></h2>
+<p>In lidar-prod, each task is implemented by a dedicated python class. Building Validation is implemented via a <code class="docutils literal notranslate"><span class="pre">BuildingValidator</span></code> class. We make sure that all parameters used for optimization are the one we actually use in production.
+For a higher internal cohesion, <code class="docutils literal notranslate"><span class="pre">BuildingValidator</span></code> does not know anything about optimization, which is taken care of by a <code class="docutils literal notranslate"><span class="pre">BuildingValidationOptimizer</span></code> python class. Two dataclasses are used to connect the two objects</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">BuildingValidationClusterInfo</span></code>: describes the cluster-level information, necessary to perform a validation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">thresholds</span></code>: describes the different thresholds used in <code class="docutils literal notranslate"><span class="pre">BuildingValidator</span></code> and optimized in <code class="docutils literal notranslate"><span class="pre">BuildingValidationOptimizer</span></code>.</p></li>
+</ul>
+<p>In Building Validation, the most time-consuming step is the preparation of data, including the clustering of candidate building points and the overlay of vectors of buildings from a public databse: up to several minutes per km² of data. The <code class="docutils literal notranslate"><span class="pre">BuildingValidationOptimizer</span></code> breaks down the Building Validation steps to make sure that data preparation only occurs onces.
+The steps are the following:</p>
+<ol class="arabic">
+<li><p>Preparation</p>
+<p>Prepares and saves each point cloud in the specified directory, and extracts all cluster information in a list of <code class="docutils literal notranslate"><span class="pre">BuildingValidationClusterInfo</span></code> objects that is pickled.</p>
+</li>
+<li><p>Optimization</p></li>
+<li><p>Evaluation</p></li>
+<li><p>Update</p></li>
 </ol>
+</section>
+<section id="id1">
+<h2>Running the optimization<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<blockquote>
+<div><p>Refer to the <span class="xref myst">installation tutorial</span> to set up your environment.</p>
+</div></blockquote>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate lidar_prod
-python lidar_prod/run.py +task<span class="o">=</span>optimize building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+optimize+evaluate+update&#39;</span> building_validation.optimization.paths.input_las_dir<span class="o">=[</span>path/to/labelled/val/dataset/<span class="o">]</span> building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span> 
+
+python lidar_prod/run.py <span class="se">\</span>
++task<span class="o">=</span>optimize building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+optimize+evaluate+update&#39;</span> <span class="se">\</span>
+building_validation.optimization.paths.input_las_dir<span class="o">=[</span>path/to/labelled/val/dataset/<span class="o">]</span> <span class="se">\</span>
+building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span> 
 </pre></div>
 </div>
-<p>Nota: to run on a single file during development, add a <code class="docutils literal notranslate"><span class="pre">+building_validation.optimization.debug=true</span></code> flag to the command line.</p>
+<p>Debug mode: to run on a single file during development, add a <code class="docutils literal notranslate"><span class="pre">+building_validation.optimization.debug=true</span></code> flag to the command line.</p>
 <p>Optimized decision threshold will be pickled inside the results directory.</p>
 <p>To evaluate the optimized module on a test set, change input las folder, and rerun. You need to specify that no optimization is required using the <code class="docutils literal notranslate"><span class="pre">todo</span></code> params. You also need to give the path to the pickled decision trheshold.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate lidar_prod
 python lidar_prod/run.py +task<span class="o">=</span>optimize building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+evaluate+update&#39;</span> building_validation.optimization.paths.input_las_dir<span class="o">=[</span>path/to/labelled/test/dataset/<span class="o">]</span> building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span> building_validation.optimization.paths.building_validation_thresholds_pickle<span class="o">=[</span>path/to/optimized_thresholds.pickle<span class="o">]</span>
 </pre></div>
 </div>
+<p>Reference:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://ieeexplore.ieee.org/document/996017">Deb et al. (2002) - A fast and elitist multiobjective genetic algorithm: NSGA-II</a>).</p></li>
+</ul>
+</section>
 </section>
 
 

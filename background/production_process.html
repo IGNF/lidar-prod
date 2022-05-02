@@ -58,7 +58,14 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../guides/thresholds_optimization.html">Optimization and evaluation of building validation decision thresholds</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/thresholds_optimization.html">Optimization and evaluation of building validation decision thresholds</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#motivations">Motivations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#strategy">Strategy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#running-the-optimization">Running the optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#id1">Running the optimization</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../guides/development.html">Developer’s guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../guides/development.html#use-application-from-source">Use application from source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../guides/development.html#cicd-and-versions">CICD and versions</a></li>
@@ -144,7 +151,7 @@
 </li>
 <li><p>Update of the point cloud classification</p></li>
 </ol>
-<p>Decision thresholds <code class="docutils literal notranslate"><span class="pre">E1</span></code>, <code class="docutils literal notranslate"><span class="pre">E2</span></code> , <code class="docutils literal notranslate"><span class="pre">C1</span></code>, <code class="docutils literal notranslate"><span class="pre">C2</span></code>, <code class="docutils literal notranslate"><span class="pre">R1</span></code>, <code class="docutils literal notranslate"><span class="pre">R2</span></code>, <code class="docutils literal notranslate"><span class="pre">O1</span></code> are chosen via a multi-objective hyperparameter optimization that aims to maximize automation, precision, and recall of the decisions.
+<p>Decision thresholds <code class="docutils literal notranslate"><span class="pre">E1</span></code>, <code class="docutils literal notranslate"><span class="pre">E2</span></code> , <code class="docutils literal notranslate"><span class="pre">C1</span></code>, <code class="docutils literal notranslate"><span class="pre">C2</span></code>, <code class="docutils literal notranslate"><span class="pre">R1</span></code>, <code class="docutils literal notranslate"><span class="pre">R2</span></code>, <code class="docutils literal notranslate"><span class="pre">O1</span></code> are chosen via a <span class="xref myst">multi-objective hyperparameter optimization</span> that aims to maximize automation, precision, and recall of the decisions.
 Current performances on a 15km² validation dataset, expressed as percentages of clusters, are:</p>
 <ul class="simple">
 <li><p>Automation=91%</p></li>
