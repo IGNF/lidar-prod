@@ -2,7 +2,12 @@ name: CICD
 
 on:
   pull_request:
-    branches: [dev, main]
+    types:
+      # will only run for non-draft pull request
+      - ready_for_review
+    branches:
+      - dev
+      - main
 
 
 jobs:
