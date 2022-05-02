@@ -32,10 +32,6 @@ jobs:
             python-version: 3.9.12
             auto-update-conda: true
             miniconda-version: "latest"
-            # Faster install with mamba; specify cona-forge for its installation
-            use-mamba: true
-            channels: conda-forge,defaults
-            mamba-version: "4.11.*"
             # Environment to create and activate for next steps
             activate-environment: lidar_prod
             environment-file: bash/setup_environment/requirements.yml
