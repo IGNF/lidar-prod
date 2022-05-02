@@ -13,26 +13,33 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    # Task to do when launching the workflow
+    # Use bash instead of sh for conda activation
+    defaults:
+      run:
+        shell: bash -l {0}
+
     steps:
-
-      # 1. First get the repository source
-
+      # Checkout the repository
       - name: "Checkout"
         uses: actions/checkout@v2
 
-      # 2. Sphinx part : install tool and dependencies
+      # See https://github.com/conda-incubator/setup-miniconda#caching-environments
 
-      - name: "Set up Python"
-        uses: actions/setup-python@v1
+      # Setup empty conda environment
+      - name: Setup a conda-incubator with an empty conda env
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: 3.9.12
+            python-version: 3.9.12
+            auto-update-conda: true
+            miniconda-version: "latest"
+            # Faster install with mamba
+            use-mamba: true
+            mamba-version: "4.11.*"
+            # Environment to create and activate for next steps
+            activate-environment: lidar_prod
+            environment-file: bash/setup_environment/requirements.yml
 
-      # Here we update base environment direcly
-      # to avoid tricky activations
-      - name: "Install Python dependencies"
-        run: conda env update -f bash/setup_environment/requirements.yml --name base
-
+      # 2. Sphinx part : install tool and dependencies
       - name: "Build Sphinx Doc"
         working-directory: ./docs/
         run: make html
