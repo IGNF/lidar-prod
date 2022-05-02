@@ -62,7 +62,7 @@ extensions = [
     "sphinx.ext.intersphinx",  # link to other docs
     "sphinx.ext.viewcode",  # creates links to view code sources in a new web page
     "sphinx.ext.githubpages",  # creates .nojekyll file to publish the doc on GitHub Pages.
-    "myst_parser",  # supports markdown syntax for doc pages
+    "myst_parser",  # supports markdown syntax for doc pages, and link to markdown pages
     "sphinx_paramlinks",  # allow to reference params, which is done in pytorch_lightning
     "sphinxnotes.mock",  # ignore third-parties directive suche as "testcode" - see "mock_directive" args below
 ]

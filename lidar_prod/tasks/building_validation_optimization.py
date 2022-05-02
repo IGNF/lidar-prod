@@ -27,7 +27,33 @@ def constraints_func(trial):
 
 
 class BuildingValidationOptimizer:
-    """Optimization logic for the BuildingValidation decision thresholds."""
+    r"""Optimizer of the decision thresholds used by `BuildingValidator`.
+
+    In lidar-prod, each task is implemented by a dedicated python class.
+    Building Validation is implemented via a :class:`BuildingValidator` class.
+    We make sure that all parameters used for optimization are the one we
+    actually use in production.
+
+    For a higher internal cohesion, `BuildingValidator` does not know
+    anything about optimization, which is taken care of by a
+    `BuildingValidationOptimizer` python class.
+    Two dataclasses are used to connect the two objects.
+    `BuildingValidationClusterInfo` describes the cluster-level information,
+    necessary to perform a validation.
+    `thresholds` describes the different thresholds used
+    in `BuildingValidator` and optimized in `BuildingValidationOptimizer`.
+
+    In Building Validation, the most time-consuming step is the preparation
+    of data, including the clustering of candidate building points and the
+    overlay of vectors of buildings from a public databse:
+    up to several minutes per km² of data.
+    The `BuildingValidationOptimizer` breaks down the Building Validation steps to make
+    sure that data preparation only occurs onces.
+    All outputs and intermediary files are stored in a `results_output_dir`
+    directory, so that operations may be resumed at any steps, for instance
+    to rerun a thresholds optimization with a different optimizer configuration.
+
+    """
 
     def __init__(
         self,
@@ -99,8 +125,10 @@ class BuildingValidationOptimizer:
     def prepare(self):
         """Preparation step.
 
-        Cluster clouds and cross with building vector database, then
-        extract cluster-level information.
+        Prepares and saves each point cloud in the specified directory,
+        and extracts all cluster information in a list of
+        `BuildingValidationClusterInfo` objects that is serialized into
+        a pickle object.
 
         """
         clusters = []
@@ -115,7 +143,15 @@ class BuildingValidationOptimizer:
         self._dump_clusters(clusters)
 
     def optimize(self):
-        """Optimization step"""
+        """Optimization step.
+
+        Deserializes the clusters informations.
+        Runs the genetic algorithm for N generations.
+        For each set of decision thresholds, computes the Recall, Precision,
+        and Automation of the `BuildingValidator`.
+        Finally, serializes the set of optimal thresholds.
+
+        """
         clusters = self._load_clusters()
         objective = functools.partial(self._objective, clusters=clusters)
         self.study.optimize(objective, n_trials=self.design.n_trials)
@@ -126,25 +162,29 @@ class BuildingValidationOptimizer:
         self.thresholds: thresholds = best_thresholds
 
     def evaluate(self) -> dict:
-        """Evaluates application on prepared clusters and computes performance metrics.
+        """Evaluation step.
 
-        The optimization step results in optimized thresholds, stored in a pickle object.
-        To use them,specify parameter `building_validation.optimization.paths.building_validation_thresholds_pickle`.
-        Elsewise, default thresholds will be used.
+        Deserializes the set of optimal thresholds.
+        Deserializes the clusters informations.
+        Computes the Recall, Precision, and Automation of the `BuildingValidator`
+        on the clusters using optimal thresholds, as well as other metrics
+        including confusion matrices.
+        If a validation dataset was used for optimization, this evaluation
+        may be ran on a test dataset.
 
         Returns:
             dict: a dictionnary of metrics of schema {metric_name:metric_value}.
 
         """
         clusters = self._load_clusters()
-        self.set_thresholds_from_pickle_if_available()
+        self._set_thresholds_from_pickle_if_available()
         decisions = np.array([self.bv._make_group_decision(c) for c in clusters])
         mts_gt = np.array([c.target for c in clusters])
-        metrics_dict = self._evaluate_decisions(mts_gt, decisions)
+        metrics_dict = self.evaluate_decisions(mts_gt, decisions)
         log.info(f"\n Results:\n{self._get_results_logs_str(metrics_dict)}")
         return metrics_dict
 
-    def set_thresholds_from_pickle_if_available(self):
+    def _set_thresholds_from_pickle_if_available(self):
         try:
             with open(self.paths.building_validation_thresholds_pickle, "rb") as f:
                 self.bv.thresholds = pickle.load(f)
@@ -159,11 +199,13 @@ class BuildingValidationOptimizer:
     def update(self):
         """Update step.
 
-        Update point cloud classification using optimized decision thresholds.
+        Deserializes the set of optimal thresholds.
+        `BuildingValidator` updates each prepared point cloud classification
+        based on those threshods and saves the result.
 
         """
         log.info(f"Updated las will be saved in {self.paths.results_output_dir}")
-        self.set_thresholds_from_pickle_if_available()
+        self._set_thresholds_from_pickle_if_available()
         for prepared_las_path, target_las_path in tqdm(
             zip(self.prepared_las_filepaths, self.out_las_filepaths),
             total=len(self.prepared_las_filepaths),
@@ -183,6 +225,7 @@ class BuildingValidationOptimizer:
 
         Returns:
             List[BuildingValidationClusterInfo]: cluster information for each cluster of candidate buildings
+
         """
         las: laspy.LasData = laspy.read(prepared_las_path)
         dim_cluster_id = las[
@@ -242,6 +285,7 @@ class BuildingValidationOptimizer:
 
         Returns:
             float, float, float: automatisation, precision, recall
+
         """
         params = {
             "min_confidence_confirmation": trial.suggest_float(
@@ -270,7 +314,7 @@ class BuildingValidationOptimizer:
         self.bv.thresholds = thresholds(**params)
         decisions = np.array([self.bv._make_group_decision(c) for c in clusters])
         mts_gt = np.array([c.target for c in clusters])
-        metrics_dict = self._evaluate_decisions(mts_gt, decisions)
+        metrics_dict = self.evaluate_decisions(mts_gt, decisions)
 
         # WARNING: order should always be automation, precision, recall
         values = (
@@ -289,7 +333,7 @@ class BuildingValidationOptimizer:
         return auto, precision, recall
 
     def _select_best_rules(self, study):
-        """Find the trial that meets constraints and that maximizes automation."""
+        """Find the trial that meet constraints and that maximizes automation."""
         trials = sorted(study.best_trials, key=lambda x: x.values[0], reverse=True)
         TRIALS_BELOW_ZERO_ARE_VALID = 0
         respect_constraints = [
@@ -311,6 +355,7 @@ class BuildingValidationOptimizer:
         return best_rules
 
     def _dump_best_rules(self, best_trial_params):
+        """Serializes best thresholds."""
         with open(self.paths.building_validation_thresholds_pickle, "wb") as f:
             pickle.dump(best_trial_params, f)
             log.info(
@@ -318,22 +363,24 @@ class BuildingValidationOptimizer:
             )
 
     def _dump_clusters(self, clusters):
+        """Serializes the list of cluster-level information objects."""
         with open(self.paths.group_info_pickle_path, "wb") as f:
             pickle.dump(clusters, f)
             log.info(f"Pickled groups to {self.paths.group_info_pickle_path}")
 
     def _load_clusters(self):
+        """Deserializes the list of cluster-level information objects."""
         with open(self.paths.group_info_pickle_path, "rb") as f:
             clusters = pickle.load(f)
             log.info(f"Loading pickled groups from {self.paths.group_info_pickle_path}")
         return clusters
 
-    def _evaluate_decisions(self, mts_gt, ia_decision):
+    def evaluate_decisions(self, mts_gt, ia_decision):
         """Evaluate confirmation and refutation decisions.
 
         Get dict of metrics to evaluate how good module decisions were in reference to ground truths.
         Targets: U=Unsure, N=No (not a building), Y=Yes (building)
-        PRedictions : U=Unsure, C=Confirmation, R=Refutation
+        Predictions : U=Unsure, C=Confirmation, R=Refutation
         Confusion Matrix :
                 predictions
                 [Uu Ur Uc]
@@ -353,6 +400,7 @@ class BuildingValidationOptimizer:
         Only candidate shapes with known ground truths are considered (ambiguous labels are ignored).
         Precision : (Yu + Yc) / (Yu + Yc + Nc)
         Recall : (Yu + Yc) / (Yu + Yn + Yc)
+
         """
         metrics_dict = dict()
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-# Semantic Segmentation production - Fusion Module
+# Lidar Prod - a tool for the production of Lidar semantic segmentation
 
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white"></a>
 <a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
@@ -30,5 +30,6 @@ Our strategy is to fuse together different sources of informations (rules-based 
 
 Right now, the class `building` is the only one that is addressed. The extension to other classes is dependent on the training of multiclass AI model, which requires high quality training datasets that are currently being produced.
 
-> Please refer to the documentation for installation and usage.
-> Please refer to the documentation to understand the production process.
+> Please refer to the documentation for [installation and usage](https://ignf.github.io/lidar-prod-quality-control/tutorials/install_and_use.html).
+    
+> Please refer to the documentation to understand the [production process](https://ignf.github.io/lidar-prod-quality-control/background/production_process.html).

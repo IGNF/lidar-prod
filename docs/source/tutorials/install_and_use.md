@@ -1,6 +1,10 @@
-# Installation and usage [TODO]
+# Installation and usage
 
 ## Install dependencies
+
+We use [Anaconda(https://anaconda.org/)] to manage and isolate dependencies. 
+The provided environment setup script also installs [Mamba](https://mamba.readthedocs.io/en/latest/index.html),
+which gets on top of conda for faster environment installs.
 
 ```yaml
 # clone project
@@ -10,14 +14,14 @@ cd lidar-prod-quality-control
 # install conda
 # see https://www.anaconda.com/products/individual
 
-
-# create conda environment (you may need to run lines manually as conda may not activate properly from bash script)
-source bash/setup_environment/setup_env.sh
-
 # install postgis to request building database
 sudo apt-get install postgis
 
-# activate using
+# create conda environment
+source bash/setup_environment/setup_env.sh
+
+
+# activate the virtual env
 conda activate lidar_prod
 ```
 
@@ -26,7 +30,7 @@ conda activate lidar_prod
 To run the module from anywhere, you can install as a package in a your virtual environment.
 
 ```bash
-# activate an env matching ./bash/setup_env.sh requirements.
+# activate your env
 conda activate lidar_prod
 
 # install the package

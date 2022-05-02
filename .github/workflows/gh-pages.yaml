@@ -47,4 +47,4 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           BRANCH: gh-pages     # <- Branch where generated doc files will be commited
-          FOLDER: docs/build/html/  # <- Dir where .nojekyll is created and from which to deploy github pages.
+          FOLDER: ./docs/build/html/  # <- Dir where .nojekyll is created and from which to deploy github pages.

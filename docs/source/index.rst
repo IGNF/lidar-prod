@@ -12,6 +12,7 @@ Lidar-Prod > Documentation
    :caption: Background
 
    background/production_process
+   background/thresholds_optimization_process
 
 .. toctree::
    :maxdepth: 1
