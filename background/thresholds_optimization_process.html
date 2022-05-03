@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview: module code &mdash; lidar_prod 1.5.0 documentation</title>
+  <title>Strategy to find optimal decision thresholds for Building validation &mdash; lidar_prod 1.5.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -17,7 +18,9 @@
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Installation and usage" href="../tutorials/install_and_use.html" />
+    <link rel="prev" title="Production process used to transform point clouds classification" href="production_process.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,16 +39,16 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Background</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../background/production_process.html">Production process used to transform point clouds classification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#a-building-validation">A) Building Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-building-completion">B) Building Completion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#c-building-identification">C) Building Identification</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="production_process.html">Production process used to transform point clouds classification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="production_process.html#a-building-validation">A) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="production_process.html#b-building-completion">B) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="production_process.html#c-building-identification">C) Building Identification</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../background/thresholds_optimization_process.html">Strategy to find optimal decision thresholds for Building validation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../background/thresholds_optimization_process.html#motivations">Motivations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../background/thresholds_optimization_process.html#strategy">Strategy</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Strategy to find optimal decision thresholds for Building validation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#motivations">Motivations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#strategy">Strategy</a></li>
 </ul>
 </li>
 </ul>
@@ -104,8 +107,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Overview: module code</li>
+      <li>Strategy to find optimal decision thresholds for Building validation</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/background/thresholds_optimization_process.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -113,20 +117,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="lidar_prod/commons/commons.html">lidar_prod.commons.commons</a></li>
-<li><a href="lidar_prod/run.html">lidar_prod.run</a></li>
-<li><a href="lidar_prod/tasks/building_completion.html">lidar_prod.tasks.building_completion</a></li>
-<li><a href="lidar_prod/tasks/building_identification.html">lidar_prod.tasks.building_identification</a></li>
-<li><a href="lidar_prod/tasks/building_validation.html">lidar_prod.tasks.building_validation</a></li>
-<li><a href="lidar_prod/tasks/building_validation_optimization.html">lidar_prod.tasks.building_validation_optimization</a></li>
-<li><a href="lidar_prod/tasks/cleaning.html">lidar_prod.tasks.cleaning</a></li>
-<li><a href="lidar_prod/tasks/utils.html">lidar_prod.tasks.utils</a></li>
-</ul>
+  <section id="strategy-to-find-optimal-decision-thresholds-for-building-validation">
+<h1>Strategy to find optimal decision thresholds for Building validation<a class="headerlink" href="#strategy-to-find-optimal-decision-thresholds-for-building-validation" title="Permalink to this headline"></a></h1>
+<section id="motivations">
+<h2>Motivations<a class="headerlink" href="#motivations" title="Permalink to this headline"></a></h2>
+<p>As described in section <span class="xref myst">Building Validation</span> of the production process, the decision to validate or not a group of candidate buildings is based on several decision thresholds. Those thresholds represents different levels of confidence, for different sources of data.</p>
+<p>They may depend on the AI model which produces the probabilities as well as on the rule-based classification from which the clusters of candidates are derived. They are highly coupled. For instance, if a lower probability is required at the point level to be confirmed as a building (threshold <code class="docutils literal notranslate"><span class="pre">C1</span></code>), we might require a higher percentage of confirmed points in a cluster of candidates (thresholds <code class="docutils literal notranslate"><span class="pre">C2</span></code>) to validate it. There must therefore be optimized jointly.</p>
+<p>These thresholds define how much we automate decisions, but also the quantity of errors we may introduce: there is a balance to be found between <code class="docutils literal notranslate"><span class="pre">recall</span></code> (proportion of buildings group that were confirmed), <code class="docutils literal notranslate"><span class="pre">precision</span></code> (proportion of buildings among confirmed groups), and <code class="docutils literal notranslate"><span class="pre">automation</span></code> (proportion of groups for which a decision was made i.e. that are not flagged as “unsure”).</p>
+</section>
+<section id="strategy">
+<h2>Strategy<a class="headerlink" href="#strategy" title="Permalink to this headline"></a></h2>
+<p>We approach the choice of decisions thresholds as a constrained multi-objectives hyperparameters optimization.
+We use the <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/generated/optuna.samplers.NSGAIISampler.html#optuna.samplers.NSGAIISampler">NSGA-II</a> algorithm from the optuna optimization library.</p>
+<p>The constraints are defined empirically: recall&gt;=98% and precision&gt;=98%. The genetic algorithms search two maximize the three objectives, but focuses the search to solutions that meet these criteria.</p>
+<p>After a chosen number of generations, the genetic algorithms outputs the <a class="reference external" href="https://en.wikipedia.org/wiki/Pareto_front">Pareto front</a> i.e. the set of Pareto efficient solutions for which no objective criterion could be increased without another one being reduced. Among Pareto-efficient solutions compliant with the constraint, the final solution is the set of thresholds that maximizes the production of precision, recall, and automation.</p>
+</section>
+</section>
+
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="production_process.html" class="btn btn-neutral float-left" title="Production process used to transform point clouds classification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../tutorials/install_and_use.html" class="btn btn-neutral float-right" title="Installation and usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

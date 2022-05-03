@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation and usage [TODO] &mdash; lidar_prod 1.5.0 documentation</title>
+  <title>Installation and usage &mdash; lidar_prod 1.5.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Optimization and evaluation of building validation decision thresholds" href="../guides/thresholds_optimization.html" />
-    <link rel="prev" title="Production process: how are point clouds transformed by the app?" href="../background/production_process.html" /> 
+    <link rel="next" title="How to optimize building validation decision thresholds?" href="../guides/thresholds_optimization.html" />
+    <link rel="prev" title="Strategy to find optimal decision thresholds for Building validation" href="../background/thresholds_optimization_process.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,16 +40,21 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Background</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../background/production_process.html">Production process: how are point clouds transformed by the app?</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../background/production_process.html">Production process used to transform point clouds classification</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#a-building-validation">A) Building Validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-building-completion">B) Building Completion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#c-building-identification">C) Building Identification</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../background/thresholds_optimization_process.html">Strategy to find optimal decision thresholds for Building validation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../background/thresholds_optimization_process.html#motivations">Motivations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../background/thresholds_optimization_process.html#strategy">Strategy</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation and usage [TODO]</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation and usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#install-dependencies">Install dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#use-application-as-a-package">Use application as a package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run-sequentialy-on-multiple-files">Run sequentialy on multiple files</a></li>
@@ -58,11 +63,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../guides/thresholds_optimization.html">Optimization and evaluation of building validation decision thresholds</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#motivations">Motivations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#strategy">Strategy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#running-the-optimization">Running the optimization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#implementation-details">Implementation details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/thresholds_optimization.html">How to optimize building validation decision thresholds?</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#running-thresholds-optimization">Running thresholds optimization</a></li>
 </ul>
 </li>
@@ -105,7 +107,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Installation and usage [TODO]</li>
+      <li>Installation and usage</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/tutorials/install_and_use.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -115,10 +117,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="installation-and-usage-todo">
-<h1>Installation and usage [TODO]<a class="headerlink" href="#installation-and-usage-todo" title="Permalink to this headline"></a></h1>
+  <section id="installation-and-usage">
+<h1>Installation and usage<a class="headerlink" href="#installation-and-usage" title="Permalink to this headline"></a></h1>
 <section id="install-dependencies">
 <h2>Install dependencies<a class="headerlink" href="#install-dependencies" title="Permalink to this headline"></a></h2>
+<p>We use [Anaconda(https://anaconda.org/)] to manage and isolate dependencies.
+The provided environment setup script also installs <a class="reference external" href="https://mamba.readthedocs.io/en/latest/index.html">Mamba</a>,
+which gets on top of conda for faster environment installs.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># clone project</span><span class="w"></span>
 <span class="l l-Scalar l-Scalar-Plain">git clone https://github.com/IGNF/lidar-prod-quality-control</span><span class="w"></span>
 <span class="l l-Scalar l-Scalar-Plain">cd lidar-prod-quality-control</span><span class="w"></span>
@@ -126,14 +131,14 @@
 <span class="l l-Scalar l-Scalar-Plain"># install conda</span><span class="w"></span>
 <span class="l l-Scalar l-Scalar-Plain"># see https://www.anaconda.com/products/individual</span><span class="w"></span>
 
-
-<span class="l l-Scalar l-Scalar-Plain"># create conda environment (you may need to run lines manually as conda may not activate properly from bash script)</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">source bash/setup_environment/setup_env.sh</span><span class="w"></span>
-
 <span class="l l-Scalar l-Scalar-Plain"># install postgis to request building database</span><span class="w"></span>
 <span class="l l-Scalar l-Scalar-Plain">sudo apt-get install postgis</span><span class="w"></span>
 
-<span class="l l-Scalar l-Scalar-Plain"># activate using</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain"># create conda environment</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">source bash/setup_environment/setup_env.sh</span><span class="w"></span>
+
+
+<span class="l l-Scalar l-Scalar-Plain"># activate the virtual env</span><span class="w"></span>
 <span class="l l-Scalar l-Scalar-Plain">conda activate lidar_prod</span><span class="w"></span>
 </pre></div>
 </div>
@@ -141,7 +146,7 @@
 <section id="use-application-as-a-package">
 <h2>Use application as a package<a class="headerlink" href="#use-application-as-a-package" title="Permalink to this headline"></a></h2>
 <p>To run the module from anywhere, you can install as a package in a your virtual environment.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate an env matching ./bash/setup_env.sh requirements.</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate your env</span>
 conda activate lidar_prod
 
 <span class="c1"># install the package</span>
@@ -170,8 +175,8 @@ pip install -e .  <span class="c1"># from local sources</span>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../background/production_process.html" class="btn btn-neutral float-left" title="Production process: how are point clouds transformed by the app?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../guides/thresholds_optimization.html" class="btn btn-neutral float-right" title="Optimization and evaluation of building validation decision thresholds" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../background/thresholds_optimization_process.html" class="btn btn-neutral float-left" title="Strategy to find optimal decision thresholds for Building validation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../guides/thresholds_optimization.html" class="btn btn-neutral float-right" title="How to optimize building validation decision thresholds?" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

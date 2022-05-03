@@ -1,26 +1,8 @@
-# Optimization and evaluation of building validation decision thresholds
+# How to optimize building validation decision thresholds?
 
-## Motivations
+This guide explains how to optimize decision thresholds following the strategy in [this note](background/thresholds_optimization_process.md).
 
-As described in section [`Building Validation`](background/production_process.md) of the production process, the decision to validate or not a group of candidate buildings is based on several decision thresholds. Those thresholds represents different levels of confidence, for different sources of data. 
-
-They may depend the AI model which produces the probabilities as well as on the rule-based classification from which the clusters of candidates are derived. They are highly coupled. For instance, if a lower probability is required at the point level to be confirmed as a building (threshold `C1`), we might require a higher percentage of confirmed points in a cluster of candidates (thresholds `C2`) to validate it. There must therefore be optimized jointly. 
-
-These thresholds define how much we automate decisions, but also the quantity of errors we may introduce: there is a balance to be found between `recall` (proportion of buildings group that were confirmed), `precision` (proportion of buildings among confirmed groups), and `automation` (proportion of groups for which a decision was made i.e. that are not flagged as "unsure"). 
-
-## Strategy
-
-We approach the choice of decisions thresholds as a constrained multi-objectives hyperparameters optimization.
-We use the [NSGA-II](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.samplers.NSGAIISampler.html#optuna.samplers.NSGAIISampler) algorithm from the optuna optimization library.
-The constraints are defined empirically: recall>=98% and precision>=98%.
-The genetic algorithms search two maximize the three objectives, but focuses the search to solutions that meets these criteria. 
-After a chosen number of generations, the genetic algorithms outputs the [Pareto front](https://en.wikipedia.org/wiki/Pareto_front) i.e. the set of Pareto efficient solutions for which no objective criterion could be increased without another one being reduced.
-Among Pareto-efficient solutions compliant with the constraint, the final solution is the set of thresholds that maximizes the production of precision, recall, and automation.
-
-
-## Running the optimization
-
-### Requirements
+## Requirements
 
 To optimize the decision thresholds you must be able to evaluate the level of automation that can be reached on data that matches production data. As a result, you need to have _corrected_ data i.e. data of which a rule-based classification was corrected and for which you keep track of the corrections that were made. For building validation, the classification must have codes to distinguish false positive, false negative, and true positive. Theses codes may be configured with parameter `buildings_correction_labels` under configuration group `bulding_validation.optimization`.
 
@@ -28,39 +10,17 @@ Furthermore, the point cloud data must include predictions from the deep learnin
 
 A large validation dataset might help having a better sense of the app performances. We used 15km² of corrected data to optimize thresholds, but a larger set might provide more diversity. This being said, performance on an unseen test set was almost equal to performance on the validation set, which indicates a robust evaluation for such volume of data. 
 
-## Implementation details
-
-In lidar-prod, each task is implemented by a dedicated python class. Building Validation is implemented via a `BuildingValidator` class. We make sure that all parameters used for optimization are the one we actually use in production.
-For a higher internal cohesion, `BuildingValidator` does not know anything about optimization, which is taken care of by a `BuildingValidationOptimizer` python class. Two dataclasses are used to connect the two objects
-- `BuildingValidationClusterInfo`: describes the cluster-level information, necessary to perform a validation
-- `thresholds`: describes the different thresholds used in `BuildingValidator` and optimized in `BuildingValidationOptimizer`.
-
-In Building Validation, the most time-consuming step is the preparation of data, including the clustering of candidate building points and the overlay of vectors of buildings from a public databse: up to several minutes per km² of data. The `BuildingValidationOptimizer` breaks down the Building Validation steps to make sure that data preparation only occurs onces.
-All outputs and intermediary files are stored in a `results_output_dir` directory, so that operations may be resumed at any steps, for instance to rerun a thresholds optimization with a different optimizer configuration.
-
-1. Preparation
-
-    Prepares and saves each point cloud in the specified directory, and extracts all cluster information in a list of `BuildingValidationClusterInfo` objects that is serialized into a pickle object.
-
-2. Optimization
-
-    Deserializes the clusters informations. Runs the genetic algorithm for N generations. For each set of decision thresholds, computes the Recall, Precision, and Automation of the `BuildingValidator`. Finally, serializes the set of optimal thresholds.
-
-3. Evaluation
-
-    Deserializes the set of optimal thresholds. Deserializes the clusters informations. Computes the Recall, Precision, and Automation of the `BuildingValidator` on the clusters using optimal thresholds, as well as other metrics including confusion matrices. If a validation dataset was used for optimization, this evaluation may be ran on a test dataset.
-
-4. Update
-
-    Deserializes the set of optimal thresholds. `BuildingValidator` updates each prepared point cloud classification based on those threshods and saves the result.
 
 ## Running thresholds optimization
 
-### Full run
+### Finding optimal thresholds
 
 > Refer to the [installation tutorial](tutorials/install_and_use.md) to set up your python environment.
 
-Your corrected data must live in a single `input_las_dir` directory as a set of LAS files. Prepared and updated files will be saved in subfolder of a `results_output_dir` directory (`./prepared` and `./updated/`, respectively). They will keep the same basename as the original files. Once your are set up, be sure that the `data_format` configurations match your data, and in particular the (clasification) `codes` and `las_dimensions` configuration groups.
+Your corrected data must live in a single `input_las_dir` directory as a set of LAS files. 
+Prepared and updated files will be saved in subfolder of a `results_output_dir` directory (`./prepared` and `./updated/`, respectively).
+They will keep the same basename as the original files.
+Be sure that the `data_format` configurations match your data, and in particular the (clasification) `codes` and `las_dimensions` configuration groups.
 A `todo` string parameter specifies the steps to run by including 1 or more of the following keywords: `prepare` | `otpimize` | `evaluate` | `update`. 
 
 Run the full optimization module with
