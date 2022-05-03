@@ -6,7 +6,8 @@
 <a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
 <a href="https://hydra.cc/"><img alt="Config: Hydra" src="https://img.shields.io/badge/Config-Hydra-89b8cd"></a>
 
-[![](https://shields.io/badge/-Lightning--Hydra--Template-017F2F?style=flat&logo=github&labelColor=303030)](https://github.com/ashleve/lightning-hydra-template)
+[![Documentation Build](https://github.com/IGNF/lidar-prod-quality-control/actions/workflows/gh-pages.yml/badge.svg)](https://github.com/IGNF/lidar-prod-quality-control/actions/workflows/gh-pages.yml)
+
 </div>
 <br><br>
 
