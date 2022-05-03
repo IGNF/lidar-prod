@@ -35,7 +35,25 @@ jobs:
             use-mamba: true
             # Environment to create and activate for next steps
             activate-environment: lidar_prod
-            environment-file: bash/setup_environment/requirements.yml
+
+      # Cache the env
+      # See https://github.com/conda-incubator/setup-miniconda#caching-environments
+      - name: Set cache date to
+        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - name: Cache conda environment
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.CONDA }}/envs
+          key: conda-${{ runner.os }}--${{ runner.arch }}--${{ steps.get-date.outputs.today }}-${{ hashFiles('bash/setup_environment/requirements.yml') }}-${{ env.CACHE_NUMBER }}
+        env:
+          # Increase this value to reset cache if bash/setup_environment/requirements.yml has not changed
+          CACHE_NUMBER: 0
+        id: cache
+
+      - name: Update environment if there was no cached env.
+        run: mamba env update -n lidar_prod -f bash/setup_environment/requirements.yml
+        if: steps.cache.outputs.cache-hit != 'true'
 
       # 2. Sphinx part : install tool and dependencies
       - name: "Build Sphinx Doc"
