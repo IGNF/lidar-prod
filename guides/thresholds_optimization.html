@@ -63,7 +63,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#strategy">Strategy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-the-optimization">Running the optimization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#implementation-details">Implementation details</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id1">Running the optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-thresholds-optimization">Running thresholds optimization</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer’s guide</a><ul>
@@ -150,21 +150,32 @@ For a higher internal cohesion, <code class="docutils literal notranslate"><span
 <li><p><code class="docutils literal notranslate"><span class="pre">thresholds</span></code>: describes the different thresholds used in <code class="docutils literal notranslate"><span class="pre">BuildingValidator</span></code> and optimized in <code class="docutils literal notranslate"><span class="pre">BuildingValidationOptimizer</span></code>.</p></li>
 </ul>
 <p>In Building Validation, the most time-consuming step is the preparation of data, including the clustering of candidate building points and the overlay of vectors of buildings from a public databse: up to several minutes per km² of data. The <code class="docutils literal notranslate"><span class="pre">BuildingValidationOptimizer</span></code> breaks down the Building Validation steps to make sure that data preparation only occurs onces.
-The steps are the following:</p>
+All outputs and intermediary files are stored in a <code class="docutils literal notranslate"><span class="pre">results_output_dir</span></code> directory, so that operations may be resumed at any steps, for instance to rerun a thresholds optimization with a different optimizer configuration.</p>
 <ol class="arabic">
 <li><p>Preparation</p>
-<p>Prepares and saves each point cloud in the specified directory, and extracts all cluster information in a list of <code class="docutils literal notranslate"><span class="pre">BuildingValidationClusterInfo</span></code> objects that is pickled.</p>
+<p>Prepares and saves each point cloud in the specified directory, and extracts all cluster information in a list of <code class="docutils literal notranslate"><span class="pre">BuildingValidationClusterInfo</span></code> objects that is serialized into a pickle object.</p>
 </li>
-<li><p>Optimization</p></li>
-<li><p>Evaluation</p></li>
-<li><p>Update</p></li>
+<li><p>Optimization</p>
+<p>Deserializes the clusters informations. Runs the genetic algorithm for N generations. For each set of decision thresholds, computes the Recall, Precision, and Automation of the <code class="docutils literal notranslate"><span class="pre">BuildingValidator</span></code>. Finally, serializes the set of optimal thresholds.</p>
+</li>
+<li><p>Evaluation</p>
+<p>Deserializes the set of optimal thresholds. Deserializes the clusters informations. Computes the Recall, Precision, and Automation of the <code class="docutils literal notranslate"><span class="pre">BuildingValidator</span></code> on the clusters using optimal thresholds, as well as other metrics including confusion matrices. If a validation dataset was used for optimization, this evaluation may be ran on a test dataset.</p>
+</li>
+<li><p>Update</p>
+<p>Deserializes the set of optimal thresholds. <code class="docutils literal notranslate"><span class="pre">BuildingValidator</span></code> updates each prepared point cloud classification based on those threshods and saves the result.</p>
+</li>
 </ol>
 </section>
-<section id="id1">
-<h2>Running the optimization<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<section id="running-thresholds-optimization">
+<h2>Running thresholds optimization<a class="headerlink" href="#running-thresholds-optimization" title="Permalink to this headline"></a></h2>
+<section id="full-run">
+<h3>Full run<a class="headerlink" href="#full-run" title="Permalink to this headline"></a></h3>
 <blockquote>
-<div><p>Refer to the <span class="xref myst">installation tutorial</span> to set up your environment.</p>
+<div><p>Refer to the <span class="xref myst">installation tutorial</span> to set up your python environment.</p>
 </div></blockquote>
+<p>Your corrected data must live in a single <code class="docutils literal notranslate"><span class="pre">input_las_dir</span></code> directory as a set of LAS files. Prepared and updated files will be saved in subfolder of a <code class="docutils literal notranslate"><span class="pre">results_output_dir</span></code> directory (<code class="docutils literal notranslate"><span class="pre">./prepared</span></code> and <code class="docutils literal notranslate"><span class="pre">./updated/</span></code>, respectively). They will keep the same basename as the original files. Once your are set up, be sure that the <code class="docutils literal notranslate"><span class="pre">data_format</span></code> configurations match your data, and in particular the (clasification) <code class="docutils literal notranslate"><span class="pre">codes</span></code> and <code class="docutils literal notranslate"><span class="pre">las_dimensions</span></code> configuration groups.
+A <code class="docutils literal notranslate"><span class="pre">todo</span></code> string parameter specifies the steps to run by including 1 or more of the following keywords: <code class="docutils literal notranslate"><span class="pre">prepare</span></code> | <code class="docutils literal notranslate"><span class="pre">otpimize</span></code> | <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> | <code class="docutils literal notranslate"><span class="pre">update</span></code>.</p>
+<p>Run the full optimization module with</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate lidar_prod
 
 python lidar_prod/run.py <span class="se">\</span>
@@ -173,17 +184,29 @@ building_validation.optimization.paths.input_las_dir<span class="o">=[</span>pat
 building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span> 
 </pre></div>
 </div>
-<p>Debug mode: to run on a single file during development, add a <code class="docutils literal notranslate"><span class="pre">+building_validation.optimization.debug=true</span></code> flag to the command line.</p>
-<p>Optimized decision threshold will be pickled inside the results directory.</p>
-<p>To evaluate the optimized module on a test set, change input las folder, and rerun. You need to specify that no optimization is required using the <code class="docutils literal notranslate"><span class="pre">todo</span></code> params. You also need to give the path to the pickled decision trheshold.</p>
+</section>
+<section id="evaluation-of-optimized-thresholds-on-a-test-set">
+<h3>Evaluation of optimized thresholds on a test set<a class="headerlink" href="#evaluation-of-optimized-thresholds-on-a-test-set" title="Permalink to this headline"></a></h3>
+<p>Once an optimal solution was found, you may want to evaluate the decision process on unseen data to evaluate generalization capability. For that, you will need another test folder of corrected data in the same format as before (a different <code class="docutils literal notranslate"><span class="pre">input_las_dir</span></code>). You need to specify that no optimization is required using the <code class="docutils literal notranslate"><span class="pre">todo</span></code> params. You also need to give the path to the pickled decision thresholds from the previous step, and specify a different <code class="docutils literal notranslate"><span class="pre">results_output_dir</span></code> so that prepared data of test and val test are not pooled together.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate lidar_prod
-python lidar_prod/run.py +task<span class="o">=</span>optimize building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+evaluate+update&#39;</span> building_validation.optimization.paths.input_las_dir<span class="o">=[</span>path/to/labelled/test/dataset/<span class="o">]</span> building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span> building_validation.optimization.paths.building_validation_thresholds_pickle<span class="o">=[</span>path/to/optimized_thresholds.pickle<span class="o">]</span>
+
+python lidar_prod/run.py <span class="se">\</span>
++task<span class="o">=</span>optimize <span class="se">\</span>
+building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+evaluate+update&#39;</span> <span class="se">\</span>
+building_validation.optimization.paths.input_las_dir<span class="o">=[</span>path/to/labelled/test/dataset/<span class="o">]</span> <span class="se">\</span>
+building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span> <span class="se">\</span>
+building_validation.optimization.paths.building_validation_thresholds_pickle<span class="o">=[</span>path/to/optimized_thresholds.pickle<span class="o">]</span>
 </pre></div>
 </div>
+</section>
+<section id="utils">
+<h3>Utils<a class="headerlink" href="#utils" title="Permalink to this headline"></a></h3>
+<p>Debug mode: to run on a single file during development, add a <code class="docutils literal notranslate"><span class="pre">+building_validation.optimization.debug=true</span></code> flag to the command line.</p>
 <p>Reference:</p>
 <ul class="simple">
 <li><p><a class="reference external" href="https://ieeexplore.ieee.org/document/996017">Deb et al. (2002) - A fast and elitist multiobjective genetic algorithm: NSGA-II</a>).</p></li>
 </ul>
+</section>
 </section>
 </section>
 

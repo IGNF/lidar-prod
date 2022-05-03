@@ -36,22 +36,34 @@ For a higher internal cohesion, `BuildingValidator` does not know anything about
 - `thresholds`: describes the different thresholds used in `BuildingValidator` and optimized in `BuildingValidationOptimizer`.
 
 In Building Validation, the most time-consuming step is the preparation of data, including the clustering of candidate building points and the overlay of vectors of buildings from a public databse: up to several minutes per km² of data. The `BuildingValidationOptimizer` breaks down the Building Validation steps to make sure that data preparation only occurs onces.
-The steps are the following:
+All outputs and intermediary files are stored in a `results_output_dir` directory, so that operations may be resumed at any steps, for instance to rerun a thresholds optimization with a different optimizer configuration.
 
 1. Preparation
 
-    Prepares and saves each point cloud in the specified directory, and extracts all cluster information in a list of `BuildingValidationClusterInfo` objects that is pickled. 
+    Prepares and saves each point cloud in the specified directory, and extracts all cluster information in a list of `BuildingValidationClusterInfo` objects that is serialized into a pickle object.
+
 2. Optimization
+
+    Deserializes the clusters informations. Runs the genetic algorithm for N generations. For each set of decision thresholds, computes the Recall, Precision, and Automation of the `BuildingValidator`. Finally, serializes the set of optimal thresholds.
 
 3. Evaluation
 
+    Deserializes the set of optimal thresholds. Deserializes the clusters informations. Computes the Recall, Precision, and Automation of the `BuildingValidator` on the clusters using optimal thresholds, as well as other metrics including confusion matrices. If a validation dataset was used for optimization, this evaluation may be ran on a test dataset.
+
 4. Update
 
-## Running the optimization
+    Deserializes the set of optimal thresholds. `BuildingValidator` updates each prepared point cloud classification based on those threshods and saves the result.
 
-> Refer to the [installation tutorial](tutorials/install_and_use.md) to set up your environment.
+## Running thresholds optimization
 
+### Full run
 
+> Refer to the [installation tutorial](tutorials/install_and_use.md) to set up your python environment.
+
+Your corrected data must live in a single `input_las_dir` directory as a set of LAS files. Prepared and updated files will be saved in subfolder of a `results_output_dir` directory (`./prepared` and `./updated/`, respectively). They will keep the same basename as the original files. Once your are set up, be sure that the `data_format` configurations match your data, and in particular the (clasification) `codes` and `las_dimensions` configuration groups.
+A `todo` string parameter specifies the steps to run by including 1 or more of the following keywords: `prepare` | `otpimize` | `evaluate` | `update`. 
+
+Run the full optimization module with
 
 ```bash
 conda activate lidar_prod
@@ -61,17 +73,26 @@ python lidar_prod/run.py \
 building_validation.optimization.paths.input_las_dir=[path/to/labelled/val/dataset/] \
 building_validation.optimization.paths.results_output_dir=[path/to/save/results] 
 ```
-Debug mode: to run on a single file during development, add a `+building_validation.optimization.debug=true` flag to the command line.
 
-Optimized decision threshold will be pickled inside the results directory.
+### Evaluation of optimized thresholds on a test set
 
-To evaluate the optimized module on a test set, change input las folder, and rerun. You need to specify that no optimization is required using the `todo` params. You also need to give the path to the pickled decision trheshold.
+Once an optimal solution was found, you may want to evaluate the decision process on unseen data to evaluate generalization capability. For that, you will need another test folder of corrected data in the same format as before (a different `input_las_dir`). You need to specify that no optimization is required using the `todo` params. You also need to give the path to the pickled decision thresholds from the previous step, and specify a different `results_output_dir` so that prepared data of test and val test are not pooled together.
+
 
 ```bash
 conda activate lidar_prod
-python lidar_prod/run.py +task=optimize building_validation.optimization.todo='prepare+evaluate+update' building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] building_validation.optimization.paths.results_output_dir=[path/to/save/results] building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
+
+python lidar_prod/run.py \
++task=optimize \
+building_validation.optimization.todo='prepare+evaluate+update' \
+building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] \
+building_validation.optimization.paths.results_output_dir=[path/to/save/results] \
+building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
 ```
 
+### Utils
+
+Debug mode: to run on a single file during development, add a `+building_validation.optimization.debug=true` flag to the command line.
 
 
 Reference:
