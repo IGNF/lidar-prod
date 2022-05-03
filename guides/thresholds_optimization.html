@@ -119,7 +119,7 @@
              
   <section id="how-to-optimize-building-validation-decision-thresholds">
 <h1>How to optimize building validation decision thresholds?<a class="headerlink" href="#how-to-optimize-building-validation-decision-thresholds" title="Permalink to this headline"></a></h1>
-<p>This guide explains how to optimize decision thresholds following the strategy in <span class="xref myst">this note</span>.</p>
+<p>This guide explains how to optimize decision thresholds following the strategy in <a class="reference internal" href="../background/thresholds_optimization_process.html"><span class="doc std std-doc">this note</span></a>.</p>
 <section id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline"></a></h2>
 <p>To optimize the decision thresholds you must be able to evaluate the level of automation that can be reached on data that matches production data. As a result, you need to have <em>corrected</em> data i.e. data of which a rule-based classification was corrected and for which you keep track of the corrections that were made. For building validation, the classification must have codes to distinguish false positive, false negative, and true positive. Theses codes may be configured with parameter <code class="docutils literal notranslate"><span class="pre">buildings_correction_labels</span></code> under configuration group <code class="docutils literal notranslate"><span class="pre">bulding_validation.optimization</span></code>.</p>
@@ -131,7 +131,7 @@
 <section id="finding-optimal-thresholds">
 <h3>Finding optimal thresholds<a class="headerlink" href="#finding-optimal-thresholds" title="Permalink to this headline"></a></h3>
 <blockquote>
-<div><p>Refer to the <span class="xref myst">installation tutorial</span> to set up your python environment.</p>
+<div><p>Refer to the <a class="reference internal" href="../tutorials/install_and_use.html"><span class="doc std std-doc">installation tutorial</span></a> to set up your python environment.</p>
 </div></blockquote>
 <p>Your corrected data must live in a single <code class="docutils literal notranslate"><span class="pre">input_las_dir</span></code> directory as a set of LAS files.
 Prepared and updated files will be saved in subfolder of a <code class="docutils literal notranslate"><span class="pre">results_output_dir</span></code> directory (<code class="docutils literal notranslate"><span class="pre">./prepared</span></code> and <code class="docutils literal notranslate"><span class="pre">./updated/</span></code>, respectively).
