@@ -261,14 +261,39 @@ Also add a “PRESENCE” column filled with 1 for later use by pdal.</p>
 <dt class="sig sig-object py" id="lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lidar_prod.tasks.building_validation_optimization.</span></span><span class="sig-name descname"><span class="pre">BuildingValidationOptimizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">todo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.10)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">building_validator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lidar_prod.tasks.building_validation.BuildingValidator" title="lidar_prod.tasks.building_validation.BuildingValidator"><span class="pre">lidar_prod.tasks.building_validation.BuildingValidator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">study</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">optuna.study.study.Study</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">design</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">buildings_correction_labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_final_classification_codes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/building_validation_optimization.html#BuildingValidationOptimizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Optimization logic for the BuildingValidation decision thresholds.</p>
+<p>Optimizer of the decision thresholds used by <cite>BuildingValidator</cite>.</p>
+<p>In lidar-prod, each task is implemented by a dedicated python class.
+Building Validation is implemented via a <code class="xref py py-class docutils literal notranslate"><span class="pre">BuildingValidator</span></code> class.
+We make sure that all parameters used for optimization are the one we
+actually use in production.</p>
+<p>For a higher internal cohesion, <cite>BuildingValidator</cite> does not know
+anything about optimization, which is taken care of by a
+<cite>BuildingValidationOptimizer</cite> python class.
+Two dataclasses are used to connect the two objects.
+<cite>BuildingValidationClusterInfo</cite> describes the cluster-level information,
+necessary to perform a validation.
+<cite>thresholds</cite> describes the different thresholds used
+in <cite>BuildingValidator</cite> and optimized in <cite>BuildingValidationOptimizer</cite>.</p>
+<p>In Building Validation, the most time-consuming step is the preparation
+of data, including the clustering of candidate building points and the
+overlay of vectors of buildings from a public databse:
+up to several minutes per km² of data.
+The <cite>BuildingValidationOptimizer</cite> breaks down the Building Validation steps to make
+sure that data preparation only occurs onces.
+All outputs and intermediary files are stored in a <cite>results_output_dir</cite>
+directory, so that operations may be resumed at any steps, for instance
+to rerun a thresholds optimization with a different optimizer configuration.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate">
 <span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/lidar_prod/tasks/building_validation_optimization.html#BuildingValidationOptimizer.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate" title="Permalink to this definition"></a></dt>
-<dd><p>Evaluates application on prepared clusters and computes performance metrics.</p>
-<p>The optimization step results in optimized thresholds, stored in a pickle object.
-To use them,specify parameter <cite>building_validation.optimization.paths.building_validation_thresholds_pickle</cite>.
-Elsewise, default thresholds will be used.</p>
+<dd><p>Evaluation step.</p>
+<p>Deserializes the set of optimal thresholds.
+Deserializes the clusters informations.
+Computes the Recall, Precision, and Automation of the <cite>BuildingValidator</cite>
+on the clusters using optimal thresholds, as well as other metrics
+including confusion matrices.
+If a validation dataset was used for optimization, this evaluation
+may be ran on a test dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>a dictionnary of metrics of schema {metric_name:metric_value}.</p>
@@ -280,17 +305,53 @@ Elsewise, default thresholds will be used.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate_decisions">
+<span class="sig-name descname"><span class="pre">evaluate_decisions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mts_gt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ia_decision</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/building_validation_optimization.html#BuildingValidationOptimizer.evaluate_decisions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate_decisions" title="Permalink to this definition"></a></dt>
+<dd><p>Evaluate confirmation and refutation decisions.</p>
+<p>Get dict of metrics to evaluate how good module decisions were in reference to ground truths.
+Targets: U=Unsure, N=No (not a building), Y=Yes (building)
+Predictions : U=Unsure, C=Confirmation, R=Refutation
+Confusion Matrix :</p>
+<blockquote>
+<div><p>predictions
+[Uu Ur Uc]</p>
+</div></blockquote>
+<dl class="simple">
+<dt>target  [Nu Nr Nc]</dt><dd><p>[Yu Yr Yc]</p>
+</dd>
+</dl>
+<p>Maximization criteria:
+Proportion of each decision among total of candidate groups.
+We want to maximize it.</p>
+<p>Accuracies:
+Confirmation/Refutation Accuracy.
+Accurate decision if either “unsure” or the same as the label.</p>
+<p>Quality
+Precision and Recall, assuming perfect posterior decision for unsure predictions.
+Only candidate shapes with known ground truths are considered (ambiguous labels are ignored).
+Precision : (Yu + Yc) / (Yu + Yc + Nc)
+Recall : (Yu + Yc) / (Yu + Yn + Yc)</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.optimize">
 <span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/building_validation_optimization.html#BuildingValidationOptimizer.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.optimize" title="Permalink to this definition"></a></dt>
-<dd><p>Optimization step</p>
+<dd><p>Optimization step.</p>
+<p>Deserializes the clusters informations.
+Runs the genetic algorithm for N generations.
+For each set of decision thresholds, computes the Recall, Precision,
+and Automation of the <cite>BuildingValidator</cite>.
+Finally, serializes the set of optimal thresholds.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.prepare">
 <span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/building_validation_optimization.html#BuildingValidationOptimizer.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.prepare" title="Permalink to this definition"></a></dt>
 <dd><p>Preparation step.</p>
-<p>Cluster clouds and cross with building vector database, then
-extract cluster-level information.</p>
+<p>Prepares and saves each point cloud in the specified directory,
+and extracts all cluster information in a list of
+<cite>BuildingValidationClusterInfo</cite> objects that is serialized into
+a pickle object.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -298,11 +359,6 @@ extract cluster-level information.</p>
 <span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/building_validation_optimization.html#BuildingValidationOptimizer.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.run" title="Permalink to this definition"></a></dt>
 <dd><p>Run decision threshold optimization.</p>
 </dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.set_thresholds_from_pickle_if_available">
-<span class="sig-name descname"><span class="pre">set_thresholds_from_pickle_if_available</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/building_validation_optimization.html#BuildingValidationOptimizer.set_thresholds_from_pickle_if_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.set_thresholds_from_pickle_if_available" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.setup">
@@ -316,7 +372,9 @@ codes to adapt to those of the optimization dataset.</p>
 <dt class="sig sig-object py" id="lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.update">
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/building_validation_optimization.html#BuildingValidationOptimizer.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.update" title="Permalink to this definition"></a></dt>
 <dd><p>Update step.</p>
-<p>Update point cloud classification using optimized decision thresholds.</p>
+<p>Deserializes the set of optimal thresholds.
+<cite>BuildingValidator</cite> updates each prepared point cloud classification
+based on those threshods and saves the result.</p>
 </dd></dl>
 
 </dd></dl>
