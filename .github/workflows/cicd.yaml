@@ -12,7 +12,8 @@ on:
   # So that we can tag the docker image appropriately.
   push:
     branches:
-      - dev
+      - dev  # TODO: remove when the tagging process is OK
+      - prod
       - main
 
 jobs:
@@ -71,10 +72,13 @@ jobs:
         building_validation.optimization.paths.results_output_dir=/outputs/
         building_validation.optimization.paths.building_validation_thresholds_pickle=/inputs/optimized_thresholds.pickle
 
-
-    - name: Everything ran. Tag the image associated to dev or main branch.
+    # Everything ran so we tag the valid docker image
+    - name: Get the branch name.
       if: github.event_name == 'push'
-      uses: nelonoel/branch-name@v1
+      uses: nelonoel/branch-name@v1.0.1
+
+    - name: Tag the docker image with either prod or main.
+      if: github.event_name == 'push'
       run: >
         echo ${BRANCH_NAME}
         docker tag lidar_prod_im:latest lidar_prod_im:${BRANCH_NAME}
