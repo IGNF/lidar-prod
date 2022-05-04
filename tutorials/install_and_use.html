@@ -57,6 +57,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation and usage</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#install-dependencies">Install dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#use-application-as-a-package">Use application as a package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-application-from-source-directly">Use application from source directly</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run-sequentialy-on-multiple-files">Run sequentialy on multiple files</a></li>
 </ul>
 </li>
@@ -69,10 +70,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../guides/development.html">Developer’s guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#use-application-from-source">Use application from source</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#cicd-and-versions">CICD and versions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#code-versionning">Code versionning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#tests">Tests</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/development.html#continuous-integration-ci">Continuous Integration (CI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/development.html#continuous-delivery-cd">Continuous Delivery (CD)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
@@ -121,7 +124,7 @@
 <h1>Installation and usage<a class="headerlink" href="#installation-and-usage" title="Permalink to this headline"></a></h1>
 <section id="install-dependencies">
 <h2>Install dependencies<a class="headerlink" href="#install-dependencies" title="Permalink to this headline"></a></h2>
-<p>We use [Anaconda(https://anaconda.org/)] to manage and isolate dependencies.
+<p>We use <a class="reference external" href="https://anaconda.org/">Anaconda</a>] to manage and isolate dependencies.
 The provided environment setup script also installs <a class="reference external" href="https://mamba.readthedocs.io/en/latest/index.html">Mamba</a>,
 which gets on top of conda for faster environment installs.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># clone project</span><span class="w"></span>
@@ -149,9 +152,12 @@ which gets on top of conda for faster environment installs.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate your env</span>
 conda activate lidar_prod
 
-<span class="c1"># install the package</span>
-pip install --upgrade https://github.com/IGNF/lidar-prod-quality-control/tarball/prod  <span class="c1"># from github directly, using production branch</span>
-pip install -e .  <span class="c1"># from local sources</span>
+<span class="c1"># install the package from github directly, using production branch</span>
+pip install --upgrade https://github.com/IGNF/lidar-prod-quality-control/tarball/prod
+</pre></div>
+</div>
+<p>During development, install in editable mode directly from source with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install --editable .
 </pre></div>
 </div>
 <p>To run the module as a package, you will need a source cloud point in LAS format with an additional channel containing predicted building probabilities (<code class="docutils literal notranslate"><span class="pre">ai_building_proba</span></code>) and another one containing predictions entropy (<code class="docutils literal notranslate"><span class="pre">entropy</span></code>). The names of thes channel can be specified via hydra config <code class="docutils literal notranslate"><span class="pre">config.data_format.las_dimensions</span></code>.</p>
@@ -161,6 +167,15 @@ pip install -e .  <span class="c1"># from local sources</span>
 </div>
 <p>You can specify a different yaml config file with the flags <code class="docutils literal notranslate"><span class="pre">--config-path</span></code> and <code class="docutils literal notranslate"><span class="pre">--config-name</span></code>. You can also override specific parameters. By default, results are saved to a <code class="docutils literal notranslate"><span class="pre">./outputs/</span></code> folder, but this can be overriden with <code class="docutils literal notranslate"><span class="pre">paths.output_dir</span></code> parameter. Refer to <a class="reference external" href="https://hydra.cc/docs/next/tutorials/basic/your_first_app/config_file/">hydra documentation</a> for the overriding syntax.</p>
 <p>To print default configuration run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">lidar_prod.run</span> <span class="pre">-h</span></code>. For pretty colors, run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">lidar_prod.run</span> <span class="pre">print_config=true</span></code>.</p>
+</section>
+<section id="use-application-from-source-directly">
+<h2>Use application from source directly<a class="headerlink" href="#use-application-from-source-directly" title="Permalink to this headline"></a></h2>
+<p>For developments and debugging, you can run the package directly from python sources instead:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate an env matching ./bash/setup_env.sh requirements.</span>
+conda activate lidar_prod
+python lidar_prod/run.py paths.src_las<span class="o">=[</span>/path/to/file.las<span class="o">]</span>
+</pre></div>
+</div>
 </section>
 <section id="run-sequentialy-on-multiple-files">
 <h2>Run sequentialy on multiple files<a class="headerlink" href="#run-sequentialy-on-multiple-files" title="Permalink to this headline"></a></h2>
