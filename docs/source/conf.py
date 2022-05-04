@@ -67,6 +67,27 @@ extensions = [
     "sphinxnotes.mock",  # ignore third-parties directive suche as "testcode" - see "mock_directive" args below
 ]
 
+# See https://myst-parser.readthedocs.io/en/latest/syntax/optional.html
+# To augment markdown parsing
+# myst_enable_extensions = [
+#     "amsmath",
+#     "colon_fence",
+#     "deflist",
+#     "dollarmath",
+#     "fieldlist",
+#     "html_admonition",
+#     "html_image",
+#     "linkify",
+#     "replacements",
+#     "smartquotes",
+#     "strikethrough",
+#     "substitution",
+#     "tasklist",
+# ]
+
+# Generates slug names for markdown titles
+myst_heading_anchors = 3
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 

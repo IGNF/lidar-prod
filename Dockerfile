@@ -1,5 +1,7 @@
 FROM nvidia/cuda:11.3.1-devel-ubuntu20.04
 
+# TODO: change to ubuntu latest.
+
 # set the IGN proxy, otherwise apt-get and other applications don't work 
 ENV http_proxy 'http://192.168.4.9:3128/'
 ENV https_proxy 'http://192.168.4.9:3128/'

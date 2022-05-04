@@ -1,14 +1,19 @@
 name: CICD
 
 on:
+  # Run CICD for non-draft pull request
   pull_request:
     types:
-      # will only run for non-draft pull request
       - ready_for_review
     branches:
       - dev
       - main
-
+  # Also run when the pull request merges (which generates a push)
+  # So that we can tag the docker image appropriately.
+  push:
+    branches:
+      - dev
+      - main
 
 jobs:
   lidar_on_docker:
@@ -31,7 +36,7 @@ jobs:
     - name: Run slow tests last.
       run: >
         docker run 
-        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
+        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/lidar-prod-quality-control/tests/files/large/
         lidar_prod_im
         python -m
         pytest -v -m slow
@@ -53,17 +58,26 @@ jobs:
     # This is somewhat redundant with unit test but may serve a a doc on usage ?
     - name: Evaluate decisions using optimization task (debug mode means on a single, corrected LAS) using CLI.
       run: >
-        docker run 
+        docker run
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/inputs/
-        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/evaluation/:/outputs/ lidar_prod_im
-        python lidar_prod/run.py 
-        print_config=true 
+        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/evaluation/:/outputs/
+        lidar_prod_im
+        python lidar_prod/run.py
+        print_config=true
         +task='optimize'
         +building_validation.optimization.debug=true
         building_validation.optimization.todo='prepare+evaluate+update'
         building_validation.optimization.paths.input_las_dir=/inputs/
         building_validation.optimization.paths.results_output_dir=/outputs/
         building_validation.optimization.paths.building_validation_thresholds_pickle=/inputs/optimized_thresholds.pickle
+
+
+    - name: Everything ran. Tag the image associated to dev or main branch.
+      if: github.event_name == 'push'
+      uses: nelonoel/branch-name@v1
+      run: >
+        echo ${BRANCH_NAME}
+        docker tag lidar_prod_im:latest lidar_prod_im:${BRANCH_NAME}
 
     - name: clean the server for further uses
       if: always()  # always do it, even if something failed
