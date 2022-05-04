@@ -1,8 +1,7 @@
-FROM ubuntu:latest
-
-# TODO: change to ubuntu latest.
+FROM continuumio/anaconda3:latest
 
 # set the IGN proxy, otherwise apt-get and other applications don't work 
+# from within our self-hoster action runner
 ENV http_proxy 'http://192.168.4.9:3128/'
 ENV https_proxy 'http://192.168.4.9:3128/'
 
@@ -12,20 +11,13 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # all the apt-get installs
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
-    software-properties-common  \
-    wget                        \
-    git                         \
-    postgis                     \
-    libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6   # package needed for anaconda
+    software-properties-common \
+    wget \
+    git \
+    postgis                     
 
-# install anaconda
-RUN wget --quiet https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh -O ~/anaconda.sh
-RUN /bin/bash ~/anaconda.sh -b -p /opt/conda && \
-    rm ~/anaconda.sh
-ENV PATH /opt/conda/bin:$PATH
-
-
-# /lidar becomes the working directory, where the repo content is copied.
+# /lidar becomes the working directory, where the repo content 
+# (where this Dockerfile lives) is copied.
 WORKDIR /lidar
 COPY . .
 
@@ -45,7 +37,7 @@ ENTRYPOINT ["conda", \
     "-n", \
     "lidar_prod"]
 
-# cmd for a normal run (non evaluate)
+# Example command to run the application from within the image
 CMD  ["python", \
     "lidar_prod/run.py", \
     "print_config=true", \

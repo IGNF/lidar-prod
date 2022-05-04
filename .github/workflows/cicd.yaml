@@ -4,13 +4,13 @@ on:
   # Run CICD for non-draft pull request
   pull_request:
     branches:
-      # - dev
+      - dev
       - main
   # Also run when the pull request merges (which generates a push)
   # So that we can tag the docker image appropriately.
   push:
     branches:
-      - add-documentation  # TODO: remove when the tagging process is OK
+      - dev
       - prod
       - main
 
@@ -23,14 +23,14 @@ jobs:
     - name: Checkout branch       
       uses: actions/checkout@v2
 
-    - name: build docker image       
-      run: docker build -t lidar_prod_im .
+    # - name: build docker image       
+    #   run: docker build -t lidar_prod_im .
 
-    # - name: Check code neatness (linter)
-    #   run: docker run lidar_prod_im flake8
+    - name: Check code neatness (linter)
+      run: docker run lidar_prod_im flake8
 
-    # - name: Run tests - fast ones go first.
-    #   run: docker run lidar_prod_im python -m pytest -v -m "not slow" --ignore=actions-runner
+    - name: Run tests - fast ones go first.
+      run: docker run lidar_prod_im python -m pytest -v -m "not slow" --ignore=actions-runner
 
     # - name: Run slow tests last.
     #   run: >
@@ -70,24 +70,26 @@ jobs:
     #     building_validation.optimization.paths.results_output_dir=/outputs/
     #     building_validation.optimization.paths.building_validation_thresholds_pickle=/inputs/optimized_thresholds.pickle
 
-    # Everything ran so we tag the valid docker image
-    - name: Get the branch name.
-      if: github.event_name == 'push' || always()
+    # Everything ran so we tag the valid docker image to keep it
+    # This happens for push events, which are in particular 
+    # triggered when a pull request is merged.
+    - name: Get the branch name into an environment variable.
+      if: github.event_name == 'push'
       uses: nelonoel/branch-name@v1.0.1
 
-    - name: Print branch name
-      if: github.event_name == 'push' || always()
+    - name: Print the branch name
+      if: github.event_name == 'push'
       run: echo ${BRANCH_NAME}
 
-    - name: Tag the docker image with branch name.
-      if: github.event_name == 'push' || always()
+    - name: Tag the docker image with branch name
+      if: github.event_name == 'push'
       run: docker tag lidar_prod_im:latest lidar_prod_im:${BRANCH_NAME}
 
-    - name: Dry run image so that is it not prunned.
-      if: github.event_name == 'push' || always()    
+    - name: Dry run image so that is it not prunned
+      if: github.event_name == 'push'
       run: docker run lidar_prod_im:${BRANCH_NAME} bash
 
-    - name: Clean dangling images.
+    - name: Clean dangling docker images
       if: always()  # always do it, even if something failed
       run: docker system prune  # remove obsolete docker images (take a HUGE amount of space)
 
