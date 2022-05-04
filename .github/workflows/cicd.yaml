@@ -4,13 +4,13 @@ on:
   # Run CICD for non-draft pull request
   pull_request:
     branches:
-      - dev
+      # - dev
       - main
   # Also run when the pull request merges (which generates a push)
   # So that we can tag the docker image appropriately.
   push:
     branches:
-      - dev  # TODO: remove when the tagging process is OK
+      - add-documentation  # TODO: remove when the tagging process is OK
       - prod
       - main
 
@@ -23,8 +23,8 @@ jobs:
     - name: Checkout branch       
       uses: actions/checkout@v2
 
-    # - name: build docker image       
-      # run: docker build -t lidar_prod_im .
+    - name: build docker image       
+      run: docker build -t lidar_prod_im .
 
     # - name: Check code neatness (linter)
     #   run: docker run lidar_prod_im flake8
@@ -75,12 +75,17 @@ jobs:
       if: github.event_name == 'push' || always()
       uses: nelonoel/branch-name@v1.0.1
 
-    - name: Tag the docker image with either prod or main.
+    - name: Print branch name
       if: github.event_name == 'push' || always()
-      run: >
-        echo ${BRANCH_NAME}
-        docker tag lidar_prod_im:latest lidar_prod_im:${BRANCH_NAME}
-        docker run lidar_prod_im:${BRANCH_NAME} bash
+      run: echo ${BRANCH_NAME}
+
+    - name: Tag the docker image with branch name.
+      if: github.event_name == 'push' || always()
+      run: docker tag lidar_prod_im:latest lidar_prod_im:${BRANCH_NAME}
+
+    - name: Dry run image so that is it not prunned.
+      if: github.event_name == 'push' || always()    
+      run: docker run lidar_prod_im:${BRANCH_NAME} bash
 
     - name: Clean dangling images.
       if: always()  # always do it, even if something failed
