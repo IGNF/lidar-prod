@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.3.1-devel-ubuntu20.04
+FROM ubuntu:latest
 
 # TODO: change to ubuntu latest.
 
