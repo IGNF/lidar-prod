@@ -15,7 +15,7 @@ A large validation dataset might help having a better sense of the app performan
 
 ### Finding optimal thresholds
 
-> Refer to the [installation tutorial](../tutorials/install_and_use.md) to set up your python environment.
+> Refer to the [installation tutorial](../tutorials/install.md) to set up your python environment.
 
 Your corrected data must live in a single `input_las_dir` directory as a set of LAS files. 
 Prepared and updated files will be saved in subfolder of a `results_output_dir` directory (`./prepared` and `./updated/`, respectively).

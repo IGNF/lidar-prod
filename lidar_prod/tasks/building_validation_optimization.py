@@ -375,21 +375,24 @@ class BuildingValidationOptimizer:
             log.info(f"Loading pickled groups from {self.paths.group_info_pickle_path}")
         return clusters
 
-    def evaluate_decisions(self, mts_gt, ia_decision):
-        """Evaluate confirmation and refutation decisions.
+    def evaluate_decisions(self, mts_gt, ia_decision) -> Dict[str, Any]:
+        r"""Evaluate confirmation and refutation decisions.
 
         Get dict of metrics to evaluate how good module decisions were in reference to ground truths.
-        Targets: U=Unsure, N=No (not a building), Y=Yes (building)
-        Predictions : U=Unsure, C=Confirmation, R=Refutation
-        Confusion Matrix :
-                predictions
-                [Uu Ur Uc]
-        target  [Nu Nr Nc]
-                [Yu Yr Yc]
 
-        Maximization criteria:
-        Proportion of each decision among total of candidate groups.
-        We want to maximize it.
+        Targets: U=Unsure, N=No (not a building), Y=Yes (building)
+
+        Predictions : U=Unsure, C=Confirmation, R=Refutation
+
+        Confusion Matrix (horizontal: target, vertical: predictions)
+
+        [Uu Ur Uc]
+
+        [Nu Nr Nc]
+
+        [Yu Yr Yc]
+
+        Automation: Proportion of each decision among total of candidate groups.
 
         Accuracies:
         Confirmation/Refutation Accuracy.
@@ -398,8 +401,17 @@ class BuildingValidationOptimizer:
         Quality
         Precision and Recall, assuming perfect posterior decision for unsure predictions.
         Only candidate shapes with known ground truths are considered (ambiguous labels are ignored).
+
         Precision : (Yu + Yc) / (Yu + Yc + Nc)
+
         Recall : (Yu + Yc) / (Yu + Yn + Yc)
+
+        Args:
+            mts_gt (np.array): ground truth of rules-based classification (0, 1, 2)
+            ia_decision (np.array): AI application decision (0, 1, 2)
+
+        Returns:
+            dict: dictionnary of metrics.
 
         """
         metrics_dict = dict()

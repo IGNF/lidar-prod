@@ -18,7 +18,8 @@ Lidar-Prod > Documentation
    :maxdepth: 1
    :caption: Getting Started
 
-   tutorials/install_and_use
+   tutorials/install
+   tutorials/use
 
 .. toctree::
    :maxdepth: 1
