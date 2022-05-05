@@ -77,6 +77,7 @@ jobs:
 
     # This needs writing rights to the mounted path
     - name: save the docker image because everything worked
+      if: github.event_name == 'push'
       run: docker save lidar_prod_im:${BRANCH_NAME} > /var/data/CICD_github_assets/lidar_prod_im_${BRANCH_NAME}.tar
 
     - name: Clean dangling docker images
