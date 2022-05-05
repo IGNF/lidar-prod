@@ -6,6 +6,11 @@ import os.path as osp
 
 @hydra.main(config_path="../configs/", config_name="config.yaml")
 def main(config: DictConfig):
+    """Main entry point to either apply or optimize thresholds.
+
+    Check the configurations files for usage.
+
+    """
 
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934

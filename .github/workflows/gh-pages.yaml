@@ -1,0 +1,68 @@
+# Workflow name
+name: "Documentation Build"
+
+# Event that must trigger the workflow
+on:
+  push:
+    branches:
+      - main  # <- only on main branch
+      - add-documentation  # <- on this branch until documentation is merged once in main.
+
+jobs:
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    # Use bash instead of sh for conda activation
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      # Checkout the repository
+      - name: "Checkout"
+        uses: actions/checkout@v2
+
+      # See https://github.com/conda-incubator/setup-miniconda#caching-environments
+
+      # Setup empty conda environment
+      - name: Setup a conda-incubator with an empty conda env
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+            python-version: 3.9.12
+            miniforge-variant: Mambaforge
+            miniforge-version: latest
+            use-mamba: true
+            # Environment to create and activate for next steps
+            activate-environment: lidar_prod
+
+      # Cache the env
+      # See https://github.com/conda-incubator/setup-miniconda#caching-environments
+      - name: Get Date
+        id: get-date
+        run: echo "::set-output name=today::$(/bin/date -u '+%Y%m%d')"
+        shell: bash
+
+      - name: Cache conda environment
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.CONDA }}/envs
+          key: conda-${{ runner.os }}--${{ runner.arch }}--${{ steps.get-date.outputs.today }}-${{ hashFiles('bash/setup_environment/requirements.yml') }}-${{ env.CACHE_NUMBER }}
+        id: cache
+
+      - name: Update environment if there was no cached env.
+        run: mamba env update -n lidar_prod -f bash/setup_environment/requirements.yml
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      # 2. Sphinx part : install tool and dependencies
+      - name: "Build Sphinx Doc"
+        working-directory: ./docs/
+        run: make html
+
+      # 3. Déploiement sur les Github Pages
+
+      - name: "Deploy Github Pages"
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          BRANCH: gh-pages     # <- Branch where generated doc files will be commited
+          FOLDER: ./docs/build/html/  # <- Dir where .nojekyll is created and from which to deploy github pages.
