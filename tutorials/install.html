@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Strategy to find optimal decision thresholds for Building validation &mdash; lidar_prod 1.5.0 documentation</title>
+  <title>Installation &mdash; lidar_prod 1.5.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Installation" href="../tutorials/install.html" />
-    <link rel="prev" title="Production process used to transform point clouds classification" href="production_process.html" /> 
+    <link rel="next" title="Using the app" href="use.html" />
+    <link rel="prev" title="Strategy to find optimal decision thresholds for Building validation" href="../background/thresholds_optimization_process.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -39,30 +39,30 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Background</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="production_process.html">Production process used to transform point clouds classification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="production_process.html#a-building-validation">A) Building Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="production_process.html#b-building-completion">B) Building Completion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="production_process.html#c-building-identification">C) Building Identification</a></li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../background/production_process.html">Production process used to transform point clouds classification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#a-building-validation">A) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-building-completion">B) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#c-building-identification">C) Building Identification</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Strategy to find optimal decision thresholds for Building validation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#motivations">Motivations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#strategy">Strategy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background/thresholds_optimization_process.html">Strategy to find optimal decision thresholds for Building validation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../background/thresholds_optimization_process.html#motivations">Motivations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../background/thresholds_optimization_process.html#strategy">Strategy</a></li>
 </ul>
 </li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/install.html#set-up-a-virtual-environment">Set up a virtual environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/install.html#install-the-app-as-a-python-module">Install the app as a python module</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#set-up-a-virtual-environment">Set up a virtual environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-the-app-as-a-python-module">Install the app as a python module</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/use.html">Using the app</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-within-a-docker-container">Run within a docker container</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-as-a-python-module">Run as a python module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-from-source-directly">Run from source directly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use.html">Using the app</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="use.html#run-within-a-docker-container">Run within a docker container</a></li>
+<li class="toctree-l2"><a class="reference internal" href="use.html#run-as-a-python-module">Run as a python module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="use.html#run-from-source-directly">Run from source directly</a></li>
 </ul>
 </li>
 </ul>
@@ -114,9 +114,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Strategy to find optimal decision thresholds for Building validation</li>
+      <li>Installation</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/background/thresholds_optimization_process.md.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/tutorials/install.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -124,20 +124,46 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="strategy-to-find-optimal-decision-thresholds-for-building-validation">
-<h1>Strategy to find optimal decision thresholds for Building validation<a class="headerlink" href="#strategy-to-find-optimal-decision-thresholds-for-building-validation" title="Permalink to this headline"></a></h1>
-<section id="motivations">
-<h2>Motivations<a class="headerlink" href="#motivations" title="Permalink to this headline"></a></h2>
-<p>As described in section <span class="xref myst">Building Validation</span> of the production process, the decision to validate or not a group of candidate buildings is based on several decision thresholds. Those thresholds represents different levels of confidence, for different sources of data.</p>
-<p>They may depend on the AI model which produces the probabilities as well as on the rule-based classification from which the clusters of candidates are derived. They are highly coupled. For instance, if a lower probability is required at the point level to be confirmed as a building (threshold <code class="docutils literal notranslate"><span class="pre">C1</span></code>), we might require a higher percentage of confirmed points in a cluster of candidates (thresholds <code class="docutils literal notranslate"><span class="pre">C2</span></code>) to validate it. There must therefore be optimized jointly.</p>
-<p>These thresholds define how much we automate decisions, but also the quantity of errors we may introduce: there is a balance to be found between <code class="docutils literal notranslate"><span class="pre">recall</span></code> (proportion of buildings group that were confirmed), <code class="docutils literal notranslate"><span class="pre">precision</span></code> (proportion of buildings among confirmed groups), and <code class="docutils literal notranslate"><span class="pre">automation</span></code> (proportion of groups for which a decision was made i.e. that are not flagged as “unsure”).</p>
+  <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
+<section id="set-up-a-virtual-environment">
+<h2>Set up a virtual environment<a class="headerlink" href="#set-up-a-virtual-environment" title="Permalink to this headline"></a></h2>
+<p>We use <a class="reference external" href="https://anaconda.org/">Anaconda</a>] to manage and isolate dependencies.
+The provided environment setup script also installs <a class="reference external" href="https://mamba.readthedocs.io/en/latest/index.html">Mamba</a>,
+which gets on top of conda for faster environment installs.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># clone project</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">git clone https://github.com/IGNF/lidar-prod-quality-control</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">cd lidar-prod-quality-control</span><span class="w"></span>
+
+<span class="l l-Scalar l-Scalar-Plain"># install conda</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain"># see https://www.anaconda.com/products/individual</span><span class="w"></span>
+
+<span class="l l-Scalar l-Scalar-Plain"># you need to install postgis to request a public database</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">sudo apt-get install postgis</span><span class="w"></span>
+
+<span class="l l-Scalar l-Scalar-Plain"># create conda environment</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">source bash/setup_environment/setup_env.sh</span><span class="w"></span>
+
+<span class="l l-Scalar l-Scalar-Plain"># activate the virtual env</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain">conda activate lidar_prod</span><span class="w"></span>
+</pre></div>
+</div>
 </section>
-<section id="strategy">
-<h2>Strategy<a class="headerlink" href="#strategy" title="Permalink to this headline"></a></h2>
-<p>We approach the choice of decisions thresholds as a constrained multi-objectives hyperparameters optimization.
-We use the <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/generated/optuna.samplers.NSGAIISampler.html#optuna.samplers.NSGAIISampler">NSGA-II</a> algorithm from the optuna optimization library.</p>
-<p>The constraints are defined empirically: recall&gt;=98% and precision&gt;=98%. The genetic algorithms search two maximize the three objectives, but focuses the search to solutions that meet these criteria.</p>
-<p>After a chosen number of generations, the genetic algorithms outputs the <a class="reference external" href="https://en.wikipedia.org/wiki/Pareto_front">Pareto front</a> i.e. the set of Pareto efficient solutions for which no objective criterion could be increased without another one being reduced. Among Pareto-efficient solutions compliant with the constraint, the final solution is the set of thresholds that maximizes the production of precision, recall, and automation.</p>
+<section id="install-the-app-as-a-python-module">
+<h2>Install the app as a python module<a class="headerlink" href="#install-the-app-as-a-python-module" title="Permalink to this headline"></a></h2>
+<p>To run the application from anywhere, you can install as a module in a your virtual environment.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate your env</span>
+conda activate lidar_prod
+
+<span class="c1"># install the package from github directly, using production branch</span>
+pip install --upgrade https://github.com/IGNF/lidar-prod-quality-control/tarball/prod
+</pre></div>
+</div>
+<p>During development, install in editable mode directly from source with</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install --editable .
+</pre></div>
+</div>
+<p>Then, refert to the <a class="reference internal" href="use.html"><span class="doc std std-doc">usage page</span></a>.</p>
 </section>
 </section>
 
@@ -145,8 +171,8 @@ We use the <a class="reference external" href="https://optuna.readthedocs.io/en/
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="production_process.html" class="btn btn-neutral float-left" title="Production process used to transform point clouds classification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../tutorials/install.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../background/thresholds_optimization_process.html" class="btn btn-neutral float-left" title="Strategy to find optimal decision thresholds for Building validation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="use.html" class="btn btn-neutral float-right" title="Using the app" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

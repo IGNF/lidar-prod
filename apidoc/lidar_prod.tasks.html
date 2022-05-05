@@ -54,11 +54,15 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/install_and_use.html">Installation and usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/install_and_use.html#install-dependencies">Install dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/install_and_use.html#use-application-as-a-package">Use application as a package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/install_and_use.html#use-application-from-source-directly">Use application from source directly</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/install_and_use.html#run-sequentialy-on-multiple-files">Run sequentialy on multiple files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/install.html#set-up-a-virtual-environment">Set up a virtual environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/install.html#install-the-app-as-a-python-module">Install the app as a python module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/use.html">Using the app</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-within-a-docker-container">Run within a docker container</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-as-a-python-module">Run as a python module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-from-source-directly">Run from source directly</a></li>
 </ul>
 </li>
 </ul>
@@ -72,10 +76,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/development.html">Developer’s guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../guides/development.html#code-versionning">Code versionning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../guides/development.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#continuous-integration-ci">Continuous Integration (CI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#continuous-delivery-cd">Continuous Delivery (CD)</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/development.html#continuous-integration-ci">Continuous Integration (CI)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/development.html#continuous-delivery-cd">Continuous Delivery (CD)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul class="current">
@@ -309,31 +313,38 @@ may be ran on a test dataset.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate_decisions">
-<span class="sig-name descname"><span class="pre">evaluate_decisions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mts_gt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ia_decision</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/building_validation_optimization.html#BuildingValidationOptimizer.evaluate_decisions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate_decisions" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">evaluate_decisions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mts_gt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ia_decision</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.10)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/lidar_prod/tasks/building_validation_optimization.html#BuildingValidationOptimizer.evaluate_decisions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate_decisions" title="Permalink to this definition"></a></dt>
 <dd><p>Evaluate confirmation and refutation decisions.</p>
-<p>Get dict of metrics to evaluate how good module decisions were in reference to ground truths.
-Targets: U=Unsure, N=No (not a building), Y=Yes (building)
-Predictions : U=Unsure, C=Confirmation, R=Refutation
-Confusion Matrix :</p>
-<blockquote>
-<div><p>predictions
-[Uu Ur Uc]</p>
-</div></blockquote>
-<dl class="simple">
-<dt>target  [Nu Nr Nc]</dt><dd><p>[Yu Yr Yc]</p>
-</dd>
-</dl>
-<p>Maximization criteria:
-Proportion of each decision among total of candidate groups.
-We want to maximize it.</p>
+<p>Get dict of metrics to evaluate how good module decisions were in reference to ground truths.</p>
+<p>Targets: U=Unsure, N=No (not a building), Y=Yes (building)</p>
+<p>Predictions : U=Unsure, C=Confirmation, R=Refutation</p>
+<p>Confusion Matrix (horizontal: target, vertical: predictions)</p>
+<p>[Uu Ur Uc]</p>
+<p>[Nu Nr Nc]</p>
+<p>[Yu Yr Yc]</p>
+<p>Automation: Proportion of each decision among total of candidate groups.</p>
 <p>Accuracies:
 Confirmation/Refutation Accuracy.
 Accurate decision if either “unsure” or the same as the label.</p>
 <p>Quality
 Precision and Recall, assuming perfect posterior decision for unsure predictions.
-Only candidate shapes with known ground truths are considered (ambiguous labels are ignored).
-Precision : (Yu + Yc) / (Yu + Yc + Nc)
-Recall : (Yu + Yc) / (Yu + Yn + Yc)</p>
+Only candidate shapes with known ground truths are considered (ambiguous labels are ignored).</p>
+<p>Precision : (Yu + Yc) / (Yu + Yc + Nc)</p>
+<p>Recall : (Yu + Yc) / (Yu + Yn + Yc)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span class="target" id="lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate_decisions.params.mts_gt"></span><strong>mts_gt</strong><a class="paramlink headerlink reference internal" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate_decisions.params.mts_gt">¶</a> (<em>np.array</em>) – ground truth of rules-based classification (0, 1, 2)</p></li>
+<li><p><span class="target" id="lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate_decisions.params.ia_decision"></span><strong>ia_decision</strong><a class="paramlink headerlink reference internal" href="#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate_decisions.params.ia_decision">¶</a> (<em>np.array</em>) – AI application decision (0, 1, 2)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionnary of metrics.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation and usage &mdash; lidar_prod 1.5.0 documentation</title>
+  <title>Using the app &mdash; lidar_prod 1.5.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="How to optimize building validation decision thresholds?" href="../guides/thresholds_optimization.html" />
-    <link rel="prev" title="Strategy to find optimal decision thresholds for Building validation" href="../background/thresholds_optimization_process.html" /> 
+    <link rel="prev" title="Installation" href="install.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -54,11 +54,15 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation and usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#install-dependencies">Install dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#use-application-as-a-package">Use application as a package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#use-application-from-source-directly">Use application from source directly</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#run-sequentialy-on-multiple-files">Run sequentialy on multiple files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#set-up-a-virtual-environment">Set up a virtual environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#install-the-app-as-a-python-module">Install the app as a python module</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using the app</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#run-within-a-docker-container">Run within a docker container</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-as-a-python-module">Run as a python module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-from-source-directly">Run from source directly</a></li>
 </ul>
 </li>
 </ul>
@@ -72,10 +76,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../guides/development.html">Developer’s guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../guides/development.html#code-versionning">Code versionning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../guides/development.html#tests">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#continuous-integration-ci">Continuous Integration (CI)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#continuous-delivery-cd">Continuous Delivery (CD)</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/development.html#continuous-integration-ci">Continuous Integration (CI)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/development.html#continuous-delivery-cd">Continuous Delivery (CD)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
@@ -110,9 +114,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Installation and usage</li>
+      <li>Using the app</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/tutorials/install_and_use.md.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/tutorials/use.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -120,67 +124,40 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="installation-and-usage">
-<h1>Installation and usage<a class="headerlink" href="#installation-and-usage" title="Permalink to this headline"></a></h1>
-<section id="install-dependencies">
-<h2>Install dependencies<a class="headerlink" href="#install-dependencies" title="Permalink to this headline"></a></h2>
-<p>We use <a class="reference external" href="https://anaconda.org/">Anaconda</a>] to manage and isolate dependencies.
-The provided environment setup script also installs <a class="reference external" href="https://mamba.readthedocs.io/en/latest/index.html">Mamba</a>,
-which gets on top of conda for faster environment installs.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># clone project</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">git clone https://github.com/IGNF/lidar-prod-quality-control</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">cd lidar-prod-quality-control</span><span class="w"></span>
-
-<span class="l l-Scalar l-Scalar-Plain"># install conda</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain"># see https://www.anaconda.com/products/individual</span><span class="w"></span>
-
-<span class="l l-Scalar l-Scalar-Plain"># install postgis to request building database</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">sudo apt-get install postgis</span><span class="w"></span>
-
-<span class="l l-Scalar l-Scalar-Plain"># create conda environment</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">source bash/setup_environment/setup_env.sh</span><span class="w"></span>
-
-
-<span class="l l-Scalar l-Scalar-Plain"># activate the virtual env</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">conda activate lidar_prod</span><span class="w"></span>
+  <section id="using-the-app">
+<h1>Using the app<a class="headerlink" href="#using-the-app" title="Permalink to this headline"></a></h1>
+<section id="run-within-a-docker-container">
+<h2>Run within a docker container<a class="headerlink" href="#run-within-a-docker-container" title="Permalink to this headline"></a></h2>
+<p>Up to date docker images (named <code class="docutils literal notranslate"><span class="pre">lidar_prod_im</span></code>) are created via Github integration actions (see <a class="reference internal" href="../guides/development.html"><span class="doc std std-doc">Developer’s guide</span></a>).</p>
+<p>To run the app, use</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker run <span class="se">\</span>
+-v <span class="o">{</span>local_src_las_dir<span class="o">}</span>:/inputs/ <span class="se">\</span>
+-v <span class="o">{</span>local_output_dir<span class="o">}</span>:/outputs/
+lidar_prod_im <span class="se">\</span>
+python lidar_prod/run.py <span class="se">\</span>
+paths.src_las<span class="o">=</span>/inputs/<span class="o">{</span>src_las_basename<span class="o">}</span>.las
+paths.output_dir<span class="o">=</span>/outputs/
+<span class="c1"># + other options...</span>
 </pre></div>
 </div>
+<p>A docker image encapsulating the virtual environment and application sources can also be built using the provided Dockerfile. This Dockerfile is not standalone and should be part of the repository (whose content is copied into the image), on the github reference you want to build from.</p>
 </section>
-<section id="use-application-as-a-package">
-<h2>Use application as a package<a class="headerlink" href="#use-application-as-a-package" title="Permalink to this headline"></a></h2>
-<p>To run the module from anywhere, you can install as a package in a your virtual environment.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate your env</span>
-conda activate lidar_prod
-
-<span class="c1"># install the package from github directly, using production branch</span>
-pip install --upgrade https://github.com/IGNF/lidar-prod-quality-control/tarball/prod
-</pre></div>
-</div>
-<p>During development, install in editable mode directly from source with</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install --editable .
-</pre></div>
-</div>
-<p>To run the module as a package, you will need a source cloud point in LAS format with an additional channel containing predicted building probabilities (<code class="docutils literal notranslate"><span class="pre">ai_building_proba</span></code>) and another one containing predictions entropy (<code class="docutils literal notranslate"><span class="pre">entropy</span></code>). The names of thes channel can be specified via hydra config <code class="docutils literal notranslate"><span class="pre">config.data_format.las_dimensions</span></code>.</p>
-<p>To run using default configurations of the installed package, use</p>
+<section id="run-as-a-python-module">
+<h2>Run as a python module<a class="headerlink" href="#run-as-a-python-module" title="Permalink to this headline"></a></h2>
+<p>To run the module as a module, you will need a source cloud point in LAS format with an additional channel containing predicted building probabilities (<code class="docutils literal notranslate"><span class="pre">ai_building_proba</span></code>) and another one containing predictions entropy (<code class="docutils literal notranslate"><span class="pre">entropy</span></code>). The names of thes channel can be specified via hydra config <code class="docutils literal notranslate"><span class="pre">config.data_format.las_dimensions</span></code>.</p>
+<p>To run using default configurations of the installed module, use</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m lidar_prod.run paths.src_las<span class="o">=</span>&lt;/path/to/file.las&gt;
 </pre></div>
 </div>
 <p>You can specify a different yaml config file with the flags <code class="docutils literal notranslate"><span class="pre">--config-path</span></code> and <code class="docutils literal notranslate"><span class="pre">--config-name</span></code>. You can also override specific parameters. By default, results are saved to a <code class="docutils literal notranslate"><span class="pre">./outputs/</span></code> folder, but this can be overriden with <code class="docutils literal notranslate"><span class="pre">paths.output_dir</span></code> parameter. Refer to <a class="reference external" href="https://hydra.cc/docs/next/tutorials/basic/your_first_app/config_file/">hydra documentation</a> for the overriding syntax.</p>
 <p>To print default configuration run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">lidar_prod.run</span> <span class="pre">-h</span></code>. For pretty colors, run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">lidar_prod.run</span> <span class="pre">print_config=true</span></code>.</p>
 </section>
-<section id="use-application-from-source-directly">
-<h2>Use application from source directly<a class="headerlink" href="#use-application-from-source-directly" title="Permalink to this headline"></a></h2>
+<section id="run-from-source-directly">
+<h2>Run from source directly<a class="headerlink" href="#run-from-source-directly" title="Permalink to this headline"></a></h2>
 <p>For developments and debugging, you can run the package directly from python sources instead:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate an env matching ./bash/setup_env.sh requirements.</span>
 conda activate lidar_prod
 python lidar_prod/run.py paths.src_las<span class="o">=[</span>/path/to/file.las<span class="o">]</span>
-</pre></div>
-</div>
-</section>
-<section id="run-sequentialy-on-multiple-files">
-<h2>Run sequentialy on multiple files<a class="headerlink" href="#run-sequentialy-on-multiple-files" title="Permalink to this headline"></a></h2>
-<p>Hydra supports running the python script with several different values for a parameter via a <code class="docutils literal notranslate"><span class="pre">--multiruns</span></code>|<code class="docutils literal notranslate"><span class="pre">-m</span></code> flag and values separated by a comma.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m lidar_prod.run --multiruns paths.src_las<span class="o">=[</span>file_1.las<span class="o">]</span>,<span class="o">[</span>file_2.las<span class="o">]</span>,<span class="o">[</span>file_3.las<span class="o">]</span>
 </pre></div>
 </div>
 </section>
@@ -190,7 +167,7 @@ python lidar_prod/run.py paths.src_las<span class="o">=[</span>/path/to/file.las
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../background/thresholds_optimization_process.html" class="btn btn-neutral float-left" title="Strategy to find optimal decision thresholds for Building validation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="install.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../guides/thresholds_optimization.html" class="btn btn-neutral float-right" title="How to optimize building validation decision thresholds?" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
