@@ -77,7 +77,7 @@ jobs:
 
     - name: Clean dangling docker images
       if: always()  # always do it, even if something failed
-      run: docker system prune  # remove obsolete docker images (take a HUGE amount of space)
+      run: docker system prune --force # remove dangling docker images, without asking user for confirmation
 
 
       
