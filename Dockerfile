@@ -15,11 +15,12 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
 
 # Only copy necessary files to set up the environment, in order
 # to use docker caching if requirements files were not updated.
-WORKDIR /setup_env
+# Dir needs to be "/tmp" for micromamba to find the pip requirements...
+WORKDIR /tmp
 COPY ./setup_env/ .
 
 # install the python packages via anaconda
-RUN micromamba create --yes --file /setup_env/requirements.yml
+RUN micromamba create --yes --file /tmp/requirements.yml
 
 # Sets the environment name (since it is not named "base")
 # This ensures that env is activated when using "docker run ..."
