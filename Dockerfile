@@ -19,7 +19,7 @@ WORKDIR /setup_env
 COPY ./setup_env/ .
 
 # install the python packages via anaconda
-RUN micromamba create --yes --file /setup_env/requirements.yaml
+RUN micromamba create --yes --file /setup_env/requirements.yml
 
 # Sets the environment name (since it is not named "base")
 # This ensures that env is activated when using "docker run ..."
