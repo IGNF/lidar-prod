@@ -18,7 +18,7 @@ cd lidar-prod-quality-control
 sudo apt-get install postgis
 
 # create conda environment
-source bash/setup_environment/setup_env.sh
+source setup_env/setup_env.sh
 
 # activate the virtual env
 conda activate lidar_prod
