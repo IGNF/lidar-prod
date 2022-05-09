@@ -11,21 +11,18 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     software-properties-common \
     wget \
     git \
-    postgis                 
+    postgis
 
-# /lidar becomes the working directory, where the repo content 
-# (where this Dockerfile lives) is copied.
-WORKDIR /lidar
-COPY . .
-
-# Copy requirements so that pip installs can occur smootly. 
-COPY bash/setup_environment/requirements.yml /tmp/env.yaml
-COPY bash/setup_environment/requirements.txt /tmp/requirements.txt
+# Only copy necessary files to set up the environment, in order
+# to use docker caching if requirements files were not updated.
+WORKDIR /setup_env
+COPY ./setup_env/ .
 
 # install the python packages via anaconda
-RUN micromamba create --yes --file /tmp/env.yaml
-# Sets the environment name since it is not "base"
-# This ensure that it is activate when usign "docker run ..."
+RUN micromamba create --yes --file /setup_env/requirements.yaml
+
+# Sets the environment name (since it is not named "base")
+# This ensures that env is activated when using "docker run ..."
 ENV ENV_NAME lidar_prod
 # Make RUN commands here use the environment
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
@@ -34,6 +31,11 @@ RUN micromamba list
 # test if pdal is installed (a tricky library!)
 RUN echo "Make sure pdal is installed:"
 RUN python -c "import pdal"
+
+# /lidar becomes the working directory, where the repo content 
+# (the context of this Dockerfile) is copied.
+WORKDIR /lidar
+COPY . .
 
 # Example command to run the application from within the image
 CMD  ["python", \
