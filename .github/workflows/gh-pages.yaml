@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - main  # <- only on main branch
-      - add-documentation  # <- on this branch until documentation is merged once in main.
 
 jobs:
 
