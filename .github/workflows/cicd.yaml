@@ -15,7 +15,7 @@ on:
       - main
 
 jobs:
-  lidar_on_docker:
+  build_test_deploy:
     runs-on: self-hosted
 
     steps:
