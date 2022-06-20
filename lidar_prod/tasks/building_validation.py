@@ -132,7 +132,6 @@ class BuildingValidator:
         )
         dim_overlay = self.data_format.las_dimensions.uni_db_overlay
 
-
         pipeline = pdal.Pipeline()
         pipeline |= get_pdal_reader(src_las_path)
         # Identify candidates buildings points with a boolean flag
@@ -169,7 +168,7 @@ class BuildingValidator:
             buildings_in_bd_topo = True
             _shp_p = self.shp_path
 
-        else: 
+        else:
             temp_dirpath = mkdtemp()
             # TODO: extract coordinates from LAS directly using pdal.
             # Request BDUni to get a shapefile of the known buildings in the LAS
@@ -182,7 +181,7 @@ class BuildingValidator:
         # Create overlay dim
         # If there are some buildings in the database, create a BDTopoOverlay boolean
         # dimension to reflect it.
-        
+
         if buildings_in_bd_topo:
             pipeline |= pdal.Filter.overlay(
                 column="PRESENCE", datasource=_shp_p, dimension=dim_overlay
