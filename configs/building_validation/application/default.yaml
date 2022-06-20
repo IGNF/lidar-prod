@@ -1,10 +1,9 @@
 _target_: lidar_prod.tasks.building_validation.BuildingValidator
 
-building_validation_thresholds_pickle: /path/to/best_trial.pkl
-
 data_format: ${data_format}
 use_final_classification_codes: true
 
+shp_path: None
 
 bd_uni_connection_params:
   _target_: lidar_prod.tasks.utils.BDUniConnectionParams

@@ -7,6 +7,8 @@ import subprocess
 import numpy as np
 import pdal
 from tempfile import TemporaryDirectory
+from tempfile import mkdtemp
+import shutil
 import geopandas
 import laspy
 from tqdm import tqdm
@@ -45,14 +47,15 @@ class BuildingValidator:
 
     def __init__(
         self,
+        shp_path: str = None,
         bd_uni_connection_params=None,
         cluster=None,
         bd_uni_request=None,
         data_format=None,
         thresholds=None,
-        building_validation_thresholds_pickle: str = None,
         use_final_classification_codes: bool = True,
     ):
+        self.shp_path = shp_path
         self.bd_uni_connection_params = bd_uni_connection_params
         self.cluster = cluster
         self.bd_uni_request = bd_uni_request
@@ -129,55 +132,67 @@ class BuildingValidator:
         )
         dim_overlay = self.data_format.las_dimensions.uni_db_overlay
 
-        with TemporaryDirectory() as td:
-            pipeline = pdal.Pipeline()
-            pipeline |= get_pdal_reader(src_las_path)
-            # Identify candidates buildings points with a boolean flag
-            pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_candidate_flag}")
-            _is_candidate_building = (
-                "("
-                + " || ".join(
-                    f"Classification == {int(candidate_code)}"
-                    for candidate_code in self.candidate_buildings_codes
-                )
-                + ")"
-            )
-            pipeline |= pdal.Filter.assign(
-                value=f"{dim_candidate_flag} = 1 WHERE {_is_candidate_building}"
-            )
-            # Cluster candidates buildings points. This creates a ClusterID dimension (int)
-            # in which unclustered points have index 0.
-            pipeline |= pdal.Filter.cluster(
-                min_points=self.cluster.min_points,
-                tolerance=self.cluster.tolerance,
-                where=f"{dim_candidate_flag} == 1",
-            )
 
-            # Copy ClusterID into a new dim and reset it to 0 to avoid conflict with later tasks.
-            pipeline |= pdal.Filter.ferry(
-                dimensions=f"{dim_cluster_id_pdal}=>{dim_cluster_id_candidates}"
+        pipeline = pdal.Pipeline()
+        pipeline |= get_pdal_reader(src_las_path)
+        # Identify candidates buildings points with a boolean flag
+        pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_candidate_flag}")
+        _is_candidate_building = (
+            "("
+            + " || ".join(
+                f"Classification == {int(candidate_code)}"
+                for candidate_code in self.candidate_buildings_codes
             )
-            pipeline |= pdal.Filter.assign(value=f"{dim_cluster_id_pdal} = 0")
+            + ")"
+        )
+        pipeline |= pdal.Filter.assign(
+            value=f"{dim_candidate_flag} = 1 WHERE {_is_candidate_building}"
+        )
+        # Cluster candidates buildings points. This creates a ClusterID dimension (int)
+        # in which unclustered points have index 0.
+        pipeline |= pdal.Filter.cluster(
+            min_points=self.cluster.min_points,
+            tolerance=self.cluster.tolerance,
+            where=f"{dim_candidate_flag} == 1",
+        )
 
+        # Copy ClusterID into a new dim and reset it to 0 to avoid conflict with later tasks.
+        pipeline |= pdal.Filter.ferry(
+            dimensions=f"{dim_cluster_id_pdal}=>{dim_cluster_id_candidates}"
+        )
+        pipeline |= pdal.Filter.assign(value=f"{dim_cluster_id_pdal} = 0")
+        bbox = get_integer_bbox(src_las_path, buffer=self.bd_uni_request.buffer)
+        pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_overlay}")
+
+        if self.shp_path:
+            temp_dirpath = None     # no need for a temporay directory to add the shapefile in it, we already have the shapefile
+            buildings_in_bd_topo = True
+            _shp_p = self.shp_path
+
+        else: 
+            temp_dirpath = mkdtemp()
             # TODO: extract coordinates from LAS directly using pdal.
             # Request BDUni to get a shapefile of the known buildings in the LAS
-            _shp_p = os.path.join(td, "temp.shp")
-            bbox = get_integer_bbox(src_las_path, buffer=self.bd_uni_request.buffer)
+            _shp_p = os.path.join(temp_dirpath, "temp.shp")
+            # _shp_p = os.path.join("/home/MDaab/temp", "temp.shp")   # MONKEYPATCHING !!!
             buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
                 self.bd_uni_connection_params, _shp_p, bbox
             )
 
-            # Create overlay dim
-            # If there are some buildings in the database, create a BDTopoOverlay boolean
-            # dimension to reflect it.
-            pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_overlay}")
-            if buildings_in_bd_topo:
-                pipeline |= pdal.Filter.overlay(
-                    column="PRESENCE", datasource=_shp_p, dimension=dim_overlay
-                )
-            pipeline |= get_pdal_writer(prepared_las_path)
-            os.makedirs(osp.dirname(prepared_las_path), exist_ok=True)
-            pipeline.execute()
+        # Create overlay dim
+        # If there are some buildings in the database, create a BDTopoOverlay boolean
+        # dimension to reflect it.
+        
+        if buildings_in_bd_topo:
+            pipeline |= pdal.Filter.overlay(
+                column="PRESENCE", datasource=_shp_p, dimension=dim_overlay
+            )
+        pipeline |= get_pdal_writer(prepared_las_path)
+        os.makedirs(osp.dirname(prepared_las_path), exist_ok=True)
+        pipeline.execute()
+
+        if temp_dirpath:
+            shutil.rmtree(temp_dirpath)
 
     def update(self, prepared_las_path: str, target_las_path: str) -> None:
         """Updates point cloud classification channel."""
