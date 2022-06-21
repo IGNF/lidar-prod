@@ -173,7 +173,6 @@ class BuildingValidator:
             # TODO: extract coordinates from LAS directly using pdal.
             # Request BDUni to get a shapefile of the known buildings in the LAS
             _shp_p = os.path.join(temp_dirpath, "temp.shp")
-            # _shp_p = os.path.join("/home/MDaab/temp", "temp.shp")   # MONKEYPATCHING !!!
             buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
                 self.bd_uni_connection_params, _shp_p, bbox
             )

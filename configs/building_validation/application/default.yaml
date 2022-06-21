@@ -3,7 +3,7 @@ _target_: lidar_prod.tasks.building_validation.BuildingValidator
 data_format: ${data_format}
 use_final_classification_codes: true
 
-shp_path: None
+shp_path:
 
 bd_uni_connection_params:
   _target_: lidar_prod.tasks.utils.BDUniConnectionParams
