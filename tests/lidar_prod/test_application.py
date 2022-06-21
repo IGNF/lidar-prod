@@ -18,18 +18,19 @@ We apply different "mutations" to the data in order to test for multiple scenari
 
 """
 LAS_SUBSET_FILE = "tests/files/870000_6618000.subset.postIA.las"
+SHAPE_FILE = "tests/files/postIA.shp"
 
 
 @pytest.mark.parametrize(
-    "las_mutation",
+    "las_mutation, query_db_Uni",     
     [
-        [],  # identity
-        [pdal.Filter.assign(value="building = 0.0")],  # low proba everywhere
-        [pdal.Filter.assign(value="Classification = 1")],  # no candidate buildings
-        [pdal.Filter.assign(value="Classification = 202")],  # only candidate buildings
-    ],
+        ([],True),  # identity
+        ([pdal.Filter.assign(value="building = 0.0")],True),  # low proba everywhere
+        ([pdal.Filter.assign(value="Classification = 1")],False),  # no candidate buildings
+        ([pdal.Filter.assign(value="Classification = 202")],False),  # only candidate buildings
+    ], # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
 )
-def test_application_data_invariance_and_data_format(default_hydra_cfg, las_mutation):
+def test_application_data_invariance_and_data_format(default_hydra_cfg, las_mutation, query_db_Uni):
     # Expected classification codes after application run are either default=0, unclassified=1, or
     # one of the decision codes.
     _fc = default_hydra_cfg.data_format.codes.building.final
@@ -48,6 +49,8 @@ def test_application_data_invariance_and_data_format(default_hydra_cfg, las_muta
             LAS_SUBSET_FILE, mutated_copy, las_mutation
         ).execute()
         default_hydra_cfg.paths.src_las = mutated_copy
+        if not query_db_Uni:    # we don't request db_uni, we use a shapefile instead
+            default_hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
         updated_las_path: str = apply(default_hydra_cfg)
         # Check output
         check_las_invariance(mutated_copy, updated_las_path)
