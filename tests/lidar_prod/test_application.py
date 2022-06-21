@@ -22,13 +22,13 @@ SHAPE_FILE = "tests/files/postIA.shp"
 
 
 @pytest.mark.parametrize(
-    "las_mutation, query_db_Uni",     
+    "las_mutation, query_db_Uni",
     [
-        ([],True),  # identity
-        ([pdal.Filter.assign(value="building = 0.0")],True),  # low proba everywhere
-        ([pdal.Filter.assign(value="Classification = 1")],False),  # no candidate buildings
-        ([pdal.Filter.assign(value="Classification = 202")],False),  # only candidate buildings
-    ], # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
+        ([], True),  # identity
+        ([pdal.Filter.assign(value="building = 0.0")], True),  # low proba everywhere
+        ([pdal.Filter.assign(value="Classification = 1")], False),  # no candidate buildings
+        ([pdal.Filter.assign(value="Classification = 202")], False),  # only candidate buildings
+    ],  # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
 )
 def test_application_data_invariance_and_data_format(default_hydra_cfg, las_mutation, query_db_Uni):
     # Expected classification codes after application run are either default=0, unclassified=1, or
