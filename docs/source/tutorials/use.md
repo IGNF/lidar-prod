@@ -28,7 +28,7 @@ To run using default configurations of the installed module, use
 python -m lidar_prod.run paths.src_las=</path/to/file.las>
 ```
 
-You can specify a different yaml config file with the flags `--config-path` and `--config-name`. You can also override specific parameters. By default, results are saved to a `./outputs/` folder, but this can be overriden with `paths.output_dir` parameter. Refer to [hydra documentation](https://hydra.cc/docs/next/tutorials/basic/your_first_app/config_file/) for the overriding syntax.
+You can specify a different yaml config file with the flags `--config-path` and `--config-name`. You can also override specific parameters. Overriding `building_validation.application.shp_path` will force the use of the provided shapefile instead of querying DB Uni to build a shapefile on the fly. By default, results are saved to a `./outputs/` folder, but this can be overriden with `paths.output_dir` parameter. Refer to [hydra documentation](https://hydra.cc/docs/next/tutorials/basic/your_first_app/config_file/) for the overriding syntax.
 
 To print default configuration run `python -m lidar_prod.run -h`. For pretty colors, run `python -m lidar_prod.run print_config=true`.
 
