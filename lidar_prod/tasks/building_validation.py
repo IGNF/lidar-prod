@@ -165,8 +165,9 @@ class BuildingValidator:
 
         if self.shp_path:
             temp_dirpath = None     # no need for a temporay directory to add the shapefile in it, we already have the shapefile
-            buildings_in_bd_topo = True
             _shp_p = self.shp_path
+            gdf = geopandas.read_file(_shp_p)
+            buildings_in_bd_topo = not len(gdf) == 0    # check if there arebuildings in the shp
 
         else:
             temp_dirpath = mkdtemp()
