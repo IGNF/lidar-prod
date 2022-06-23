@@ -18,7 +18,7 @@ We apply different "mutations" to the data in order to test for multiple scenari
 
 """
 LAS_SUBSET_FILE = "tests/files/870000_6618000.subset.postIA.las"
-SHAPE_FILE = "tests/files/postIA.shp"
+SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
 
 
 @pytest.mark.parametrize(
