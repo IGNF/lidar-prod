@@ -9,6 +9,7 @@ from lidar_prod.commons import commons
 
 log = logging.getLogger(__name__)
 
+# TODO: optimization logic should be splitted by task and put into the main() of each script.
 
 @commons.eval_time
 def optimize(config: DictConfig):

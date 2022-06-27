@@ -1,12 +1,18 @@
 from dataclasses import dataclass
-import json
-import math
 from numbers import Number
+import os
+from pathlib import Path
 import subprocess
 import tempfile
-from typing import Any, Dict, Iterable
+import json
+import math
 import numpy as np
+from typing import Any, Dict, Iterable
+from osgeo import gdal, ogr, osr
 import pdal
+
+LAMBERT_93_SRID = 2154
+LAMBERT_93_EPSG_STR = f"EPSG:{LAMBERT_93_SRID}"
 
 
 @dataclass
@@ -94,7 +100,7 @@ def get_pdal_reader(las_path: str) -> pdal.Reader.las:
     return pdal.Reader.las(
         filename=las_path,
         nosrs=True,
-        override_srs="EPSG:2154",
+        override_srs=LAMBERT_93_EPSG_STR,
     )
 
 
@@ -149,3 +155,56 @@ def pdal_read_las_array(las_path: str):
     p1 = pdal.Pipeline() | get_pdal_reader(las_path)
     p1.execute()
     return p1.arrays[0]
+
+
+def stem(input_file: str):
+    return Path(input_file).stem
+
+
+# Rasterization and vectorization
+
+
+def gdal_polygonize(
+    fic_mask, fic_output, epsg_out=None, field_name="value", value_to_polygonize=0
+):
+    """Polygonisation des valeurs non-nulles d'un raster monobande."""
+
+    src_ds = gdal.Open(fic_mask)
+    srcband = src_ds.GetRasterBand(1)
+    srcband2 = src_ds.GetRasterBand(1)
+
+    srs = get_ogr_srs(epsg_out)
+    ext_driver = get_ogr_driver_by_ext(fic_output)
+    drv = ogr.GetDriverByName(ext_driver)
+
+    if os.path.exists(fic_output):
+        drv.DeleteDataSource(fic_output)
+
+    dst_datasource = drv.CreateDataSource(fic_output)
+    dst_layer = dst_datasource.CreateLayer(fic_output, srs)
+    field_defn = ogr.FieldDefn(field_name, ogr.OFTString)
+    dst_layer.CreateField(field_defn)
+
+    gdal.Polygonize(
+        srcband, srcband2, dst_layer, value_to_polygonize, ["8"], callback=None
+    )
+
+
+def get_ogr_srs(epsg):
+    if epsg is not None:
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(int(epsg))
+        return srs
+    else:
+        return None
+
+
+def get_ogr_driver_by_ext(file):
+    _, file_extension = os.path.splitext(file)
+    if file_extension == ".json" or file_extension == ".geojson":
+        return "GeoJson"
+    elif file_extension == ".shp":
+        return "ESRI Shapefile"
+    else:
+        raise Exception("Extension de fichier vecteur non comprise")
+        return 0

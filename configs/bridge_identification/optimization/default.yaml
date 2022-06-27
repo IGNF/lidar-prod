@@ -1,0 +1,9 @@
+_target_: lidar_prod.tasks.bridge_identification_optimization.BridgeIdentificationOptimizer
+
+bridge_identifier: ${bridge_identification.application}
+paths:
+  input_las_dir:  "/path/to/folder/"  # contains .las files
+  output_dir: "/path/to/folder/"  # will contain bridge vectorization outputs and ultimately best opti trial
+# Parameters for rasterization of bridge points (labels or predicted) to a TIF file.
+gdal_writer_window_size: 0.25
+gdal_writer_resolution: 0.25

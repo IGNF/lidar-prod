@@ -13,6 +13,7 @@ import geopandas
 import laspy
 from tqdm import tqdm
 from lidar_prod.tasks.utils import (
+    LAMBERT_93_SRID,
     BDUniConnectionParams,
     get_integer_bbox,
     get_pdal_reader,
@@ -164,10 +165,12 @@ class BuildingValidator:
         pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_overlay}")
 
         if self.shp_path:
-            temp_dirpath = None     # no need for a temporay directory to add the shapefile in it, we already have the shapefile
+            temp_dirpath = None  # no need for a temporay directory to add the shapefile in it, we already have the shapefile
             _shp_p = self.shp_path
             gdf = geopandas.read_file(_shp_p)
-            buildings_in_bd_topo = not len(gdf) == 0    # check if there arebuildings in the shp
+            buildings_in_bd_topo = (
+                not len(gdf) == 0
+            )  # check if there arebuildings in the shp
 
         else:
             temp_dirpath = mkdtemp()
@@ -350,14 +353,13 @@ def request_bd_uni_for_building_shapefile(
     Also add a "PRESENCE" column filled with 1 for later use by pdal.
 
     """
-    Lambert_93_SRID = 2154
     sql_request = f'SELECT \
-        st_setsrid(batiment.geometrie,{Lambert_93_SRID}) AS geometry, \
+        st_setsrid(batiment.geometrie,{LAMBERT_93_SRID}) AS geometry, \
         1 as presence \
         FROM batiment \
         WHERE batiment.geometrie \
             && \
-        ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
+        ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {LAMBERT_93_SRID}) \
         and \
         not gcms_detruit'
     cmd = [

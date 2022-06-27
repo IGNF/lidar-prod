@@ -6,6 +6,7 @@ defaults:
   - hydra: default.yaml
   - paths: default.yaml
   - data_format: default.yaml
+  - bridge_identification: default.yaml
   - building_validation: default.yaml
   - building_identification: default.yaml
   - building_completion: default.yaml

@@ -1,10 +1,11 @@
 # Those names connect the logics between successive tasks
 las_dimensions:
   # input
-  classification: classification  # las format
+  classification: classification  # name of dim in las format for laspy
 
   # Extra dims
-  # ATTENTION: If extra dimensions are added, you may want to add them in cleaning.in parameter as well.
+  # ATTENTION: If extra dimensions are added, you may want to add them in cleaning.input parameter as well.
+  ai_bridge_proba: bridge
   ai_building_proba: building  # user-defined - output by deep learning model
   entropy: entropy # user-defined - output by deep learning model
 
@@ -19,6 +20,7 @@ las_dimensions:
   ai_building_identified: Group
 
 codes:
+  bridge: 17  # single code.
   building:
     candidates: [202]  # found by rules-based classification (TerraScan)
     detailed:  # used for detailed output when doing threshold optimization
@@ -51,6 +53,7 @@ cleaning:
     _target_: lidar_prod.tasks.cleaning.Cleaner
     extra_dims:
       - "${data_format.las_dimensions.ai_building_proba}=float"
+      - "${data_format.las_dimensions.ai_bridge_proba}=float"
       - "${data_format.las_dimensions.entropy}=float"
   output:
     # Extra dims that are kept before final saving.
@@ -58,5 +61,6 @@ cleaning:
     _target_: lidar_prod.tasks.cleaning.Cleaner
     extra_dims:
       - "${data_format.las_dimensions.ai_building_proba}=float"
+      - "${data_format.las_dimensions.ai_bridge_proba}=float"
       - "${data_format.las_dimensions.entropy}=float"
       - "${data_format.las_dimensions.ai_building_identified}=uint"

@@ -2,6 +2,7 @@
 nohup.out
 inputs/
 outputs/
+tests/tmp/
 
 # large file for tests
 tests/files/large/V0.5_792000_6272000.las

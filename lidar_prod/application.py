@@ -4,6 +4,7 @@ import os.path as osp
 from tempfile import TemporaryDirectory
 import hydra
 from omegaconf import DictConfig
+from lidar_prod.tasks.bridge_identification import BridgeIdentifier
 from lidar_prod.tasks.building_completion import BuildingCompletor
 from lidar_prod.tasks.cleaning import Cleaner
 
@@ -36,6 +37,11 @@ def apply(config: DictConfig):
         # Removes unnecessary input dimensions to reduce memory usage
         cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.input)
         cl.run(src_las_path, tmp_las_path)
+
+        # TODO: add a bridge proba dim to test LAS subset before uncommenting
+        # Identify bridge from a specialized model predictions
+        # bi: BridgeIdentifier = hydra.utils.instantiate(config.bridge_identification)
+        # bi.run(tmp_las_path, tmp_las_path)
 
         # Validate buildings (unsure/confirmed/refuted) on a per-group basis.
         bv: BuildingValidator = hydra.utils.instantiate(
