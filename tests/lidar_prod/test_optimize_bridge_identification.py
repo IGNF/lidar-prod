@@ -1,10 +1,5 @@
-import shutil
 import pytest
-import os
-import os.path as osp
-import tempfile
 import hydra
-import numpy as np
 
 from lidar_prod.tasks.bridge_identification_optimization import (
     BridgeIdentificationOptimizer,
