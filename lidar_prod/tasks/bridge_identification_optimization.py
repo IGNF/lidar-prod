@@ -6,13 +6,12 @@ Takes bridge probabilities as input, and defines bridge.
 import logging
 from numbers import Number
 import tempfile
-from typing import Any, Dict
+from typing import Dict, List
 from glob import glob
 import os.path as osp
 import geopandas
 
-# from shapely.geometry import Polygon
-from shapely import wkt
+from shapely.geometry import Polygon
 import numpy as np
 import pdal
 from lidar_prod.tasks.bridge_identification import BridgeIdentifier
@@ -41,12 +40,21 @@ def compute_bridge_iou(json_path_target, json_path_predicted) -> float:
     return target.intersection(predicted).area / target.union(predicted).area
 
 
+def save_geometries_to_geodataframe(geometry_list: List[Polygon], out_json: str):
+    "Save a list of geometries to a geojson file.."
+    s = geopandas.GeoDataFrame({"geometry": geometry_list})
+    s.to_file(out_json)
+
+
 def load_json_unary_union(json_path_target):
-    return (
-        geopandas.read_file(json_path_target)
-        .fillna(value=wkt.loads("POLYGON EMPTY"))
-        .unary_union
-    )
+    """Get the unary union of a geojson in a way that is robust to null values.
+
+    Note: filling na values is needed because empty polygons saved by geopandas are
+    read as null value, which is unexpected according to
+    https://geopandas.org/en/stable/docs/user_guide/missing_empty.html.
+
+    """
+    return geopandas.read_file(json_path_target).fillna(value=Polygon([])).unary_union
 
 
 class BridgeIdentificationOptimizer:
@@ -102,8 +110,7 @@ class BridgeIdentificationOptimizer:
         points = pipeline.arrays[0]
         if len(points) == 0:
             # no building points in this LAS, so we create an empty geometry
-            s = geopandas.GeoDataFrame({"geometry": [wkt.loads("POLYGON EMPTY")]})
-            s.to_file(out_json)
+            save_geometries_to_geodataframe([Polygon([])], out_json)
             return
         # else we rasterize the bridge points inot a TIF that we then vectorize
         pipeline = pdal.Writer.gdal(

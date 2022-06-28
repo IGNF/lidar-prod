@@ -9,12 +9,11 @@ from lidar_prod.commons import commons
 
 log = logging.getLogger(__name__)
 
-# TODO: optimization logic should be splitted by task and put into the main() of each script.
 
 @commons.eval_time
 def optimize(config: DictConfig):
     """
-    Run a multi-objectives hyperparameters optimization of the decision
+    Runs a multi-objectives hyperparameters optimization of the decision
     thresholds, to maximize recall and precision directly while
     also maximizing automation.
 
@@ -28,3 +27,4 @@ def optimize(config: DictConfig):
         config.building_validation.optimization
     )
     bvo.run()
+    # TODO: optimization logic should be splitted by task and put into the main() of each script.

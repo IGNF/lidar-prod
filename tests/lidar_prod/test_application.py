@@ -26,11 +26,19 @@ SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
     [
         ([], True),  # identity
         ([pdal.Filter.assign(value="building = 0.0")], True),  # low proba everywhere
-        ([pdal.Filter.assign(value="Classification = 1")], False),  # no candidate buildings
-        ([pdal.Filter.assign(value="Classification = 202")], False),  # only candidate buildings
+        (
+            [pdal.Filter.assign(value="Classification = 1")],
+            False,
+        ),  # no candidate buildings
+        (
+            [pdal.Filter.assign(value="Classification = 202")],
+            False,
+        ),  # only candidate buildings
     ],  # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
 )
-def test_application_data_invariance_and_data_format(default_hydra_cfg, las_mutation, query_db_Uni):
+def test_application_data_invariance_and_data_format(
+    default_hydra_cfg, las_mutation, query_db_Uni
+):
     # Expected classification codes after application run are either default=0, unclassified=1, or
     # one of the decision codes.
     _fc = default_hydra_cfg.data_format.codes.building.final
@@ -49,7 +57,7 @@ def test_application_data_invariance_and_data_format(default_hydra_cfg, las_muta
             LAS_SUBSET_FILE, mutated_copy, las_mutation
         ).execute()
         default_hydra_cfg.paths.src_las = mutated_copy
-        if not query_db_Uni:    # we don't request db_uni, we use a shapefile instead
+        if not query_db_Uni:  # we don't request db_uni, we use a shapefile instead
             default_hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
         updated_las_path: str = apply(default_hydra_cfg)
         # Check output
@@ -67,7 +75,7 @@ def check_format_of_application_output_las(output_las_path: str, expected_codes:
     """
     # Check that we contain extra_dims that production needs
     check_las_contains_dims(
-        output_las_path, dims_to_check=["Group", "building", "entropy"]
+        output_las_path, dims_to_check=["Group", "bridge", "building", "entropy"]
     )
 
     # Ensure that the format versions are as expected
