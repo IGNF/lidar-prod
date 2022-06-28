@@ -12,7 +12,7 @@ Lidar-Prod > Documentation
    :caption: Background
 
    background/production_process
-   background/thresholds_optimization_process
+   background/building_thresholds_optimization_process
 
 .. toctree::
    :maxdepth: 1
@@ -25,7 +25,8 @@ Lidar-Prod > Documentation
    :maxdepth: 1
    :caption: Guides
 
-   guides/thresholds_optimization
+   guides/building_validation_optimization
+   guides/bridge_validation_optimization
    guides/development
 
 

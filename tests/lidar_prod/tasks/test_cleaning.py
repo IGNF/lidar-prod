@@ -5,7 +5,7 @@ import pytest
 from lidar_prod.tasks.cleaning import Cleaner
 from lidar_prod.tasks.utils import pdal_read_las_array
 from tests.conftest import check_las_invariance
-from tests.lidar_prod.test_application import check_las_format_versions_and_srs
+from tests.lidar_prod.test_run_app import check_las_format_versions_and_srs
 
 SRC_LAS_SUBSET_PATH = "tests/files/870000_6618000.subset.postIA.las"
 

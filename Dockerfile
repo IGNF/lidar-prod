@@ -33,14 +33,14 @@ RUN micromamba list
 RUN echo "Make sure pdal is installed:"
 RUN python -c "import pdal"
 
-# /lidar becomes the working directory, where the repo content 
+# /lidar-prod-quality-control/ becomes the working directory, where the repo content 
 # (the context of this Dockerfile) is copied.
-WORKDIR /lidar
+WORKDIR /lidar-prod-quality-control
 COPY . .
 
 # Example command to run the application from within the image
 CMD  ["python", \
-    "lidar_prod/run.py", \
+    "lidar_prod/run_app.py", \
     "print_config=true", \
     "paths.src_las=your_las.las", \
     "paths.output_dir=./path/to/outputs/"]

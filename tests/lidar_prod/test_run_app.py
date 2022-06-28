@@ -3,7 +3,7 @@ import pytest
 import tempfile
 import numpy as np
 
-from lidar_prod.application import apply
+from lidar_prod.run_app import run_app
 from lidar_prod.tasks.utils import get_a_las_to_las_pdal_pipeline, get_las_metadata
 from tests.conftest import (
     check_las_contains_dims,
@@ -59,7 +59,7 @@ def test_application_data_invariance_and_data_format(
         default_hydra_cfg.paths.src_las = mutated_copy
         if not query_db_Uni:  # we don't request db_uni, we use a shapefile instead
             default_hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
-        updated_las_path: str = apply(default_hydra_cfg)
+        updated_las_path: str = run_app(default_hydra_cfg)
         # Check output
         check_las_invariance(mutated_copy, updated_las_path)
         check_format_of_application_output_las(updated_las_path, expected_codes)

@@ -61,7 +61,7 @@ def eval_time(function: Callable):
         result = function(*args, **kwargs)
         time_elapsed = round(time.time() - time_start, 2)
 
-        log.info(f"Processing time of {function.__name__}: {time_elapsed}s")
+        log.info(f"Running time of {function.__name__}: {time_elapsed}s")
         return result
 
     return timed

@@ -30,7 +30,7 @@ buildings_correction_labels:
     true_positives: 0.95 # >=x% of confirmed points --> cluster is a building
     false_positives: 0.05 # <x% of confirmed points --> cluster is not a building
 
-
+# Parameters for optuna optimization of decision thresholds
 study:
   _target_: optuna.create_study
   study_name: "auto_precision_recall"

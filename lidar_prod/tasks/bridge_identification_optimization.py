@@ -10,11 +10,12 @@ from typing import Dict, List
 from glob import glob
 import os.path as osp
 import geopandas
+import optuna
 
 from shapely.geometry import Polygon
 import numpy as np
 import pdal
-from lidar_prod.tasks.bridge_identification import BridgeIdentifier
+from lidar_prod.tasks.bridge_identification import BridgeIdentifier, thresholds
 from lidar_prod.tasks.utils import (
     LAMBERT_93_EPSG_STR,
     LAMBERT_93_SRID,
@@ -62,16 +63,58 @@ class BridgeIdentificationOptimizer:
         self,
         paths: Dict[str, str],
         bridge_identifier: BridgeIdentifier,
+        optimization_design: Dict,
+        study: optuna.Study,
         gdal_writer_window_size: Number = 0.25,
         gdal_writer_resolution: Number = 0.25,
     ):
         self.paths = paths
         self.bri = bridge_identifier
+        self.optimization_design = optimization_design
+        self.study = study
         self.gdal_writer_window_size = gdal_writer_window_size
         self.gdal_writer_resolution = gdal_writer_resolution
 
+    def optimize(self):
+        """Optimize decision thresholds for bridge identification.
+
+        Runs the genetic algorithm for N generations.
+        For each set of decision thresholds, computes the iou on all files.
+        Finally, select the optimal thresholds.
+
+        """
+        self.study.optimize(self._optuna_objective_func, n_trials=self.design.n_trials)
+        best_thresholds = self._select_best_thresholds(self.study)
+        log.info(f"Best_trial thresholds: \n{best_thresholds}")
+        # TODO: save thresholds to a pickle ?
+        # Perform an evaluation step wit the best thresholds to get results files for inspection.
+        self.bri.thresholds = best_thresholds
+        iou = self.bri.evaluate()
+        log.info(f"Maximized vector IoU is {iou}")
+
+    def _optuna_objective_func(self, trial):
+        """Sets decision threshold for the trial and computes resulting vector IoU."""
+        self.bri.thresholds = thresholds(
+            min_bridge_proba=trial.suggest_float(
+                "min_confidence_confirmation", 0.0, 1.0
+            )
+        )
+        return self.bri.evaluate()
+
+    def evaluate_mean_bridge_iou_across_data(self) -> None:
+        """Iterates through las_filepaths to perform bridge identification and evaluate resulting vector IoU."""
+        ious = []
+        for input_las_path in glob(osp.join(self.paths.input_las_dir, "*.las")):
+            output_las_path = osp.join(
+                self.paths.output_las_dir, osp.basename(input_las_path)
+            )
+            iou = self.evaluate_one_iou(input_las_path, output_las_path)
+            print(iou)
+            ious += [iou]
+        return np.mean(ious)
+
     def evaluate_one_iou(self, input_las: str, output_las_path: str):
-        """Performe bridge evaluation on one file and evaluate vector IoU."""
+        """Performs bridge vector IoU evaluation on a single file."""
         # Set Classification to 0.0 in a temporary file to avoid conflicts at evaluation time.
         tmp_las = tempfile.NamedTemporaryFile(suffix=".las").name
         self.nullify_classification(input_las, tmp_las)
@@ -86,20 +129,8 @@ class BridgeIdentificationOptimizer:
         iou = compute_bridge_iou(out_json_target, out_json_predicted)
         return iou
 
-    def evaluate(self) -> None:
-        """Iterate through las_filepaths to perform bridge identification and evaluate resulting vector IoU."""
-        # TODO: more detailed statistics by file in a dataframe
-        ious = []
-        for input_las_path in glob(osp.join(self.paths.input_las_dir, "*.las")):
-            output_las_path = osp.join(
-                self.paths.output_las_dir, osp.basename(input_las_path)
-            )
-            iou = self.evaluate_one_iou(input_las_path, output_las_path)
-            print(iou)
-            ious += [iou]
-        return np.mean(ious)
-
     def vectorize_bridge(self, las_path, out_json) -> None:
+        """Vectorizes bridge points into a geojson."""
         out_tif = out_json.replace(".json", ".tif")
 
         bridge_code = self.bri.data_format.codes.bridge
@@ -134,10 +165,15 @@ class BridgeIdentificationOptimizer:
         gdal_polygonize(out_tif, out_json, epsg_out=LAMBERT_93_SRID)
 
     def nullify_classification(self, input_las, output_las):
-        """Save the LAS with a nullified Classification dim to avoid conflict when updating Classification."""
+        """Saves the LAS with a nullified Classification dim to avoid conflict when updating Classification."""
         pipeline = get_a_las_to_las_pdal_pipeline(
             input_las,
             output_las,
             [pdal.Filter.assign(value="Classification = 0")],
         )
         pipeline.execute()
+
+    def _select_best_thresholds(self, study):
+        """Gets the trial that maximizes IoU."""
+        trials = sorted(study.best_trials, key=lambda x: x.values[0], reverse=True)
+        return trials[0]

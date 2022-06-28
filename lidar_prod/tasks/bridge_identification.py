@@ -3,6 +3,7 @@ Takes bridge probabilities as input, and defines bridge.
 
 """
 
+from dataclasses import dataclass
 import logging
 import os
 import numpy as np
@@ -13,6 +14,13 @@ from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer
 
 
 log = logging.getLogger(__name__)
+
+
+@dataclass
+class thresholds:
+    """The decision thresholds for a cluser-level decisions."""
+
+    min_bridge_proba: float
 
 
 class BridgeIdentifier:
@@ -27,8 +35,8 @@ class BridgeIdentifier:
 
     """
 
-    def __init__(self, min_bridge_proba: float = 0.5, data_format=None):
-        self.min_bridge_proba = min_bridge_proba
+    def __init__(self, thresholds: thresholds = 0.5, data_format=None):
+        self.thresholds = thresholds
         self.data_format = data_format
 
     def run(self, src_las_path: str, target_las_path: str):
@@ -60,4 +68,4 @@ class BridgeIdentifier:
 
     def identify_bridges(self, ai_bridge_proba: np.ndarray) -> np.ndarray:
         """Return a mask for identified bridge points from probabilities."""
-        return ai_bridge_proba >= self.min_bridge_proba
+        return ai_bridge_proba >= self.thresholds.min_bridge_proba

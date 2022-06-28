@@ -3,4 +3,6 @@ _target_: lidar_prod.tasks.bridge_identification.BridgeIdentifier
 data_format: ${data_format}
 
 # parameters
-min_bridge_proba: 0.5
+thresholds:
+  _target_: lidar_prod.tasks.bridge_identification.thresholds
+  min_bridge_proba: 0.5

@@ -5,5 +5,25 @@ paths:
   input_las_dir:  "/path/to/folder/"  # contains .las files
   output_dir: "/path/to/folder/"  # will contain bridge vectorization outputs and ultimately best opti trial
 # Parameters for rasterization of bridge points (labels or predicted) to a TIF file.
+# TODO: we might want to use larger values in case we keep current method of vectorization
+# However, we might keep them if we try to compute a bounding polygon to vectorized points.
+
 gdal_writer_window_size: 0.25
 gdal_writer_resolution: 0.25
+
+# Metaparameters for the optimization of decision thresholds with optuna.
+optimization_design:
+  n_trials: 300
+
+# Parameters for the optimization of decision thresholds with optuna.
+study:
+  _target_: optuna.create_study
+  study_name: "bridge_iou_maximization"
+  directions: ["maximize"]
+  sampler:
+    _target_: optuna.samplers.NSGAIISampler
+    population_size: 50
+    mutation_prob: 0.25
+    crossover_prob: 0.1
+    swapping_prob: 0.1
+    seed: 12345

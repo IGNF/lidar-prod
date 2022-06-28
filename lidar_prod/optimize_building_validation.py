@@ -1,4 +1,6 @@
 import logging
+import os.path as osp
+import sys
 import hydra
 from omegaconf import DictConfig
 from lidar_prod.tasks.building_validation_optimization import (
@@ -11,9 +13,9 @@ log = logging.getLogger(__name__)
 
 
 @commons.eval_time
-def optimize(config: DictConfig):
-    """
-    Runs a multi-objectives hyperparameters optimization of the decision
+@hydra.main(config_path="../configs/", config_name="config.yaml")
+def optimize_building_validation(config: DictConfig):
+    """Runs a multi-objectives hyperparameters optimization of the decision
     thresholds, to maximize recall and precision directly while
     also maximizing automation.
 
@@ -27,4 +29,8 @@ def optimize(config: DictConfig):
         config.building_validation.optimization
     )
     bvo.run()
-    # TODO: optimization logic should be splitted by task and put into the main() of each script.
+
+
+if __name__ == "__main__":
+    sys.path.append(osp.dirname(osp.dirname(__file__)))
+    optimize_building_validation()

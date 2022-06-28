@@ -1,6 +1,6 @@
 # How to optimize building validation decision thresholds?
 
-This guide explains how to optimize decision thresholds following the strategy in [this note](../background/thresholds_optimization_process.md).
+This guide explains how to optimize decision thresholds following the strategy in [this note](../background/building_validation_optimization.md).
 
 ## Requirements
 
@@ -28,8 +28,8 @@ Run the full optimization module with
 ```bash
 conda activate lidar_prod
 
-python lidar_prod/run.py \
-+task=optimize building_validation.optimization.todo='prepare+optimize+evaluate+update' \
+python lidar_prod/optimize_building_validation.py \
+building_validation.optimization.todo='prepare+optimize+evaluate+update' \
 building_validation.optimization.paths.input_las_dir=[path/to/labelled/val/dataset/] \
 building_validation.optimization.paths.results_output_dir=[path/to/save/results] 
 ```
@@ -42,8 +42,7 @@ Once an optimal solution was found, you may want to evaluate the decision proces
 ```bash
 conda activate lidar_prod
 
-python lidar_prod/run.py \
-+task=optimize \
+python lidar_prod/optimize_building_validation.py \
 building_validation.optimization.todo='prepare+evaluate+update' \
 building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] \
 building_validation.optimization.paths.results_output_dir=[path/to/save/results] \
