@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 
 @commons.eval_time
-@hydra.main(config_path=".../configs/", config_name="config.yaml")
+@hydra.main(config_path="../configs/", config_name="config.yaml")
 def optimize_bridge_identification(config: DictConfig):
     """Runs hyperparameters optimization of decision thresholds to maximize bridge vector IoU."""
 

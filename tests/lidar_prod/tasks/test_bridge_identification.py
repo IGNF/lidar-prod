@@ -31,14 +31,15 @@ def setup_module(module):
 
 
 bri_cases = [
-    ("prio4_bridge_with_probas.las", "bridge_accurate", 1.0),
     ("prio4_bridge_with_probas.las", "bridge_too_large", 0.35),
     ("prio4_bridge_with_probas.las", "bridge_half", 0.56),
     ("prio4_bridge_with_probas.las", "bridge_with_a_false_positive", 0.5),
+    ("prio4_bridge_with_probas.las", "bridge_accurate", 1.0),
     ("prio4_no_bridge_patch_with_probas.las", "bridge_false_positive", 0.0),
-    ("prio4_two_bridges_with_probas.las", "bridge_accurate", 1.0),
+    ("prio4_no_bridge_patch_with_probas.las", "bridge_accurate", 1.0),
     ("prio4_two_bridges_with_probas.las", "bridge_one_out_of_two", 0.58),
     ("prio4_two_bridges_with_probas.las", "bridge_no_detection", 0.0),
+    ("prio4_two_bridges_with_probas.las", "bridge_accurate", 1.0),
 ]
 
 

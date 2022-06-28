@@ -83,13 +83,15 @@ class BridgeIdentificationOptimizer:
         Finally, select the optimal thresholds.
 
         """
-        self.study.optimize(self._optuna_objective_func, n_trials=self.design.n_trials)
+        self.study.optimize(
+            self._optuna_objective_func, n_trials=self.optimization_design.n_trials
+        )
         best_thresholds = self._select_best_thresholds(self.study)
         log.info(f"Best_trial thresholds: \n{best_thresholds}")
         # TODO: save thresholds to a pickle ?
         # Perform an evaluation step wit the best thresholds to get results files for inspection.
         self.bri.thresholds = best_thresholds
-        iou = self.bri.evaluate()
+        iou = self.evaluate_all()
         log.info(f"Maximized vector IoU is {iou}")
 
     def _optuna_objective_func(self, trial):
@@ -99,12 +101,21 @@ class BridgeIdentificationOptimizer:
                 "min_confidence_confirmation", 0.0, 1.0
             )
         )
-        return self.bri.evaluate()
+        return self.evaluate_all()
 
-    def evaluate_mean_bridge_iou_across_data(self) -> None:
+    def evaluate_all(self) -> None:
         """Iterates through las_filepaths to perform bridge identification and evaluate resulting vector IoU."""
         ious = []
-        for input_las_path in glob(osp.join(self.paths.input_las_dir, "*.las")):
+        input_las_paths = glob(osp.join(self.paths.input_las_dir, "*.las"))
+        if len(input_las_paths) == 0:
+            raise FileNotFoundError(
+                (
+                    "\nGiven input directory does not contain any LAS file"
+                    "\nCurrent value for bridge_identification_optimization.paths.input_las_dir is:"
+                    f"\n   {self.paths.input_las_dir}"
+                )
+            )
+        for input_las_path in input_las_paths:
             output_las_path = osp.join(
                 self.paths.output_las_dir, osp.basename(input_las_path)
             )
@@ -176,4 +187,14 @@ class BridgeIdentificationOptimizer:
     def _select_best_thresholds(self, study):
         """Gets the trial that maximizes IoU."""
         trials = sorted(study.best_trials, key=lambda x: x.values[0], reverse=True)
-        return trials[0]
+        try:
+            return trials[0]
+        except IndexError as e:
+            log.error(
+                (
+                    "Empty trial list after optuna optimization"
+                    "This is usually caused when given input_dir does not contain any data."
+                    f"Current input_dir is: {self.paths.input_las_dir}"
+                )
+            )
+            raise e
