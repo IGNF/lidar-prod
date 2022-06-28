@@ -24,32 +24,32 @@ jobs:
       uses: actions/checkout@v2
 
     - name: build docker image       
-      run: docker build -t lidar_prod_im .
+      run: docker build -t lidar_prod .
 
     - name: Check code neatness (linter)
-      run: docker run lidar_prod_im flake8
+      run: docker run lidar_prod flake8
 
     - name: Run tests & get coverage - fast ones go first.
       run: >
         docker run
-        lidar_prod_im
+        lidar_prod
         python -m
         pytest -rA -v -m "not slow" --ignore=actions-runner
 
     - name: Run slow tests last (evaluation on large file)
       run: >
         docker run
-        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar-prod-quality-control/tests/files/large/
-        lidar_prod_im
+        -v /var/data/cicd/CICD_github_assets/lidar_prod/inputs/evaluation/:/lidar-prod-quality-control/tests/files/large/
+        lidar_prod
         python -m
         pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
 
     - name: Test run from CLI on a LAS subset.
       run: >
         docker run 
-        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
-        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/
-        lidar_prod_im
+        -v /var/data/cicd/CICD_github_assets/lidar_prod/inputs/:/inputs/
+        -v /var/data/cicd/CICD_github_assets/lidar_prod/outputs/:/outputs/
+        lidar_prod
         python 
         lidar_prod/run_app.py
         print_config=true
@@ -69,16 +69,16 @@ jobs:
 
     - name: Tag the docker image with branch name
       if: github.event_name == 'push'
-      run: docker tag lidar_prod_im:latest lidar_prod_im:${BRANCH_NAME}
+      run: docker tag lidar_prod:latest lidar_prod:${BRANCH_NAME}
 
     - name: Dry run image so that is it not prunned
       if: github.event_name == 'push'
-      run: docker run lidar_prod_im:${BRANCH_NAME} bash
+      run: docker run lidar_prod:${BRANCH_NAME} bash
 
     # This needs writing rights to the mounted path
     - name: save the docker image because everything worked
       if: github.event_name == 'push'
-      run: docker save lidar_prod_im:${BRANCH_NAME} -o /var/data/cicd/CICD_github_assets/CICD_docker_images/lidar_prod_im_${BRANCH_NAME}.tar
+      run: docker save lidar_prod:${BRANCH_NAME} -o /var/data/cicd/CICD_github_assets/CICD_docker_images/lidar_prod_${BRANCH_NAME}.tar
 
     - name: Clean dangling docker images
       if: always()  # always do it, even if something failed

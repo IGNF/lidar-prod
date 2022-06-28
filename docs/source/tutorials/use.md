@@ -2,7 +2,7 @@
 
 ## Run within a docker container
 
-Up to date docker images (named `lidar_prod_im`) are created via Github integration actions (see [Developer's guide](../guides/development.md)). 
+Up to date docker images (named `lidar_prod`) are created via Github integration actions (see [Developer's guide](../guides/development.md)). 
 
 To run the app, use
 
@@ -10,7 +10,7 @@ To run the app, use
 docker run \
 -v {local_src_las_dir}:/inputs/ \
 -v {local_output_dir}:/outputs/
-lidar_prod_im \
+lidar_prod \
 python lidar_prod/run.py \
 paths.src_las=/inputs/{src_las_basename}.las
 paths.output_dir=/outputs/
