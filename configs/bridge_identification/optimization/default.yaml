@@ -4,10 +4,10 @@ bridge_identifier: ${bridge_identification.application}
 paths:
   input_las_dir:  "/path/to/folder/"  # contains .las files
   output_dir: "/path/to/folder/"  # will contain bridge vectorization outputs and ultimately best opti trial
+
 # Parameters for rasterization of bridge points (labels or predicted) to a TIF file.
 # TODO: we might want to use larger values in case we keep current method of vectorization
 # However, we might keep them if we try to compute a bounding polygon to vectorized points.
-
 gdal_writer_window_size: 0.25
 gdal_writer_resolution: 0.25
 

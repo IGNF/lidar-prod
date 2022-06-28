@@ -90,20 +90,21 @@ class BridgeIdentificationOptimizer:
         log.info(f"Best_trial thresholds: \n{best_thresholds}")
         # TODO: save thresholds to a pickle ?
         # Perform an evaluation step wit the best thresholds to get results files for inspection.
-        self.bri.thresholds = best_thresholds
-        iou = self.evaluate_all()
-        log.info(f"Maximized vector IoU is {iou}")
+        self.bri.thresholds = thresholds(**best_thresholds.params)
+        best_mean_iou = self.update_all_and_evaluate_mean_iou()
+        log.info(f"Maximized vector IoU is {best_mean_iou}")
+        return best_mean_iou
 
     def _optuna_objective_func(self, trial):
         """Sets decision threshold for the trial and computes resulting vector IoU."""
         self.bri.thresholds = thresholds(
             min_bridge_proba=trial.suggest_float(
-                "min_confidence_confirmation", 0.0, 1.0
+                "min_bridge_proba", 0.0, 1.0
             )
         )
-        return self.evaluate_all()
+        return self.update_all_and_evaluate_mean_iou()
 
-    def evaluate_all(self) -> None:
+    def update_all_and_evaluate_mean_iou(self) -> None:
         """Iterates through las_filepaths to perform bridge identification and evaluate resulting vector IoU."""
         ious = []
         input_las_paths = glob(osp.join(self.paths.input_las_dir, "*.las"))
@@ -117,7 +118,7 @@ class BridgeIdentificationOptimizer:
             )
         for input_las_path in input_las_paths:
             output_las_path = osp.join(
-                self.paths.output_las_dir, osp.basename(input_las_path)
+                self.paths.output_dir, osp.basename(input_las_path)
             )
             iou = self.evaluate_one_iou(input_las_path, output_las_path)
             print(iou)
