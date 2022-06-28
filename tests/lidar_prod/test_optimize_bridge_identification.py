@@ -7,7 +7,7 @@ from lidar_prod.tasks.bridge_identification_optimization import (
 
 # Directory with labeled test bridge data
 BRIDGE_TEST_INPUT_LAS_DIRNAME = "tests/files/bridges/"
-BRIDGE_TEST_OUTPUT_LAS_DIRNAME = "tests/tmp/bridges/opti/"
+BRIDGE_TEST_OUTPUT_LAS_DIRNAME = "tests/tmp/bridge/opti/"
 # name of dim containing perfect bridge probas in all bridge test data
 DIM_BRIDGE_PROBAS = "bridge_accurate"
 
