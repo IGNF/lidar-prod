@@ -5,6 +5,7 @@ las_dimensions:
 
   # Extra dims
   # ATTENTION: If extra dimensions are added, you may want to add them in cleaning.in parameter as well.
+  ai_vegetation_proba: vegetation
   ai_building_proba: building  # user-defined - output by deep learning model
   entropy: entropy # user-defined - output by deep learning model
 
@@ -19,6 +20,7 @@ las_dimensions:
   ai_building_identified: Group
 
 codes:
+  vegetation: 3
   building:
     candidates: [202]  # found by rules-based classification (TerraScan)
     detailed:  # used for detailed output when doing threshold optimization
@@ -58,5 +60,6 @@ cleaning:
     _target_: lidar_prod.tasks.cleaning.Cleaner
     extra_dims:
       - "${data_format.las_dimensions.ai_building_proba}=float"
+      - "${data_format.las_dimensions.ai_vegetation_proba}=float"
       - "${data_format.las_dimensions.entropy}=float"
       - "${data_format.las_dimensions.ai_building_identified}=uint"
