@@ -23,7 +23,7 @@ def main(config: DictConfig):
     if config.get("task") == "optimize":
         return optimize(config)
     else:
-        return apply(config)
+        apply(config)
 
 
 if __name__ == "__main__":

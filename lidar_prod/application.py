@@ -27,7 +27,26 @@ def apply(config: DictConfig):
 
     """
     assert os.path.exists(config.paths.src_las)
-    src_las_path = config.paths.src_las
+
+    # src_las is a unique file
+    if os.path.isfile(config.paths.src_las):
+        src_las_path = config.paths.src_las
+        whole_process(config, src_las_path)
+
+    # src_las is a directory, we process all LAS files in it
+    if os.path.isdir(config.paths.src_las):
+        for (root, _, files) in os.walk(config.paths.src_las):
+            for file in files:
+                _, file_extension = os.path.splitext(file)
+                if file_extension.lower() != ".las":    # only LAS files are processed (the extension might be in uppercase)
+                    continue
+                
+                src_las_path = os.path.join(root,file)
+                whole_process(config, src_las_path)
+
+@commons.eval_time    
+def whole_process(config: DictConfig, src_las_path: str):
+    log.info(f"Processing {src_las_path}")
     target_las_path = osp.join(config.paths.output_dir, osp.basename(src_las_path))
 
     with TemporaryDirectory() as td:
@@ -62,4 +81,3 @@ def apply(config: DictConfig):
         # Remove unnecessary intermediary dimensions
         cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.output)
         cl.run(tmp_las_path, target_las_path)
-    return target_las_path
