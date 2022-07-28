@@ -1,7 +1,8 @@
-import hydra
-from omegaconf import DictConfig
 import sys
 import os.path as osp
+import logging
+import hydra
+from omegaconf import DictConfig
 
 
 @hydra.main(config_path="../configs/", config_name="config.yaml")
@@ -17,12 +18,26 @@ def main(config: DictConfig):
     from lidar_prod.commons.commons import extras
     from lidar_prod.application import apply
     from lidar_prod.optimization import optimize
+    from lidar_prod.tasks.vegetation_identification_optimization import BasicIdentifierOptimizer
+
+    log = logging.getLogger(__name__)
 
     extras(config)
-    print(config.paths.output_dir)
-    if config.get("task") == "optimize":
-        return optimize(config)
+
+    if config.get("task") == "optimize_veg_id":
+        log.info("Starting optimizing vegetation identifier")
+        data_format = config["data_format"]
+        vegetation_identification_optimiser = BasicIdentifierOptimizer(
+            config,  
+            data_format.las_dimensions.ai_vegetation_proba,
+            data_format.las_dimensions.ai_vegetation_unclassified_groups,
+            data_format.codes.vegetation,
+            data_format.las_dimensions.classification
+            )
+        vegetation_identification_optimiser.optimize()
+        # return optimize(config)
     else:
+        log.info("Starting applying the default process")
         apply(config)
 
 

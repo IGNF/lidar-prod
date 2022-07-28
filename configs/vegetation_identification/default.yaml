@@ -3,5 +3,6 @@ _target_: lidar_prod.tasks.vegetation_identification.VegetationIdentifier
 data_format: ${data_format}
 
 # parameters
-vegetation_thresholds: 0.5
-unclassified_thresholds: 0.5
+vegetation_threshold: 0.5
+unclassified_threshold: 0.5
+evaluate_ious: False

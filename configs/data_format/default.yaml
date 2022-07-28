@@ -9,7 +9,7 @@ las_dimensions:
   ai_unclassified_proba: unclassified
   ai_building_proba: building  # user-defined - output by deep learning model
   entropy: entropy # user-defined - output by deep learning model
-  groups: groups
+
 
   # Intermediary channels
   cluster_id: ClusterID  # pdal-defined -> created by clustering operations
@@ -20,6 +20,7 @@ las_dimensions:
 
   # Additionnal output channel
   ai_building_identified: Group
+  ai_vegetation_unclassified_groups: Group
 
 codes:
   vegetation: 3
@@ -68,4 +69,4 @@ cleaning:
       # - "${data_format.las_dimensions.ai_vegetation_proba}=float"
       - "${data_format.las_dimensions.entropy}=float"
       # - "${data_format.las_dimensions.ai_building_identified}=uint"
-      - "${data_format.las_dimensions.groups}=uint"
+      - "${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint"
