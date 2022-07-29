@@ -30,7 +30,7 @@ SUBSET_EXPECTED_METRICS = {
         "group_no_buildings": 0.4,
     },
     "min": {
-        "p_auto": 0.86,
+        "p_auto": 1.0,
         "recall": 1.0,
         "precision": 1.0,
     },
@@ -85,13 +85,12 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
         # Check the output of the evaluate method. Note that it uses the
         # prepared data and the threshold from previous run
         metrics_dict = bvo.evaluate()
+        print(metrics_dict)
         # Assert inclusion
         assert SUBSET_EXPECTED_METRICS["exact"].items() <= metrics_dict.items()
         # Assert <= with a relative tolerance
         for k, v in SUBSET_EXPECTED_METRICS["min"].items():
-            pytest.approx(
-                v, abs=RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS
-            ) <= metrics_dict[k]
+            v <= metrics_dict[k]
         # Update classification dimension and check if the codes are the expected ones.
         bvo.bv.use_final_classification_codes = True
         bvo.update()
@@ -149,9 +148,7 @@ def test_BVOptimization_on_large_file(default_hydra_cfg):
         min_expected_val = LARGE_EXPECTED_METRICS["min"]
         for k in min_expected_val:
             assert (
-                pytest.approx(
-                    min_expected_val[k], rel=RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS
-                )
+                (1 - RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS) * min_expected_val[k]
             ) <= metrics_dict[k]
 
 
