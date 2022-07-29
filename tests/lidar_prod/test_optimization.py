@@ -30,7 +30,7 @@ SUBSET_EXPECTED_METRICS = {
         "group_no_buildings": 0.4,
     },
     "min": {
-        "p_auto": 0.86,
+        "p_auto": 0.80,
         "recall": 1.0,
         "precision": 1.0,
     },
@@ -85,6 +85,7 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
         # Check the output of the evaluate method. Note that it uses the
         # prepared data and the threshold from previous run
         metrics_dict = bvo.evaluate()
+        print(metrics_dict)
         # Assert inclusion
         assert SUBSET_EXPECTED_METRICS["exact"].items() <= metrics_dict.items()
         # Assert <= with a relative tolerance
