@@ -148,9 +148,7 @@ def test_BVOptimization_on_large_file(default_hydra_cfg):
         min_expected_val = LARGE_EXPECTED_METRICS["min"]
         for k in min_expected_val:
             assert (
-                pytest.approx(
-                    min_expected_val[k], rel=RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS
-                )
+                (1 - RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS) * min_expected_val[k]
             ) <= metrics_dict[k]
 
 
