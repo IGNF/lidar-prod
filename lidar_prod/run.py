@@ -16,8 +16,9 @@ def main(config: DictConfig):
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934
     from lidar_prod.commons.commons import extras
-    from lidar_prod.application import apply
+    from lidar_prod.application import apply, apply_veg, apply_cleaning
     from lidar_prod.optimization import optimize
+    from lidar_prod.tasks.vegetation_identification import BasicIdentifier
     from lidar_prod.tasks.vegetation_identification_optimization import BasicIdentifierOptimizer
 
     log = logging.getLogger(__name__)
@@ -36,6 +37,14 @@ def main(config: DictConfig):
             )
         vegetation_identification_optimiser.optimize()
         # return optimize(config)
+    if config.get("task") == "identify_vegetation":
+        log.info("Starting identifying vegetation")
+        apply_veg(config)
+
+    if config.get("task") == "cleaning":
+        log.info("Starting cleaning")
+        apply_cleaning(config)
+
     else:
         log.info("Starting applying the default process")
         apply(config)

@@ -11,8 +11,10 @@ from lidar_prod.tasks.cleaning import Cleaner
 from lidar_prod.commons import commons
 from lidar_prod.tasks.building_validation import BuildingValidator
 from lidar_prod.tasks.building_identification import BuildingIdentifier
-from lidar_prod.tasks.vegetation_identification import VegetationIdentifier
+from lidar_prod.tasks.vegetation_identification import BasicIdentifier
 
+import pdal
+from lidar_prod.tasks.utils import get_points_from_las, set_points_to_las
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +40,6 @@ def apply(config: DictConfig):
     assert os.path.exists(config.paths.src_las)
 
     for src_las_path in get_list_las_path_from_src(config.paths.src_las):
-        # stepper = {cleaner_beginning: hydra.utils.instantiate(config.data_format.cleaning.input)}
         target_las_path = osp.join(config.paths.output_dir, osp.basename(src_las_path))
         stepper = {
             Step.cleaner_beginning : hydra.utils.instantiate(config.data_format.cleaning.input),
@@ -46,6 +47,30 @@ def apply(config: DictConfig):
             Step.cleaner_ending: hydra.utils.instantiate(config.data_format.cleaning.output)
         }
         process_one_file(stepper, src_las_path, target_las_path)
+
+@commons.eval_time
+def apply_veg(config: DictConfig):
+    """
+    Augment rule-based classification of a point cloud with deep learning
+    probabilities and vector building database.
+
+    Args:
+        config (DictConfig): Hydra config passed from run.py
+
+    """
+    assert os.path.exists(config.paths.src_las)
+
+    for src_las_path in get_list_las_path_from_src(config.paths.src_las):
+        target_las_path = osp.join(config.paths.output_dir, osp.basename(src_las_path))
+        process_one_file_no_intermediary_save(config, src_las_path, target_las_path)
+
+@commons.eval_time
+def apply_cleaning(config: DictConfig):
+    assert os.path.exists(config.paths.src_las)
+
+    for src_las_path in get_list_las_path_from_src(config.paths.src_las):
+        target_las_path = osp.join(config.paths.output_dir, osp.basename(src_las_path))
+        process_one_file_just_clean(config, src_las_path, target_las_path)
 
 def get_list_las_path_from_src(src_path: str):
     """get a list of las from a path. 
@@ -65,6 +90,52 @@ def get_list_las_path_from_src(src_path: str):
                     continue
                 src_las_path.append(os.path.join(root,file))
         return src_las_path
+
+@commons.eval_time 
+def process_one_file_no_intermediary_save(config, src_las_path: str, dest_las_path: str = None):
+    log.info(f"Processing {src_las_path}")
+    points = get_points_from_las(src_las_path) 
+
+    cleaner = hydra.utils.instantiate(config.data_format.cleaning.input)
+    points = cleaner.remove_unwanted_dimensions(points)
+
+    data_format = config["data_format"]
+
+    # detect vegetation
+    vegetation_identifier = BasicIdentifier(
+            config["vegetation_identification"]["vegetation_threshold"],
+            data_format.las_dimensions.ai_vegetation_proba,
+            data_format.las_dimensions.ai_vegetation_unclassified_groups,
+            data_format.codes.vegetation,
+            data_format
+            )
+    points = vegetation_identifier.identify(points)
+
+    # detect unclassified
+    unclassified_identifier = BasicIdentifier(
+            config["vegetation_identification"]["unclassified_threshold"],
+            data_format.las_dimensions.ai_unclassified_proba,
+            data_format.las_dimensions.ai_vegetation_unclassified_groups,
+            data_format.codes.unclassified,
+            data_format
+            )
+    points = unclassified_identifier.identify(points)
+
+    cleaner = hydra.utils.instantiate(config.data_format.cleaning.output)
+    points = cleaner.remove_unwanted_dimensions(points)
+    # save points array to the target
+    set_points_to_las(dest_las_path, points)
+
+@commons.eval_time 
+def process_one_file_just_clean(config, src_las_path: str, dest_las_path: str = None):
+    log.info(f"Processing {src_las_path}")
+    points = get_points_from_las(src_las_path) 
+
+    cleaner = hydra.utils.instantiate(config.data_format.cleaning.input)
+    points = cleaner.remove_unwanted_dimensions(points)
+
+    # save points array to the target
+    set_points_to_las(dest_las_path, points)
 
 @commons.eval_time    
 def process_one_file(stepper: dict, src_las_path: str, dest_las_path: str = None):

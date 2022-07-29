@@ -44,7 +44,7 @@ class IoU:
                 )
 
 class BasicIdentifier:
-    def __init__(self, threshold: float, proba_column: str, result_column: str, result_code: int, data_format, evaluate_iou: bool, truth_column: str=None):
+    def __init__(self, threshold: float, proba_column: str, result_column: str, result_code: int, data_format, evaluate_iou: bool=False, truth_column: str=None):
         self.threshold = threshold
         self.proba_column = proba_column
         self.result_column = result_column
@@ -53,34 +53,31 @@ class BasicIdentifier:
         self.evaluate_iou = evaluate_iou
         self.truth_column = truth_column
 
-    def identify(self, src_las_path: str, target_las_path: str):
+    # def identify(self, src_las_path: str, target_las_path: str):
+    def identify(self, points: np.ndarray):
         # read the LAS, get its points list and add a dimension, if needed 
-        pipeline = pdal.Pipeline() | get_pdal_reader(src_las_path)
-        pipeline.execute()
+        # pipeline = pdal.Pipeline() | get_pdal_reader(src_las_path)
+        # pipeline.execute()
+        # points = pipeline.arrays[0]
 
-        points = pipeline.arrays[0]
-        points = rfn.append_fields(points, self.result_column, np.empty(points.shape[0], dtype='uint'))
+        # add the result column if not yet in points
+        if self.result_column not in points.dtype.names:    
+            points = rfn.append_fields(points, self.result_column, np.empty(points.shape[0], dtype='uint')) # adding the result column
 
+        # get the mask listing the points above the threshold
         threshold_mask = points[self.proba_column] >= self.threshold   
         points[self.result_column][threshold_mask] = self.result_code
-
-        # try:
-        #     points = pipeline.arrays[0]
-        #     points[self.result_column] = 0  # if that dimension doesn't exist, will raise a ValueError
-        # except ValueError:
-        #     pipeline |= pdal.Filter.ferry(dimensions=f"=>{self.result_column}") # add the new dimension
-        #     pipeline.execute()
-        #     points = pipeline.arrays[0]        
-        # pass
-
+     
         # save points list to the target
-        pipeline_test = get_pdal_writer(target_las_path).pipeline(points)
-        os.makedirs(os.path.dirname(target_las_path), exist_ok=True)
-        pipeline_test.execute()
+        # pipeline = get_pdal_writer(target_las_path).pipeline(points)
+        # os.makedirs(os.path.dirname(target_las_path), exist_ok=True)
+        # pipeline.execute()
 
-                # calculate ious if necessary
+        # calculate ious if necessary
         if self.evaluate_iou:
             self.iou = self.calculate_iou(points[self.truth_column], self.result_code, threshold_mask)
+
+        return points
 
     def calculate_iou(self, truth_array, value_truth_should_have, evaluated_mask):
         true_positive = np.count_nonzero(

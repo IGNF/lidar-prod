@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 import json
 import math
@@ -97,6 +98,11 @@ def get_pdal_reader(las_path: str) -> pdal.Reader.las:
         override_srs="EPSG:2154",
     )
 
+def get_points_from_las(las_path: str) -> np.ndarray:
+    """ Load an array of points from a las file """
+    pipeline = pdal.Pipeline() | get_pdal_reader(las_path)
+    pipeline.execute()
+    return pipeline.arrays[0]
 
 def get_pdal_writer(target_las_path: str, extra_dims: str = "all") -> pdal.Writer.las:
     """Standard LAS Writer which imposes LAS 1.4 specification and dataformat 8.
@@ -116,6 +122,12 @@ def get_pdal_writer(target_las_path: str, extra_dims: str = "all") -> pdal.Write
         forward="all",
         extra_dims=extra_dims,
     )
+
+def set_points_to_las(las_path: str, points: np.ndarray):
+    """ Save an array of points to a las file """
+    pipeline = get_pdal_writer(las_path).pipeline(points)
+    os.makedirs(os.path.dirname(las_path), exist_ok=True)
+    pipeline.execute()
 
 
 def get_a_las_to_las_pdal_pipeline(
