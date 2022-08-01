@@ -61,8 +61,8 @@ class BasicIdentifier:
         # points = pipeline.arrays[0]
 
         # add the result column if not yet in points
-        if self.result_column not in points.dtype.names:    
-            points = rfn.append_fields(points, self.result_column, np.empty(points.shape[0], dtype='uint')) # adding the result column
+        # if self.result_column not in points.dtype.names:    
+        #     points = rfn.append_fields(points, self.result_column, np.empty(points.shape[0], dtype='uint')) # adding the result column
 
         # get the mask listing the points above the threshold
         threshold_mask = points[self.proba_column] >= self.threshold   

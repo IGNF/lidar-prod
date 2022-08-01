@@ -41,7 +41,7 @@ def main(config: DictConfig):
         log.info("Starting identifying vegetation")
         apply_veg(config)
 
-    if config.get("task") == "cleaning":
+    elif config.get("task") == "cleaning":
         log.info("Starting cleaning")
         apply_cleaning(config)
 

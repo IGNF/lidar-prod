@@ -94,12 +94,15 @@ def get_list_las_path_from_src(src_path: str):
 @commons.eval_time 
 def process_one_file_no_intermediary_save(config, src_las_path: str, dest_las_path: str = None):
     log.info(f"Processing {src_las_path}")
-    points = get_points_from_las(src_las_path) 
-
-    cleaner = hydra.utils.instantiate(config.data_format.cleaning.input)
-    points = cleaner.remove_unwanted_dimensions(points)
-
     data_format = config["data_format"]
+
+    cleaner = hydra.utils.instantiate(data_format.cleaning.input)
+
+    cleaner.add_column(src_las_path, dest_las_path, [data_format.las_dimensions.ai_vegetation_unclassified_groups])
+    points = get_points_from_las(dest_las_path)
+
+    # points = get_points_from_las(src_las_path) 
+    # points = cleaner.remove_unwanted_dimensions(points)
 
     # detect vegetation
     vegetation_identifier = BasicIdentifier(
@@ -121,7 +124,7 @@ def process_one_file_no_intermediary_save(config, src_las_path: str, dest_las_pa
             )
     points = unclassified_identifier.identify(points)
 
-    cleaner = hydra.utils.instantiate(config.data_format.cleaning.output)
+    cleaner = hydra.utils.instantiate(data_format.cleaning.output)
     points = cleaner.remove_unwanted_dimensions(points)
     # save points array to the target
     set_points_to_las(dest_las_path, points)

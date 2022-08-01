@@ -71,5 +71,14 @@ class Cleaner:
                 dimensions_to_keep.remove(dimension)
         return points[dimensions_to_keep]
 
+    def add_column(self, src_las_path: str, target_las_path: str, column_to_add_list: list[str]):
+        pipeline = pdal.Pipeline() | get_pdal_reader(src_las_path)
+        pipeline.execute()
 
-                
+        for column_to_add in column_to_add_list:
+            pipeline |= pdal.Filter.ferry(dimensions=f"=>{column_to_add}")
+        pipeline.execute()
+
+        pipeline |= get_pdal_writer(target_las_path)
+        os.makedirs(os.path.dirname(target_las_path), exist_ok=True)
+        pipeline.execute()
