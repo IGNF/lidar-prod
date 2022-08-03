@@ -25,10 +25,7 @@ class Cleaner:
 
     def get_extra_dims_as_str(self):
         """ 'stringify' the extra_dims list and return it, or an empty list if there is no extra dims"""
-        if self.extra_dims:
-            return_str = self.extra_dims
-            if not isinstance(self.extra_dims, str):
-                return_str = ",".join(self.extra_dims)  
+        return_str = ",".join(self.extra_dims)
         return return_str if return_str else []
 
     def run(self, src_las_path: str, target_las_path: str):
@@ -48,6 +45,7 @@ class Cleaner:
 
     def remove_unwanted_dimensions(self, points: np.ndarray):
         """remove the dimensions we don't want to keep in the points array"""
+        # list of dimension that are, by default, in a las file 
         default_pdal_dimension_list = [
             'X', 'Y', 'Z', 
             'Intensity', 
@@ -64,12 +62,18 @@ class Cleaner:
             'ScanChannel', 
             'ClassFlags'
             ]
+
+        # substract unwanted dimensions from the dimensions from the points array to get the kept dimensions
         dimensions_to_keep = [dimension for dimension in points.dtype.names]
         extra_dim_no_type = [dimension.split('=')[0] for dimension in self.extra_dims] # removing the type of the dimension (int, float, etc.)
         for dimension in reversed(dimensions_to_keep): # reversed because we may remove some dimension, therefore the list may change
             if dimension not in default_pdal_dimension_list + extra_dim_no_type:
                 dimensions_to_keep.remove(dimension)
-        return points[dimensions_to_keep]
+        
+        # return a modified points array only if there are modifications to carry
+        if len(dimensions_to_keep) != len(points.dtype.names):
+            return points[dimensions_to_keep]
+        return points
 
     def add_column(self, src_las_path: str, target_las_path: str, column_to_add_list: list[str]):
         pipeline = pdal.Pipeline() | get_pdal_reader(src_las_path)

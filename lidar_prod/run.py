@@ -1,5 +1,5 @@
 import sys
-import os.path as osp
+import os 
 import logging
 import hydra
 from omegaconf import DictConfig
@@ -16,14 +16,15 @@ def main(config: DictConfig):
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934
     from lidar_prod.commons.commons import extras
-    from lidar_prod.application import apply, apply_veg, apply_cleaning
+    from lidar_prod.application import apply, applying, detect_vegetation_unclassified, just_clean
     from lidar_prod.optimization import optimize
-    from lidar_prod.tasks.vegetation_identification import BasicIdentifier
     from lidar_prod.tasks.vegetation_identification_optimization import BasicIdentifierOptimizer
 
     log = logging.getLogger(__name__)
 
     extras(config)
+
+    assert os.path.exists(config.paths.src_las)
 
     if config.get("task") == "optimize_veg_id":
         log.info("Starting optimizing vegetation identifier")
@@ -38,19 +39,18 @@ def main(config: DictConfig):
         vegetation_identification_optimiser.optimize()
         # return optimize(config)
     if config.get("task") == "identify_vegetation":
-        log.info("Starting identifying vegetation")
-        apply_veg(config)
+        logic = detect_vegetation_unclassified
 
     elif config.get("task") == "cleaning":
-        log.info("Starting cleaning")
-        apply_cleaning(config)
+        logic = just_clean
 
-    else:
-        log.info("Starting applying the default process")
-        apply(config)
+    # else:
+    #     log.info("Starting applying the default process")
+    #     apply(config)
 
+    applying(config, logic)
 
 if __name__ == "__main__":
-    sys.path.append(osp.dirname(osp.dirname(__file__)))
+    sys.path.append(os.path.dirname(os.path.dirname(__file__)))
     # OmegaConf.register_new_resolver("get_method", hydra.utils.get_method)
     main()

@@ -81,7 +81,6 @@ def get_integer_bbox(las_path: str, buffer: Number = 0) -> Dict[str, int]:
         "y_max": math.ceil(bbox["y_max"]),
     }
 
-
 def get_pdal_reader(las_path: str) -> pdal.Reader.las:
     """Standard Reader which imposes Lamber 93 SRS.
 

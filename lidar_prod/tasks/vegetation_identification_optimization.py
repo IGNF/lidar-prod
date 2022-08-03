@@ -54,6 +54,7 @@ class BasicIdentifierOptimizer:
             iou_list.append(basic_identifier.iou)
         return IoU.combine_iou(iou_list).iou    # return the combined IoU of all the .las
 
+
 class VegetationIdentificationOptimizer:
     def __init__(
         self,
