@@ -10,6 +10,7 @@ import pickle
 
 import numpy as np
 import numpy.lib.recfunctions as rfn
+import laspy
 
 import pdal
 
@@ -54,20 +55,24 @@ class BasicIdentifier:
         self.truth_column = truth_column
 
     # def identify(self, src_las_path: str, target_las_path: str):
-    def identify(self, points: np.ndarray):
+    # def identify(self, points: np.ndarray):
+    def identify(self, las_data: laspy.lasdata.LasData):
         # read the LAS, get its points list and add a dimension, if needed 
         # pipeline = pdal.Pipeline() | get_pdal_reader(src_las_path)
         # pipeline.execute()
         # points = pipeline.arrays[0]
 
         # add the result column if not yet in points
-        if self.result_column not in points.dtype.names:    
-            points = rfn.append_fields(points, self.result_column, np.empty(points.shape[0], dtype='uint')) # adding the result column
+        # if self.result_column not in points.dtype.names:    
+        #     points = rfn.append_fields(points, self.result_column, np.empty(points.shape[0], dtype='uint'))
+
+        if self.result_column not in [dim for dim in las_data.point_format.extra_dimension_names]:
+            las_data.add_extra_dim(laspy.ExtraBytesParams(name=self.result_column, type="uint32"))
 
         # get the mask listing the points above the threshold
-        threshold_mask = points[self.proba_column] >= self.threshold   
-        points[self.result_column][threshold_mask] = self.result_code
-     
+        threshold_mask = las_data.points[self.proba_column] >= self.threshold   
+        las_data.points[self.result_column][threshold_mask] = self.result_code
+    
         # save points list to the target
         # pipeline = get_pdal_writer(target_las_path).pipeline(points)
         # os.makedirs(os.path.dirname(target_las_path), exist_ok=True)
@@ -75,9 +80,9 @@ class BasicIdentifier:
 
         # calculate ious if necessary
         if self.evaluate_iou:
-            self.iou = self.calculate_iou(points[self.truth_column], self.result_code, threshold_mask)
+            self.iou = self.calculate_iou(las_data.points[self.truth_column], self.result_code, threshold_mask)
 
-        return points
+        return las_data.points
 
     def calculate_iou(self, truth_array, value_truth_should_have, evaluated_mask):
         true_positive = np.count_nonzero(

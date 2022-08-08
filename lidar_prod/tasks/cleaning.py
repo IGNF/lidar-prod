@@ -4,6 +4,8 @@ import os.path as osp
 from typing import Iterable, Optional, Union
 import pdal
 import numpy as np
+import numpy.lib.recfunctions as rfn
+import laspy
 
 from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer
 
@@ -69,20 +71,25 @@ class Cleaner:
         for dimension in reversed(dimensions_to_keep): # reversed because we may remove some dimension, therefore the list may change
             if dimension not in default_pdal_dimension_list + extra_dim_no_type:
                 dimensions_to_keep.remove(dimension)
-        
+
         # return a modified points array only if there are modifications to carry
         if len(dimensions_to_keep) != len(points.dtype.names):
             return points[dimensions_to_keep]
         return points
 
-    def add_column(self, src_las_path: str, target_las_path: str, column_to_add_list: list[str]):
-        pipeline = pdal.Pipeline() | get_pdal_reader(src_las_path)
-        pipeline.execute()
-
-        for column_to_add in column_to_add_list:
-            pipeline |= pdal.Filter.ferry(dimensions=f"=>{column_to_add}")
-        pipeline.execute()
-
-        pipeline |= get_pdal_writer(target_las_path)
-        os.makedirs(os.path.dirname(target_las_path), exist_ok=True)
-        pipeline.execute()
+    def remove_dimensions(self, las_data: laspy.lasdata.LasData):
+        """remove existing dimensions we don't want"""
+        extra_dim_no_type = [dimension.split('=')[0] for dimension in self.extra_dims] # list of kept dimensions, without the type
+        dimension_to_remove = []
+        for dimension in las_data.point_format.extra_dimension_names:
+            if dimension not in extra_dim_no_type:
+                dimension_to_remove.append(dimension)
+        
+        if not dimension_to_remove:
+            return
+        
+        if len(dimension_to_remove) == 1:
+            las_data.remove_extra_dim(dimension_to_remove[0])
+            return
+        
+        las_data.remove_extra_dims(dimension_to_remove)

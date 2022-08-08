@@ -34,22 +34,37 @@ def main(config: DictConfig):
             data_format.las_dimensions.ai_vegetation_proba,
             data_format.las_dimensions.ai_vegetation_unclassified_groups,
             data_format.codes.vegetation,
-            data_format.las_dimensions.classification
+            data_format.las_dimensions.classification,
+            25
             )
         vegetation_identification_optimiser.optimize()
-        # return optimize(config)
-    if config.get("task") == "identify_vegetation":
+
+    elif config.get("task") == "optimize_unc_id":
+        log.info("Starting optimizing unclassifier identifier")
+        data_format = config["data_format"]
+        vegetation_identification_optimiser = BasicIdentifierOptimizer(
+            config,  
+            data_format.las_dimensions.ai_unclassified_proba,
+            data_format.las_dimensions.ai_vegetation_unclassified_groups,
+            data_format.codes.unclassified,
+            data_format.las_dimensions.classification,
+            50
+            )
+        vegetation_identification_optimiser.optimize()
+    
+    elif config.get("task") == "identify_vegetation":
         logic = detect_vegetation_unclassified
+        applying(config, logic)
 
     elif config.get("task") == "cleaning":
         logic = just_clean
+        applying(config, logic)
 
-    # else:
-    #     log.info("Starting applying the default process")
-    #     apply(config)
+    else:
+        log.info("Starting applying the default process")
+        apply(config)
 
-    applying(config, logic)
-
+    
 if __name__ == "__main__":
     sys.path.append(os.path.dirname(os.path.dirname(__file__)))
     # OmegaConf.register_new_resolver("get_method", hydra.utils.get_method)
