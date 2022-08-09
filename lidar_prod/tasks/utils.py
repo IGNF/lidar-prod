@@ -7,7 +7,6 @@ import subprocess
 import tempfile
 from typing import Any, Dict, Iterable
 import numpy as np
-import numpy.lib.recfunctions as rfn
 import pdal
 import laspy
 
@@ -83,6 +82,7 @@ def get_integer_bbox(las_path: str, buffer: Number = 0) -> Dict[str, int]:
         "y_max": math.ceil(bbox["y_max"]),
     }
 
+
 def get_pdal_reader(las_path: str) -> pdal.Reader.las:
     """Standard Reader which imposes Lamber 93 SRS.
 
@@ -99,6 +99,7 @@ def get_pdal_reader(las_path: str) -> pdal.Reader.las:
         override_srs="EPSG:2154",
     )
 
+
 def get_points_from_las(las_path: str) -> np.ndarray:
     """ Load an array of points from a las file """
     pipeline = pdal.Pipeline() | get_pdal_reader(las_path)
@@ -106,9 +107,11 @@ def get_points_from_las(las_path: str) -> np.ndarray:
     print("dtype", pipeline.arrays[0].dtype)
     return pipeline.arrays[0]
 
+
 def get_las_data_from_las(las_path: str) -> laspy.lasdata.LasData:
     """ Load a point record from a las file """
     return laspy.read(las_path)
+
 
 def get_pdal_writer(target_las_path: str, extra_dims: str = "all") -> pdal.Writer.las:
     """Standard LAS Writer which imposes LAS 1.4 specification and dataformat 8.
@@ -129,14 +132,17 @@ def get_pdal_writer(target_las_path: str, extra_dims: str = "all") -> pdal.Write
         extra_dims=extra_dims,
     )
 
+
 def set_points_to_las(las_path: str, points: np.ndarray):
     """ Save an array of points to a las file """
     pipeline = get_pdal_writer(las_path).pipeline(points)
     os.makedirs(os.path.dirname(las_path), exist_ok=True)
     pipeline.execute()
-    
+
+
 def save_las_data_to_las(las_path: str, las: laspy.lasdata.LasData):
     las.write(las_path)
+
 
 def get_a_las_to_las_pdal_pipeline(
     src_las_path: str, target_las_path: str, ops: Iterable[Any]

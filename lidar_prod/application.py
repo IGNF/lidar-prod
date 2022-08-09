@@ -1,7 +1,6 @@
 import logging
 import os
 from typing import Callable
-from enum import Enum
 from tempfile import TemporaryDirectory
 import hydra
 from omegaconf import DictConfig
@@ -11,10 +10,9 @@ from lidar_prod.tasks.cleaning import Cleaner
 from lidar_prod.commons import commons
 from lidar_prod.tasks.building_validation import BuildingValidator
 from lidar_prod.tasks.building_identification import BuildingIdentifier
-from lidar_prod.tasks.vegetation_identification import BasicIdentifier
+from lidar_prod.tasks.basic_identification import BasicIdentifier
 
-import pdal
-from lidar_prod.tasks.utils import get_points_from_las, set_points_to_las, get_pdal_reader, get_a_las_to_las_pdal_pipeline, get_pdal_writer, get_las_data_from_las, save_las_data_to_las
+from lidar_prod.tasks.utils import get_las_data_from_las, save_las_data_to_las
 
 log = logging.getLogger(__name__)
 
@@ -29,9 +27,11 @@ def apply(config: DictConfig):
         config (DictConfig): Hydra config passed from run.py
 
     """
+    processed_file_list = []
     for src_las_path in get_list_las_path_from_src(config.paths.src_las):
         target_las_path = os.path.join(config.paths.output_dir, os.path.basename(src_las_path))
-        process_one_file(config, src_las_path, target_las_path)
+        processed_file_list.append(process_one_file(config, src_las_path, target_las_path))
+    return processed_file_list
 
 
 @commons.eval_time
@@ -42,7 +42,7 @@ def applying(config: DictConfig, logic: Callable):
 
 
 def get_list_las_path_from_src(src_path: str):
-    """get a list of las from a path. 
+    """get a list of las from a path.
     If the path is a single file, that file will be the only one in the returned list
     if the path is a directory, all the .las will be in the returned list"""
     # src_path is a unique file
@@ -64,27 +64,9 @@ def get_list_las_path_from_src(src_path: str):
 @commons.eval_time
 def detect_vegetation_unclassified(config, src_las_path: str, dest_las_path: str = None):
 
-    # pipeline = pdal.Pipeline() | get_pdal_reader(src_las_path)
-    # pipeline.execute()
-
     log.info(f"Detecting on {src_las_path}")
     data_format = config["data_format"]
-
-
-    # points = get_points_from_las(src_las_path)
     las_data = get_las_data_from_las(src_las_path)
-
-    print("extra dimension :", [dim for dim in las_data.point_format.extra_dimension_names])
-    print("standard dimension :", [dim for dim in las_data.point_format.standard_dimension_names])
-    points = las_data.points
-
-    cleaner = hydra.utils.instantiate(data_format.cleaning.input)
-    # points = cleaner.remove_unwanted_dimensions(points)
-    # cleaner.remove_dimensions(las_data)
-
-    # cleaner.add_column(src_las_path, dest_las_path, [data_format.las_dimensions.ai_vegetation_unclassified_groups])
-    # points = get_points_from_las(src_las_path)
-
 
     # detect vegetation
     vegetation_identifier = BasicIdentifier(
@@ -94,7 +76,7 @@ def detect_vegetation_unclassified(config, src_las_path: str, dest_las_path: str
         data_format.codes.vegetation,
         data_format
     )
-    points = vegetation_identifier.identify(las_data)
+    vegetation_identifier.identify(las_data)
 
     # detect unclassified
     unclassified_identifier = BasicIdentifier(
@@ -104,35 +86,26 @@ def detect_vegetation_unclassified(config, src_las_path: str, dest_las_path: str
         data_format.codes.unclassified,
         data_format
     )
-    points = unclassified_identifier.identify(las_data)
+    unclassified_identifier.identify(las_data)
 
     # keeping only the wanted dimensions for the result las
     cleaner = hydra.utils.instantiate(data_format.cleaning.output)
-    # points = cleaner.remove_unwanted_dimensions(points)
     cleaner.remove_dimensions(las_data)
-
-    # save points array to the target
-    # set_points_to_las(dest_las_path, las_data)
-
     save_las_data_to_las(dest_las_path, las_data)
-
-    # get_a_las_to_las_pdal_pipeline(dest_las_path, dest_las_path, [])
-    # pipeline = get_pdal_writer(dest_las_path).pipeline(points)
-    # os.makedirs(os.path.dirname(dest_las_path), exist_ok=True)
-    # pipeline.execute()
 
 
 @commons.eval_time
 def just_clean(config, src_las_path: str, dest_las_path: str = None):
     log.info(f"Cleaning {src_las_path}")
-    points = get_points_from_las(src_las_path)
+    data_format = config["data_format"]
+    las_data = get_las_data_from_las(src_las_path)
 
     # remove unwanted dimensions
-    cleaner = hydra.utils.instantiate(config.data_format.cleaning.input)
-    points = cleaner.remove_unwanted_dimensions(points)
+    cleaner = hydra.utils.instantiate(data_format.cleaning.input)
+    cleaner.remove_dimensions(las_data)
 
     # save points array to the target
-    set_points_to_las(dest_las_path, points)
+    save_las_data_to_las(dest_las_path, las_data)
 
 
 @commons.eval_time
@@ -168,3 +141,5 @@ def process_one_file(config: DictConfig, src_las_path: str, dest_las_path: str =
         # Remove unnecessary intermediary dimensions
         cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.output)
         cl.run(tmp_las_path, dest_las_path)
+
+    return dest_las_path

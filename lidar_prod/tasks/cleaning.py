@@ -4,7 +4,6 @@ import os.path as osp
 from typing import Iterable, Optional, Union
 import pdal
 import numpy as np
-import numpy.lib.recfunctions as rfn
 import laspy
 
 from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer
@@ -23,7 +22,7 @@ class Cleaner:
             If a string, used directly; if an iterable, dimensions are joined together.
 
         """
-        self.extra_dims = [dimension for dimension in extra_dims] # turn a listconfig into a 'normal' list
+        self.extra_dims = [dimension for dimension in extra_dims]  # turn a listconfig into a 'normal' list
 
     def get_extra_dims_as_str(self):
         """ 'stringify' the extra_dims list and return it, or an empty list if there is no extra dims"""
@@ -47,28 +46,28 @@ class Cleaner:
 
     def remove_unwanted_dimensions(self, points: np.ndarray):
         """remove the dimensions we don't want to keep in the points array"""
-        # list of dimension that are, by default, in a las file 
+        # list of dimension that are, by default, in a las file
         default_pdal_dimension_list = [
-            'X', 'Y', 'Z', 
-            'Intensity', 
-            'ReturnNumber', 
-            'NumberOfReturns', 
-            'ScanDirectionFlag', 
-            'EdgeOfFlightLine', 
-            'Classification', 
-            'ScanAngleRank', 
-            'UserData', 
-            'PointSourceId', 
-            'GpsTime', 
-            'Red', 'Green', 'Blue', 'Infrared', 
-            'ScanChannel', 
+            'X', 'Y', 'Z',
+            'Intensity',
+            'ReturnNumber',
+            'NumberOfReturns',
+            'ScanDirectionFlag',
+            'EdgeOfFlightLine',
+            'Classification',
+            'ScanAngleRank',
+            'UserData',
+            'PointSourceId',
+            'GpsTime',
+            'Red', 'Green', 'Blue', 'Infrared',
+            'ScanChannel',
             'ClassFlags'
             ]
 
         # substract unwanted dimensions from the dimensions from the points array to get the kept dimensions
         dimensions_to_keep = [dimension for dimension in points.dtype.names]
-        extra_dim_no_type = [dimension.split('=')[0] for dimension in self.extra_dims] # removing the type of the dimension (int, float, etc.)
-        for dimension in reversed(dimensions_to_keep): # reversed because we may remove some dimension, therefore the list may change
+        extra_dim_no_type = [dimension.split('=')[0] for dimension in self.extra_dims]  # removing dimension type (int, float, etc.)
+        for dimension in reversed(dimensions_to_keep):  # reversed because we may remove some dimension, therefore the list may change
             if dimension not in default_pdal_dimension_list + extra_dim_no_type:
                 dimensions_to_keep.remove(dimension)
 
@@ -79,17 +78,17 @@ class Cleaner:
 
     def remove_dimensions(self, las_data: laspy.lasdata.LasData):
         """remove existing dimensions we don't want"""
-        extra_dim_no_type = [dimension.split('=')[0] for dimension in self.extra_dims] # list of kept dimensions, without the type
+        extra_dim_no_type = [dimension.split('=')[0] for dimension in self.extra_dims]  # removing dimension type (int, float, etc.)
         dimension_to_remove = []
         for dimension in las_data.point_format.extra_dimension_names:
             if dimension not in extra_dim_no_type:
                 dimension_to_remove.append(dimension)
-        
+
         if not dimension_to_remove:
             return
-        
+
         if len(dimension_to_remove) == 1:
             las_data.remove_extra_dim(dimension_to_remove[0])
             return
-        
+
         las_data.remove_extra_dims(dimension_to_remove)

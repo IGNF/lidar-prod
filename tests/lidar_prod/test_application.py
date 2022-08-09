@@ -51,10 +51,10 @@ def test_application_data_invariance_and_data_format(default_hydra_cfg, las_muta
         default_hydra_cfg.paths.src_las = mutated_copy
         if not query_db_Uni:    # we don't request db_uni, we use a shapefile instead
             default_hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
-        updated_las_path: str = apply(default_hydra_cfg)
+        updated_las_path_list: str = apply(default_hydra_cfg)
         # Check output
-        check_las_invariance(mutated_copy, updated_las_path)
-        check_format_of_application_output_las(updated_las_path, expected_codes)
+        check_las_invariance(mutated_copy, updated_las_path_list[0])
+        check_format_of_application_output_las(updated_las_path_list[0], expected_codes)
 
 
 def check_format_of_application_output_las(output_las_path: str, expected_codes: dict):
