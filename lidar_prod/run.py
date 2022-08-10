@@ -34,7 +34,7 @@ def main(config: DictConfig):
             data_format.las_dimensions.ai_vegetation_unclassified_groups,
             data_format.codes.vegetation,
             data_format.las_dimensions.classification,
-            50
+            100
             )
         vegetation_identification_optimiser.optimize()
 
@@ -47,7 +47,7 @@ def main(config: DictConfig):
             data_format.las_dimensions.ai_vegetation_unclassified_groups,
             data_format.codes.unclassified,
             data_format.las_dimensions.classification,
-            50
+            100
             )
         vegetation_identification_optimiser.optimize()
 

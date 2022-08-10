@@ -30,10 +30,36 @@ SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
         ([pdal.Filter.assign(value="Classification = 202")], False),  # only candidate buildings
     ],  # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
 )
-def test_application_data_invariance_and_data_format(default_hydra_cfg, las_mutation, query_db_Uni):
+# def test_application_data_invariance_and_data_format(default_hydra_cfg, las_mutation, query_db_Uni):
+#     # Expected classification codes after application run are either default=0, unclassified=1, or
+#     # one of the decision codes.
+#     _fc = default_hydra_cfg.data_format.codes.building.final
+#     expected_codes = {
+#         1,
+#         2,
+#         _fc.building,
+#         _fc.not_building,
+#         _fc.unsure,
+#     }
+#     # Run application on the data subset
+#     with tempfile.TemporaryDirectory() as default_hydra_cfg.paths.output_dir:
+#         # Copy the data and apply the "mutation"
+#         mutated_copy: str = tempfile.NamedTemporaryFile().name
+#         get_a_las_to_las_pdal_pipeline(
+#             LAS_SUBSET_FILE, mutated_copy, las_mutation
+#         ).execute()
+#         default_hydra_cfg.paths.src_las = mutated_copy
+#         if not query_db_Uni:    # we don't request db_uni, we use a shapefile instead
+#             default_hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
+#         updated_las_path_list: str = apply(default_hydra_cfg)
+#         # Check output
+#         check_las_invariance(mutated_copy, updated_las_path_list[0])
+#         check_format_of_application_output_las(updated_las_path_list[0], expected_codes)
+
+def test_application_data_invariance_and_data_format(legacy_hydra_cfg, las_mutation, query_db_Uni):
     # Expected classification codes after application run are either default=0, unclassified=1, or
     # one of the decision codes.
-    _fc = default_hydra_cfg.data_format.codes.building.final
+    _fc = legacy_hydra_cfg.data_format.codes.building.final
     expected_codes = {
         1,
         2,
@@ -42,16 +68,16 @@ def test_application_data_invariance_and_data_format(default_hydra_cfg, las_muta
         _fc.unsure,
     }
     # Run application on the data subset
-    with tempfile.TemporaryDirectory() as default_hydra_cfg.paths.output_dir:
+    with tempfile.TemporaryDirectory() as legacy_hydra_cfg.paths.output_dir:
         # Copy the data and apply the "mutation"
         mutated_copy: str = tempfile.NamedTemporaryFile().name
         get_a_las_to_las_pdal_pipeline(
             LAS_SUBSET_FILE, mutated_copy, las_mutation
         ).execute()
-        default_hydra_cfg.paths.src_las = mutated_copy
+        legacy_hydra_cfg.paths.src_las = mutated_copy
         if not query_db_Uni:    # we don't request db_uni, we use a shapefile instead
-            default_hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
-        updated_las_path_list: str = apply(default_hydra_cfg)
+            legacy_hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
+        updated_las_path_list: str = apply(legacy_hydra_cfg)
         # Check output
         check_las_invariance(mutated_copy, updated_las_path_list[0])
         check_format_of_application_output_las(updated_las_path_list[0], expected_codes)

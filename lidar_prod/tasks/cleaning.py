@@ -22,7 +22,8 @@ class Cleaner:
             If a string, used directly; if an iterable, dimensions are joined together.
 
         """
-        self.extra_dims = [dimension for dimension in extra_dims]  # turn a listconfig into a 'normal' list
+        # turn a listconfig into a 'normal' list
+        self.extra_dims = [extra_dims] if isinstance(extra_dims, str) else [dimension for dimension in extra_dims]  
 
     def get_extra_dims_as_str(self):
         """ 'stringify' the extra_dims list and return it, or an empty list if there is no extra dims"""
@@ -36,7 +37,6 @@ class Cleaner:
             src_las_path (str): input LAS path
             target_las_path (str): output LAS path, with specified extra dims.
         """
-
         pipeline = pdal.Pipeline()
         pipeline |= get_pdal_reader(src_las_path)
         pipeline |= get_pdal_writer(target_las_path, extra_dims=self.get_extra_dims_as_str())
@@ -62,7 +62,7 @@ class Cleaner:
             'Red', 'Green', 'Blue', 'Infrared',
             'ScanChannel',
             'ClassFlags'
-            ]
+        ]
 
         # substract unwanted dimensions from the dimensions from the points array to get the kept dimensions
         dimensions_to_keep = [dimension for dimension in points.dtype.names]
