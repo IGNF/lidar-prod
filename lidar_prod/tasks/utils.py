@@ -100,16 +100,15 @@ def get_pdal_reader(las_path: str) -> pdal.Reader.las:
     )
 
 
-def get_points_from_las(las_path: str) -> np.ndarray:
-    """ Load an array of points from a las file """
-    pipeline = pdal.Pipeline() | get_pdal_reader(las_path)
-    pipeline.execute()
-    print("dtype", pipeline.arrays[0].dtype)
-    return pipeline.arrays[0]
+# def get_points_from_las(las_path: str) -> np.ndarray:
+#     """ Load an array of points from a las file """
+#     pipeline = pdal.Pipeline() | get_pdal_reader(las_path)
+#     pipeline.execute()
+#     return pipeline.arrays[0]
 
 
 def get_las_data_from_las(las_path: str) -> laspy.lasdata.LasData:
-    """ Load a point record from a las file """
+    """ Load las data from a las file """
     return laspy.read(las_path)
 
 
@@ -133,15 +132,16 @@ def get_pdal_writer(target_las_path: str, extra_dims: str = "all") -> pdal.Write
     )
 
 
-def set_points_to_las(las_path: str, points: np.ndarray):
-    """ Save an array of points to a las file """
-    pipeline = get_pdal_writer(las_path).pipeline(points)
-    os.makedirs(os.path.dirname(las_path), exist_ok=True)
-    pipeline.execute()
+# def set_points_to_las(las_path: str, points: np.ndarray):
+#     """ Save an array of points to a las file """
+#     pipeline = get_pdal_writer(las_path).pipeline(points)
+#     os.makedirs(os.path.dirname(las_path), exist_ok=True)
+#     pipeline.execute()
 
 
-def save_las_data_to_las(las_path: str, las: laspy.lasdata.LasData):
-    las.write(las_path)
+def save_las_data_to_las(las_path: str, las_data: laspy.lasdata.LasData):
+    """ save las data to a las file"""
+    las_data.write(las_path)
 
 
 def get_a_las_to_las_pdal_pipeline(

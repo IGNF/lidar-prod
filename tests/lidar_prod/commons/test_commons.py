@@ -10,15 +10,15 @@ from lidar_prod.commons.commons import eval_time, extras, ignore_warnings, print
 
 
 @pytest.mark.xfail
-def test_extras(default_hydra_cfg):
+def test_extras(legacy_hydra_cfg):
     # Will fail since hydra default config cannot be resolved
     # This is done to ensure coverage
-    default_hydra_cfg.ignore_warnings = False
-    default_hydra_cfg.print_config = False
-    extras(default_hydra_cfg)
-    default_hydra_cfg.ignore_warnings = True
-    default_hydra_cfg.print_config = True
-    extras(default_hydra_cfg)
+    legacy_hydra_cfg.ignore_warnings = False
+    legacy_hydra_cfg.print_config = False
+    extras(legacy_hydra_cfg)
+    legacy_hydra_cfg.ignore_warnings = True
+    legacy_hydra_cfg.print_config = True
+    extras(legacy_hydra_cfg)
 
 
 # See https://docs.python.org/3/library/warnings.html#testing-warnings
@@ -53,11 +53,11 @@ def test_eval_time(caplog):
         assert caplog.records[-1].message.endswith(f"{d}s")
 
 
-def test_file_existence(default_hydra_cfg):
+def test_file_existence(legacy_hydra_cfg):
     with tempfile.TemporaryDirectory() as td:
         cfg_print_path = os.path.join(td, "config_tree.txt")
         print_config(
-            default_hydra_cfg,
+            legacy_hydra_cfg,
             resolve=False,
             cfg_print_path=cfg_print_path,
         )

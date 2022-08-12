@@ -1,6 +1,7 @@
 import os.path as osp
 import tempfile
 import pytest
+import laspy
 
 from lidar_prod.tasks.cleaning import Cleaner
 from lidar_prod.tasks.utils import pdal_read_las_array
@@ -57,3 +58,27 @@ def test_cleaning_format(extra_dims):
         clean_las_path = osp.join(td, "float_extra_dim.las")
         cl.run(SRC_LAS_SUBSET_PATH, clean_las_path)
         check_las_format_versions_and_srs(clean_las_path)
+
+
+@pytest.mark.parametrize(
+    "extra_dims, expected",
+    [("", []),
+     ("entropy=float", "entropy=float"),
+     (["entropy=float", "building=float"], "entropy=float,building=float")])
+def test_cleaning_get_extra_dims_as_str(extra_dims, expected):
+    cleaner = Cleaner(extra_dims=extra_dims)
+    assert cleaner.get_extra_dims_as_str() == expected
+
+    # def remove_dimensions(self, las_data: laspy.lasdata.LasData)
+
+
+@pytest.mark.parametrize(
+    "extra_dims, expected", 
+    [("all", ['classification', 'entropy', 'vegetation', 'unclassified']),
+    ("", []),
+    (['classification', 'entropy'], ['classification', 'entropy'])
+    ])
+def test_cleaning_remove_dimensions(las_data: laspy.lasdata.LasData, extra_dims, expected):
+    cleaner = Cleaner(extra_dims=extra_dims)
+    cleaner.remove_dimensions(las_data)
+    assert [dim for dim in las_data.point_format.extra_dimension_names] == expected

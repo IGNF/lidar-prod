@@ -62,7 +62,7 @@ def get_list_las_path_from_src(src_path: str):
 
 
 @commons.eval_time
-def detect_vegetation_unclassified(config, src_las_path: str, dest_las_path: str = None):
+def detect_vegetation_unclassified(config, src_las_path: str, dest_las_path: str):
 
     log.info(f"Detecting on {src_las_path}")
     data_format = config["data_format"]
@@ -91,11 +91,12 @@ def detect_vegetation_unclassified(config, src_las_path: str, dest_las_path: str
     # keeping only the wanted dimensions for the result las
     cleaner = hydra.utils.instantiate(data_format.cleaning.output)
     cleaner.remove_dimensions(las_data)
+
     save_las_data_to_las(dest_las_path, las_data)
 
 
 @commons.eval_time
-def just_clean(config, src_las_path: str, dest_las_path: str = None):
+def just_clean(config, src_las_path: str, dest_las_path: str):
     log.info(f"Cleaning {src_las_path}")
     data_format = config["data_format"]
     las_data = get_las_data_from_las(src_las_path)

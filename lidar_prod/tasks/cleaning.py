@@ -44,51 +44,27 @@ class Cleaner:
         os.makedirs(osp.dirname(target_las_path), exist_ok=True)
         log.info(f"Saved to {target_las_path}")
 
-    def remove_unwanted_dimensions(self, points: np.ndarray):
-        """remove the dimensions we don't want to keep in the points array"""
-        # list of dimension that are, by default, in a las file
-        default_pdal_dimension_list = [
-            'X', 'Y', 'Z',
-            'Intensity',
-            'ReturnNumber',
-            'NumberOfReturns',
-            'ScanDirectionFlag',
-            'EdgeOfFlightLine',
-            'Classification',
-            'ScanAngleRank',
-            'UserData',
-            'PointSourceId',
-            'GpsTime',
-            'Red', 'Green', 'Blue', 'Infrared',
-            'ScanChannel',
-            'ClassFlags'
-        ]
-
-        # substract unwanted dimensions from the dimensions from the points array to get the kept dimensions
-        dimensions_to_keep = [dimension for dimension in points.dtype.names]
-        extra_dim_no_type = [dimension.split('=')[0] for dimension in self.extra_dims]  # removing dimension type (int, float, etc.)
-        for dimension in reversed(dimensions_to_keep):  # reversed because we may remove some dimension, therefore the list may change
-            if dimension not in default_pdal_dimension_list + extra_dim_no_type:
-                dimensions_to_keep.remove(dimension)
-
-        # return a modified points array only if there are modifications to carry
-        if len(dimensions_to_keep) != len(points.dtype.names):
-            return points[dimensions_to_keep]
-        return points
-
     def remove_dimensions(self, las_data: laspy.lasdata.LasData):
-        """remove existing dimensions we don't want"""
+        """remove dimension from (laspy) data"""
+        # if we want to keep all dimension, we do nothing
+        if self.extra_dims == ['all']:
+            return 
+        
+        # selecting dimensions to remove
         extra_dim_no_type = [dimension.split('=')[0] for dimension in self.extra_dims]  # removing dimension type (int, float, etc.)
         dimension_to_remove = []
         for dimension in las_data.point_format.extra_dimension_names:
             if dimension not in extra_dim_no_type:
                 dimension_to_remove.append(dimension)
 
+        # case 0 dimension to remove
         if not dimension_to_remove:
             return
 
+        # case 1 dimension to remove
         if len(dimension_to_remove) == 1:
             las_data.remove_extra_dim(dimension_to_remove[0])
             return
 
+        # case 2+ dimensions to remove
         las_data.remove_extra_dims(dimension_to_remove)

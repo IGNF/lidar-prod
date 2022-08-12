@@ -1,0 +1,72 @@
+# Those names connect the logics between successive tasks
+las_dimensions:
+  # input
+  classification: classification  # las format
+
+  # Extra dims
+  # ATTENTION: If extra dimensions are added, you may want to add them in cleaning.in parameter as well.
+  ai_vegetation_proba: vegetation
+  ai_unclassified_proba: unclassified
+  ai_building_proba: building  # user-defined - output by deep learning model
+  entropy: entropy # user-defined - output by deep learning model
+
+
+  # Intermediary channels
+  cluster_id: ClusterID  # pdal-defined -> created by clustering operations
+  uni_db_overlay: BDTopoOverlay  # user-defined -> a 0/1 flag for presence of a BDUni vector
+  candidate_buildings_flag: F_CandidateB # -> a 0/1 flag identifying candidate buildings found by rules-based classification  
+  ClusterID_candidate_building: CID_CandidateB  # -> Cluster index from BuildingValidator, 0 if no cluster, 1-n otherwise
+  ClusterID_isolated_plus_confirmed: CID_IsolatedOrConfirmed  # -> Cluster index from BuildingCompletor, 0 if no cluster, 1-n otherwise
+
+  # Additionnal output channel
+  ai_building_identified: Group
+  ai_vegetation_unclassified_groups: Group
+
+codes:
+  vegetation: 3
+  unclassified: 1
+  building:
+    candidates: [202]  # found by rules-based classification (TerraScan)
+    detailed:  # used for detailed output when doing threshold optimization
+      unsure_by_entropy: 200 # unsure (based on entropy)
+      unclustered: 202  # refuted
+      ia_refuted: 110  # refuted
+      ia_refuted_but_under_db_uni: 111  # unsure
+      both_unsure: 112  # unsure (otherwise)
+      ia_confirmed_only: 113  # confirmed
+      db_overlayed_only: 114  # confirmed
+      both_confirmed: 115  # confirmed
+    final:  # used at the end of the building process
+      unsure: 214  # unsure
+      not_building: 208  # refuted
+      building: 6  # confirmed
+    detailed_to_final:
+      - ["${data_format.codes.building.detailed.unclustered}","${data_format.codes.building.final.not_building}"]
+      - ["${data_format.codes.building.detailed.ia_refuted}","${data_format.codes.building.final.not_building}"]
+      - ["${data_format.codes.building.detailed.ia_refuted_but_under_db_uni}","${data_format.codes.building.final.unsure}"]
+      - ["${data_format.codes.building.detailed.both_unsure}","${data_format.codes.building.final.unsure}"]
+      - ["${data_format.codes.building.detailed.unsure_by_entropy}","${data_format.codes.building.final.unsure}"]
+      - ["${data_format.codes.building.detailed.ia_confirmed_only}","${data_format.codes.building.final.building}"]
+      - ["${data_format.codes.building.detailed.db_overlayed_only}","${data_format.codes.building.final.building}"]
+      - ["${data_format.codes.building.detailed.both_confirmed}","${data_format.codes.building.final.building}"]
+
+
+cleaning:
+    # Extra dims that are kept when application starts. Others are removed to lighten the LAS.
+  input:
+    _target_: lidar_prod.tasks.cleaning.Cleaner
+    extra_dims:
+      # - "${data_format.las_dimensions.ai_building_proba}=float"
+      - "${data_format.las_dimensions.entropy}=float"
+      - "${data_format.las_dimensions.ai_vegetation_proba}=float"
+      - "${data_format.las_dimensions.ai_unclassified_proba}=float"
+  output:
+    # Extra dims that are kept before final saving.
+    # You can override with "all" to keep all extra dimensions at development time.
+    _target_: lidar_prod.tasks.cleaning.Cleaner
+    extra_dims:
+      # - "${data_format.las_dimensions.ai_building_proba}=float"
+      # - "${data_format.las_dimensions.ai_vegetation_proba}=float"
+      - "${data_format.las_dimensions.entropy}=float"
+      # - "${data_format.las_dimensions.ai_building_identified}=uint"
+      - "${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint"
