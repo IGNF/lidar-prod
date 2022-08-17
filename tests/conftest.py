@@ -9,7 +9,12 @@ from lidar_prod.tasks.utils import pdal_read_las_array
 @pytest.fixture
 def vegetation_unclassifed_hydra_cfg():
     with initialize(config_path="./../configs/", job_name="config"):
-        return compose(config_name="config", overrides=["data_format=vegetation_unclassified.yaml"])
+        return compose(
+            config_name="config",
+            overrides=[
+                "data_format=vegetation_unclassified.yaml",
+                "basic_identification=for_testing.yaml",
+                "paths.src_las=tests/files/436000_6478000.subset.postIA.las"])
 
 
 @pytest.fixture
@@ -42,6 +47,7 @@ def check_las_contains_dims(las1, dims_to_check=[]):
     for d in dims_to_check:
         assert d in a1.dtype.fields.keys()
 
+
 @pytest.fixture
 def las_data():
     points_count = 100
@@ -57,10 +63,10 @@ def las_data():
 
     # header
     header = laspy.LasHeader(point_format=3, version="1.4")
-    header.add_extra_dim(laspy.ExtraBytesParams(name="classification", type=np.int32))  
-    header.add_extra_dim(laspy.ExtraBytesParams(name="entropy", type=np.float)) 
-    header.add_extra_dim(laspy.ExtraBytesParams(name="vegetation", type=np.float)) 
-    header.add_extra_dim(laspy.ExtraBytesParams(name="unclassified", type=np.float)) 
+    header.add_extra_dim(laspy.ExtraBytesParams(name="classification", type=np.int32))
+    header.add_extra_dim(laspy.ExtraBytesParams(name="entropy", type=np.float))
+    header.add_extra_dim(laspy.ExtraBytesParams(name="vegetation", type=np.float))
+    header.add_extra_dim(laspy.ExtraBytesParams(name="unclassified", type=np.float))
     header.offsets = [np.floor(np.min(x_data)), np.floor(np.min(y_data)), np.floor(np.min(z_data))]
     header.scales = np.array([0.1, 0.1, 0.1])
 

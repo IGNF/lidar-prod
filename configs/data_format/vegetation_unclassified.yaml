@@ -24,6 +24,10 @@ las_dimensions:
 
 codes:
   vegetation: 3
+  vegetation_truth:
+  - 3    
+  - 4
+  - 5
   unclassified: 1
   building:
     candidates: [202]  # found by rules-based classification (TerraScan)
@@ -70,3 +74,8 @@ cleaning:
       - "${data_format.las_dimensions.entropy}=float"
       # - "${data_format.las_dimensions.ai_building_identified}=uint"
       - "${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint"
+  vegetation_unclassified_detection:
+    # Extra dims added for storing the result of the vegetation/unclassified detection.
+    _target_: lidar_prod.tasks.cleaning.Cleaner
+    extra_dims:
+      - "${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint32"

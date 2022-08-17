@@ -30,28 +30,29 @@ def main(config: DictConfig):
         data_format = config["data_format"]
         vegetation_identification_optimiser = BasicIdentifierOptimizer(
             config,
-            data_format.las_dimensions.ai_vegetation_proba,
-            data_format.las_dimensions.ai_vegetation_unclassified_groups,
-            data_format.codes.vegetation,
-            data_format.las_dimensions.classification,
-            100
+            data_format["las_dimensions"]["ai_vegetation_proba"],
+            data_format["las_dimensions"]["ai_vegetation_unclassified_groups"],
+            data_format["codes"]["vegetation"],
+            data_format["las_dimensions"]["classification"],
+            config["basic_identification"]["vegetation_nb_trial"],
+            data_format["codes"]["vegetation_truth"],
             )
         vegetation_identification_optimiser.optimize()
 
     elif config.get("task") == "optimize_unc_id":
         log.info("Starting optimizing unclassifier identifier")
         data_format = config["data_format"]
-        vegetation_identification_optimiser = BasicIdentifierOptimizer(
+        unclassified_identification_optimiser = BasicIdentifierOptimizer(
             config,
-            data_format.las_dimensions.ai_unclassified_proba,
-            data_format.las_dimensions.ai_vegetation_unclassified_groups,
-            data_format.codes.unclassified,
-            data_format.las_dimensions.classification,
-            100
+            data_format["las_dimensions"]["ai_unclassified_proba"],
+            data_format["las_dimensions"]["ai_vegetation_unclassified_groups"],
+            data_format["codes"]["unclassified"],
+            data_format["las_dimensions"]["classification"],
+            config["basic_identification"]["unclassified_nb_trial"]
             )
-        vegetation_identification_optimiser.optimize()
+        unclassified_identification_optimiser.optimize()
 
-    elif config.get("task") == "identify_vegetation":
+    elif config.get("task") == "identify_vegetation_unclassified":
         logic = detect_vegetation_unclassified
         applying(config, logic)
 

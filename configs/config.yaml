@@ -9,5 +9,5 @@ defaults:
   - building_validation: default.yaml
   - building_identification: default.yaml
   - building_completion: default.yaml
-  - vegetation_identification: default.yaml
+  - basic_identification: default.yaml
   - _self_  # needed by pdal for legacy reasons

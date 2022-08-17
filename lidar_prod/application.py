@@ -68,23 +68,25 @@ def detect_vegetation_unclassified(config, src_las_path: str, dest_las_path: str
     data_format = config["data_format"]
     las_data = get_las_data_from_las(src_las_path)
 
+    # add the necessary dimension to store the results
+    cleaner: Cleaner = hydra.utils.instantiate(data_format.cleaning.vegetation_unclassified_detection)
+    cleaner.add_dimensions(las_data)
+
     # detect vegetation
     vegetation_identifier = BasicIdentifier(
-        config["vegetation_identification"]["vegetation_threshold"],
+        config["basic_identification"]["vegetation_threshold"],
         data_format.las_dimensions.ai_vegetation_proba,
         data_format.las_dimensions.ai_vegetation_unclassified_groups,
         data_format.codes.vegetation,
-        data_format
     )
     vegetation_identifier.identify(las_data)
 
     # detect unclassified
     unclassified_identifier = BasicIdentifier(
-        config["vegetation_identification"]["unclassified_threshold"],
+        config["basic_identification"]["unclassified_threshold"],
         data_format.las_dimensions.ai_unclassified_proba,
         data_format.las_dimensions.ai_vegetation_unclassified_groups,
         data_format.codes.unclassified,
-        data_format
     )
     unclassified_identifier.identify(las_data)
 

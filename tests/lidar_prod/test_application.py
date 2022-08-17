@@ -30,8 +30,6 @@ LAS_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.las"
         ([pdal.Filter.assign(value="Classification = 202")], False),  # only candidate buildings
     ],  # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
 )
-
-
 def test_application_data_invariance_and_data_format(legacy_hydra_cfg, las_mutation, query_db_Uni):
     # Expected classification codes after application run are either default=0, unclassified=1, or
     # one of the decision codes.
@@ -96,6 +94,7 @@ def test_just_clean(vegetation_unclassifed_hydra_cfg):
     las_data = get_las_data_from_las(destination_path)
     assert [dim for dim in las_data.point_format.extra_dimension_names] == ['entropy', 'vegetation', 'unclassified']
 
+
 def test_detect_vegetation_unclassified(vegetation_unclassifed_hydra_cfg):
     destination_path = tempfile.NamedTemporaryFile().name
     detect_vegetation_unclassified(
@@ -103,7 +102,7 @@ def test_detect_vegetation_unclassified(vegetation_unclassifed_hydra_cfg):
         LAS_SUBSET_FILE_VEGETATION,
         destination_path)
     las_data = get_las_data_from_las(destination_path)
-    testa = np.count_nonzero(las_data.points.classification == vegetation_unclassifed_hydra_cfg.data_format.codes.vegetation)
-    testb = np.count_nonzero(las_data.points.classification == vegetation_unclassifed_hydra_cfg.data_format.codes.unclassified)
-    assert testa == 17
-    assert testb == 23222
+    vegetation_count = np.count_nonzero(las_data.points.classification == vegetation_unclassifed_hydra_cfg.data_format.codes.vegetation)
+    unclassified_count = np.count_nonzero(las_data.points.classification == vegetation_unclassifed_hydra_cfg.data_format.codes.unclassified)
+    assert vegetation_count == 17
+    assert unclassified_count == 23222

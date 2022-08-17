@@ -1,14 +1,14 @@
 import os.path as osp
 import tempfile
 import pytest
-import laspy
 
 from lidar_prod.tasks.cleaning import Cleaner
-from lidar_prod.tasks.utils import pdal_read_las_array
+from lidar_prod.tasks.utils import pdal_read_las_array, get_las_data_from_las
 from tests.conftest import check_las_invariance
 from tests.lidar_prod.test_application import check_las_format_versions_and_srs
 
 SRC_LAS_SUBSET_PATH = "tests/files/870000_6618000.subset.postIA.las"
+LAS_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.las"
 
 
 @pytest.mark.parametrize("extra_dims", ([], ""))
@@ -69,16 +69,62 @@ def test_cleaning_get_extra_dims_as_str(extra_dims, expected):
     cleaner = Cleaner(extra_dims=extra_dims)
     assert cleaner.get_extra_dims_as_str() == expected
 
-    # def remove_dimensions(self, las_data: laspy.lasdata.LasData)
+
+@pytest.mark.parametrize(
+    "extra_dims, expected",
+    [
+        ("all", [
+            'entropy',
+            'PredictedClassification',
+            'lasting_above',
+            'bridge',
+            'water',
+            'building',
+            'vegetation',
+            'ground',
+            'unclassified'
+            ]),
+        ("", []),
+        (['PredictedClassification', 'entropy'], ['entropy', 'PredictedClassification'])
+    ])
+def test_cleaning_remove_dimensions(extra_dims, expected):
+    las_data = get_las_data_from_las(LAS_SUBSET_FILE_VEGETATION)
+    cleaner = Cleaner(extra_dims=extra_dims)
+    cleaner.remove_dimensions(las_data)
+    assert [dim for dim in las_data.point_format.extra_dimension_names] == expected
 
 
 @pytest.mark.parametrize(
-    "extra_dims, expected", 
-    [("all", ['classification', 'entropy', 'vegetation', 'unclassified']),
-    ("", []),
-    (['classification', 'entropy'], ['classification', 'entropy'])
+    "extra_dims, expected",
+    [
+        (['dimenplus1=int32'], [
+            'entropy',
+            'PredictedClassification',
+            'lasting_above',
+            'bridge',
+            'water',
+            'building',
+            'vegetation',
+            'ground',
+            'unclassified',
+            'dimenplus1'
+            ]),
+        (['dimenplus1=int32', 'dimenplus2=float'], [
+            'entropy',
+            'PredictedClassification',
+            'lasting_above',
+            'bridge',
+            'water',
+            'building',
+            'vegetation',
+            'ground',
+            'unclassified',
+            'dimenplus1',
+            'dimenplus2'
+            ]),
     ])
-def test_cleaning_remove_dimensions(las_data: laspy.lasdata.LasData, extra_dims, expected):
+def test_cleaning_add_dimensions(extra_dims, expected):
+    las_data = get_las_data_from_las(LAS_SUBSET_FILE_VEGETATION)
     cleaner = Cleaner(extra_dims=extra_dims)
-    cleaner.remove_dimensions(las_data)
+    cleaner.add_dimensions(las_data)
     assert [dim for dim in las_data.point_format.extra_dimension_names] == expected
