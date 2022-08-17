@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 from lidar_prod.tasks.basic_identification import BasicIdentifier
 from lidar_prod.tasks.utils import get_las_data_from_las
