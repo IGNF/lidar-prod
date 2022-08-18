@@ -2,8 +2,10 @@ import pdal
 import pytest
 import tempfile
 import numpy as np
+import os
 
-from lidar_prod.application import apply, just_clean, detect_vegetation_unclassified
+from omegaconf import open_dict
+from lidar_prod.application import apply, just_clean, detect_vegetation_unclassified, applying
 from lidar_prod.tasks.utils import get_a_las_to_las_pdal_pipeline, get_las_metadata, get_las_data_from_las
 from tests.conftest import (
     check_las_contains_dims,
@@ -19,6 +21,8 @@ We apply different "mutations" to the data in order to test for multiple scenari
 LAS_SUBSET_FILE_BUILDING = "tests/files/870000_6618000.subset.postIA.las"
 SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
 LAS_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.las"
+DUMMY_DIRECTORY_PATH = "tests/files/dummy_folder"
+DUMMY_FILE_PATH = "tests/files/dummy_folder/dummy_file1.las"
 
 
 @pytest.mark.parametrize(
@@ -106,3 +110,23 @@ def test_detect_vegetation_unclassified(vegetation_unclassifed_hydra_cfg):
     unclassified_count = np.count_nonzero(las_data.points.classification == vegetation_unclassifed_hydra_cfg.data_format.codes.unclassified)
     assert vegetation_count == 17
     assert unclassified_count == 23222
+
+
+@pytest.mark.parametrize(
+    "path, expected",
+    [
+        (DUMMY_DIRECTORY_PATH, ["dummy_file1.las", "dummy_file2.las"]),
+        (DUMMY_FILE_PATH, ["dummy_file1.las"]),
+    ],
+)
+def test_applying(vegetation_unclassifed_hydra_cfg, path, expected):
+    def dummy_method(config, src_las_path, target_las_path):
+        assert os.path.basename(src_las_path) in config.expected
+        assert os.path.basename(target_las_path) in config.expected
+
+    vegetation_unclassifed_hydra_cfg.paths.src_las = path
+    with tempfile.TemporaryDirectory() as td:
+        vegetation_unclassifed_hydra_cfg.paths.output_dir = td
+    with open_dict(vegetation_unclassifed_hydra_cfg):   # needed to open the config dict and add elements
+        vegetation_unclassifed_hydra_cfg.expected = expected
+    applying(vegetation_unclassifed_hydra_cfg, dummy_method)

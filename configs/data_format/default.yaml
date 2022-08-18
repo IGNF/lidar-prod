@@ -23,12 +23,12 @@ las_dimensions:
   ai_vegetation_unclassified_groups: Group
 
 codes:
+  unclassified: 1
   vegetation: 3
   vegetation_truth:
     - 3
     - 4
     - 5
-  unclassified: 1
   building:
     candidates: [202]  # found by rules-based classification (TerraScan)
     detailed:  # used for detailed output when doing threshold optimization

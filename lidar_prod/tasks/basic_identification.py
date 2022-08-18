@@ -96,3 +96,20 @@ class BasicIdentifier:
             else:   # if not an int, truth_mask should be a list
                 truth_mask = np.isin(las_data.points[self.truth_column], self.truth_result_code)
             self.iou = IoU.iou_by_mask(threshold_mask, truth_mask)
+
+        # # MONKEY PATCHING !!! for debugging
+        # if self.result_code == 1:   # unclassified
+        #     truth_mask = las_data.points["classification"] == 1
+        # else:   # vegetation
+        #     truth_mask = np.isin(las_data.points["classification"], [3, 4, 5])
+
+        # print("threshold_mask size: ", np.count_nonzero(threshold_mask), "truth_mask size: ", np.count_nonzero(truth_mask))
+
+        # las_data.points[self.result_column][np.logical_and(truth_mask, threshold_mask)] = self.result_code # correct values
+        # las_data.points[self.result_column][np.logical_and(truth_mask, ~threshold_mask)] = self.result_code+10 # false positive
+        # las_data.points[self.result_column][np.logical_and(~truth_mask, threshold_mask)] = self.result_code+20 # false negative
+        # print(
+        #     "true positive: ", np.count_nonzero(np.logical_and(truth_mask, threshold_mask)),
+        #     "False positive: ", np.count_nonzero(np.logical_and(truth_mask, ~threshold_mask)),
+        #     "False negative: ", np.count_nonzero(np.logical_and(~truth_mask, threshold_mask))
+        # )

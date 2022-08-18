@@ -84,6 +84,46 @@ def test_cleaning_get_extra_dims_as_str(extra_dims, expected):
             'ground',
             'unclassified'
             ]),
+        ([
+            'entropy',
+            'PredictedClassification',
+            'lasting_above',
+            'bridge',
+            'water',
+            'building',
+            'vegetation',
+            'ground',
+            'unclassified'
+            ], [
+            'entropy',
+            'PredictedClassification',
+            'lasting_above',
+            'bridge',
+            'water',
+            'building',
+            'vegetation',
+            'ground',
+            'unclassified'
+            ]),
+        ([
+            'entropy',
+            'PredictedClassification',
+            'lasting_above',
+            'bridge',
+            'water',
+            'building',
+            'vegetation',
+            'ground',
+            ], [
+            'entropy',
+            'PredictedClassification',
+            'lasting_above',
+            'bridge',
+            'water',
+            'building',
+            'vegetation',
+            'ground',
+            ]),
         ("", []),
         (['PredictedClassification', 'entropy'], ['entropy', 'PredictedClassification'])
     ])
@@ -97,30 +137,56 @@ def test_cleaning_remove_dimensions(extra_dims, expected):
 @pytest.mark.parametrize(
     "extra_dims, expected",
     [
-        (['dimenplus1=int32'], [
-            'entropy',
-            'PredictedClassification',
-            'lasting_above',
-            'bridge',
-            'water',
-            'building',
-            'vegetation',
-            'ground',
-            'unclassified',
-            'dimenplus1'
+        ([],
+            [
+                'entropy',
+                'PredictedClassification',
+                'lasting_above',
+                'bridge',
+                'water',
+                'building',
+                'vegetation',
+                'ground',
+                'unclassified'
             ]),
-        (['dimenplus1=int32', 'dimenplus2=float'], [
-            'entropy',
-            'PredictedClassification',
-            'lasting_above',
-            'bridge',
-            'water',
-            'building',
-            'vegetation',
-            'ground',
-            'unclassified',
-            'dimenplus1',
-            'dimenplus2'
+        (['dimenplus1=int32'],
+            [
+                'entropy',
+                'PredictedClassification',
+                'lasting_above',
+                'bridge',
+                'water',
+                'building',
+                'vegetation',
+                'ground',
+                'unclassified',
+                'dimenplus1'
+            ]),
+        (['dimenplus1'],
+            [
+                'entropy',
+                'PredictedClassification',
+                'lasting_above',
+                'bridge',
+                'water',
+                'building',
+                'vegetation',
+                'ground',
+                'unclassified'
+            ]),
+        (['dimenplus1=int32', 'dimenplus2=float'],
+            [
+                'entropy',
+                'PredictedClassification',
+                'lasting_above',
+                'bridge',
+                'water',
+                'building',
+                'vegetation',
+                'ground',
+                'unclassified',
+                'dimenplus1',
+                'dimenplus2'
             ]),
     ])
 def test_cleaning_add_dimensions(extra_dims, expected):

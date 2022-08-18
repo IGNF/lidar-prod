@@ -1,7 +1,3 @@
-"""
-Takes bridge probabilities as input, and defines bridge.
-
-"""
 from typing import Union
 
 import logging

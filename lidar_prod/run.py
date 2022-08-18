@@ -6,7 +6,7 @@ from omegaconf import DictConfig
 
 
 @hydra.main(config_path="../configs/", config_name="config.yaml")
-def main(config: DictConfig):
+def main(config: DictConfig):  # pragma: no cover
     """Main entry point to either apply or optimize thresholds.
 
     Check the configurations files for usage.
@@ -65,7 +65,7 @@ def main(config: DictConfig):
         apply(config)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     sys.path.append(os.path.dirname(os.path.dirname(__file__)))
     # OmegaConf.register_new_resolver("get_method", hydra.utils.get_method)
     main()
