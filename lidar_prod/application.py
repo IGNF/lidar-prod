@@ -18,27 +18,13 @@ log = logging.getLogger(__name__)
 
 
 @commons.eval_time
-def apply(config: DictConfig):
-    """
-    Augment rule-based classification of a point cloud with deep learning
-    probabilities and vector building database.
-
-    Args:
-        config (DictConfig): Hydra config passed from run.py
-
-    """
-    processed_file_list = []
-    for src_las_path in get_list_las_path_from_src(config.paths.src_las):
-        target_las_path = os.path.join(config.paths.output_dir, os.path.basename(src_las_path))
-        processed_file_list.append(process_one_file(config, src_las_path, target_las_path))
-    return processed_file_list
-
-
-@commons.eval_time
-def applying(config: DictConfig, logic: Callable):
+def apply(config: DictConfig, logic: Callable):
+    applied_file_list = []
     for src_las_path in get_list_las_path_from_src(config.paths.src_las):
         target_las_path = os.path.join(config.paths.output_dir, os.path.basename(src_las_path))
         logic(config, src_las_path, target_las_path)
+        applied_file_list.append(target_las_path)
+    return applied_file_list
 
 
 def get_list_las_path_from_src(src_path: str):
@@ -62,14 +48,14 @@ def get_list_las_path_from_src(src_path: str):
 
 
 @commons.eval_time
-def detect_vegetation_unclassified(config, src_las_path: str, dest_las_path: str):
+def identify_vegetation_unclassified(config, src_las_path: str, dest_las_path: str):
 
-    log.info(f"Detecting on {src_las_path}")
+    log.info(f"Identifying on {src_las_path}")
     data_format = config["data_format"]
     las_data = get_las_data_from_las(src_las_path)
 
     # add the necessary dimension to store the results
-    cleaner: Cleaner = hydra.utils.instantiate(data_format.cleaning.vegetation_unclassified_detection)
+    cleaner: Cleaner = hydra.utils.instantiate(data_format.cleaning.input_vegetation_unclassified)
     cleaner.add_dimensions(las_data)
 
     # detect vegetation
@@ -91,7 +77,7 @@ def detect_vegetation_unclassified(config, src_las_path: str, dest_las_path: str
     unclassified_identifier.identify(las_data)
 
     # keeping only the wanted dimensions for the result las
-    cleaner = hydra.utils.instantiate(data_format.cleaning.output)
+    cleaner = hydra.utils.instantiate(data_format.cleaning.output_vegetation_unclassified)
     cleaner.remove_dimensions(las_data)
 
     save_las_data_to_las(dest_las_path, las_data)
@@ -112,7 +98,7 @@ def just_clean(config, src_las_path: str, dest_las_path: str):
 
 
 @commons.eval_time
-def process_one_file(config: DictConfig, src_las_path: str, dest_las_path: str = None):
+def apply_building_module(config: DictConfig, src_las_path: str, dest_las_path: str = None):
     """call every desired step to process a las
     Args:
         src_las_path: the path of the source las
@@ -124,7 +110,7 @@ def process_one_file(config: DictConfig, src_las_path: str, dest_las_path: str =
         tmp_las_path = os.path.join(td, os.path.basename(src_las_path))
 
         # Removes unnecessary input dimensions to reduce memory usage
-        cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.input)
+        cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.input_building)
         cl.run(src_las_path, tmp_las_path)
 
         # Validate buildings (unsure/confirmed/refuted) on a per-group basis.
@@ -142,7 +128,7 @@ def process_one_file(config: DictConfig, src_las_path: str, dest_las_path: str =
         bi.run(tmp_las_path, tmp_las_path)
 
         # Remove unnecessary intermediary dimensions
-        cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.output)
+        cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.output_building)
         cl.run(tmp_las_path, dest_las_path)
 
     return dest_las_path

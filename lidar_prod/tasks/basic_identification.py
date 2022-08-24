@@ -2,17 +2,20 @@
 Takes vegetation probabilities as input, and defines vegetation
 
 """
+from __future__ import annotations   # to recognize IoU as a type by itself (in __add__())
+
 import logging
 from typing import Union
 
 import numpy as np
 import laspy
 
+
 log = logging.getLogger(__name__)
 
 
 class IoU:
-    """contains an IoU and its associated values """
+    """Contains an IoU and its associated values."""
     true_positive: int
     false_negative: int
     false_positive: int
@@ -22,7 +25,17 @@ class IoU:
         self.true_positive = true_positive
         self.false_negative = false_negative
         self.false_positive = false_positive
-        self.iou = true_positive / (true_positive + false_negative + false_positive)
+        if true_positive + false_negative + false_positive > 0:
+            self.iou = true_positive / (true_positive + false_negative + false_positive)
+        else:
+            self.iou = 1
+
+    def __add__(self, other_iou: IoU):
+        return IoU(
+            self.true_positive + other_iou.true_positive,
+            self.false_negative + other_iou.false_negative,
+            self.false_positive + other_iou.false_positive,
+            )
 
     def __str__(self):
         return "IoU: {:0.3f} |  true positive: {:,} | false negative: {:,} | false positive: {:,}"\
@@ -30,7 +43,7 @@ class IoU:
 
     @staticmethod
     def combine_iou(iou_list: list):
-        """combine several IoUs to return an average/total IoU"""
+        """Combine several IoUs to return an average/total IoU."""
         return IoU(
             sum(iou.true_positive for iou in iou_list),
             sum(iou.false_negative for iou in iou_list),
@@ -38,11 +51,11 @@ class IoU:
             )
 
     @staticmethod
-    def iou_by_mask(mask_to_evaluate: np.ndarray, truth_mask: np.ndarray):
+    def iou_by_mask(preds_mask: np.ndarray, target_mask: np.ndarray):
         """ return an IoU from a mask we want to evaluate and a mask containing the truth"""
-        true_positive = np.count_nonzero(np.logical_and(truth_mask, mask_to_evaluate))
-        false_negative = np.count_nonzero(np.logical_and(truth_mask, ~mask_to_evaluate))
-        false_positive = np.count_nonzero(np.logical_and(~truth_mask, mask_to_evaluate))
+        true_positive = np.count_nonzero(np.logical_and(target_mask, preds_mask))
+        false_negative = np.count_nonzero(np.logical_and(target_mask, ~preds_mask))
+        false_positive = np.count_nonzero(np.logical_and(~target_mask, preds_mask))
         return IoU(true_positive, false_negative, false_positive)
 
 
@@ -54,31 +67,32 @@ class BasicIdentifier:
             result_column: str,
             result_code: int,
             evaluate_iou: bool = False,
-            truth_column: str = None,
-            truth_result_code: Union[int, list] = None):
+            target_column: str = None,
+            target_result_code: Union[int, list] = None) -> None:
         """
         BasicIdentifier set all points with a value from a column above a threshold to another value in another column
 
-        threshold: above the threshold, a point is set
-        proba_column: the column the treshold is compared against
-        result_column: the column to store the result
-        result_code: the value the point will be set to
-        evaluate_iou: True if we want to evaluate the IoU of that selection
-        truth_column: if we want to evaluate the IoU, this is the column with the real results to compare againt
-        truth_result_code: if we want to evaluate the IoU, this is/are the code(s) of the "truth".
-                            Can be an int of a list of int, if we want an IoU but truth_result_code is not provided then result_code
-                            is used instead
+        args:
+            threshold: above the threshold, a point is set
+            proba_column: the column the treshold is compared against
+            result_column: the column to store the result
+            result_code: the value the point will be set to
+            evaluate_iou: True if we want to evaluate the IoU of that selection
+            target_column: if we want to evaluate the IoU, this is the column with the real results to compare againt
+            target_result_code: if we want to evaluate the IoU, this is/are the code(s) of the target.
+                                Can be an int of a list of int, if we want an IoU but target_result_code
+                                is not provided then result_code is used instead.
         """
         self.threshold = threshold
         self.proba_column = proba_column
         self.result_column = result_column
         self.result_code = result_code
         self.evaluate_iou = evaluate_iou
-        self.truth_column = truth_column
-        self.truth_result_code = truth_result_code if truth_result_code else result_code
+        self.truth_column = target_column
+        self.truth_result_code = target_result_code if target_result_code else result_code
 
-    def identify(self, las_data: laspy.lasdata.LasData):
-
+    def identify(self, las_data: laspy.lasdata.LasData) -> None:
+        """Identify the points above the threshold and set them to the wanted value."""
         # if the result column doesn't exist, we add it
         if self.result_column not in [dim for dim in las_data.point_format.extra_dimension_names]:
             las_data.add_extra_dim(laspy.ExtraBytesParams(name=self.result_column, type="uint32"))
@@ -92,10 +106,10 @@ class BasicIdentifier:
         # calculate ious if necessary
         if self.evaluate_iou:
             if isinstance(self.truth_result_code, int):
-                truth_mask = las_data.points[self.truth_column] == self.truth_result_code
+                target_mask = las_data.points[self.truth_column] == self.truth_result_code
             else:   # if not an int, truth_mask should be a list
-                truth_mask = np.isin(las_data.points[self.truth_column], self.truth_result_code)
-            self.iou = IoU.iou_by_mask(threshold_mask, truth_mask)
+                target_mask = np.isin(las_data.points[self.truth_column], self.truth_result_code)
+            self.iou = IoU.iou_by_mask(threshold_mask, target_mask)
 
         # # MONKEY PATCHING !!! for debugging
         # if self.result_code == 1:   # unclassified

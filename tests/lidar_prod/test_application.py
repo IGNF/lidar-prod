@@ -5,7 +5,7 @@ import numpy as np
 import os
 
 from omegaconf import open_dict
-from lidar_prod.application import apply, just_clean, detect_vegetation_unclassified, applying
+from lidar_prod.application import just_clean, identify_vegetation_unclassified, apply, apply_building_module
 from lidar_prod.tasks.utils import get_a_las_to_las_pdal_pipeline, get_las_metadata, get_las_data_from_las
 from tests.conftest import (
     check_las_contains_dims,
@@ -55,7 +55,7 @@ def test_application_data_invariance_and_data_format(legacy_hydra_cfg, las_mutat
         legacy_hydra_cfg.paths.src_las = mutated_copy
         if not query_db_Uni:    # we don't request db_uni, we use a shapefile instead
             legacy_hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
-        updated_las_path_list: str = apply(legacy_hydra_cfg)
+        updated_las_path_list = apply(legacy_hydra_cfg, apply_building_module)
         # Check output
         check_las_invariance(mutated_copy, updated_las_path_list[0])
         check_format_of_application_output_las(updated_las_path_list[0], expected_codes)
@@ -101,7 +101,7 @@ def test_just_clean(vegetation_unclassifed_hydra_cfg):
 
 def test_detect_vegetation_unclassified(vegetation_unclassifed_hydra_cfg):
     destination_path = tempfile.NamedTemporaryFile().name
-    detect_vegetation_unclassified(
+    identify_vegetation_unclassified(
         vegetation_unclassifed_hydra_cfg,
         LAS_SUBSET_FILE_VEGETATION,
         destination_path)
@@ -129,4 +129,4 @@ def test_applying(vegetation_unclassifed_hydra_cfg, path, expected):
         vegetation_unclassifed_hydra_cfg.paths.output_dir = td
     with open_dict(vegetation_unclassifed_hydra_cfg):   # needed to open the config dict and add elements
         vegetation_unclassifed_hydra_cfg.expected = expected
-    applying(vegetation_unclassifed_hydra_cfg, dummy_method)
+    apply(vegetation_unclassifed_hydra_cfg, dummy_method)

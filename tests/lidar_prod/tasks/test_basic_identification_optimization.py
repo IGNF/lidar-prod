@@ -10,8 +10,8 @@ def test_basic_identifier_optimizer(vegetation_unclassifed_hydra_cfg):
         vegetation_unclassifed_hydra_cfg["data_format"]["las_dimensions"]["ai_vegetation_unclassified_groups"],
         vegetation_unclassifed_hydra_cfg["data_format"]["codes"]["vegetation"],
         vegetation_unclassifed_hydra_cfg["data_format"]["las_dimensions"]["classification"],
-        vegetation_unclassifed_hydra_cfg["basic_identification"]["vegetation_nb_trial"],
-        vegetation_unclassifed_hydra_cfg["data_format"]["codes"]["vegetation_truth"]
+        vegetation_unclassifed_hydra_cfg["basic_identification"]["vegetation_nb_trials"],
+        vegetation_unclassifed_hydra_cfg["data_format"]["codes"]["vegetation_target"]
     )
     basic_identifier_optimizer.optimize()
     trial = basic_identifier_optimizer.study.best_trial

@@ -3,6 +3,15 @@ import os
 import logging
 import hydra
 from omegaconf import DictConfig
+from enum import Enum
+
+
+class POSSIBLE_TASK(Enum):
+    CLEANING = "cleaning"
+    ID_VEGETATION_UNCLASSIFIED = "identify_vegetation_unclassified"
+    OPT_VEGETATION = "optimize_veg_id"
+    OPT_UNCLASSIFIED = "optimize_unc_id"
+    OPT_BUIlDING = "optimize_building"
 
 
 @hydra.main(config_path="../configs/", config_name="config.yaml")
@@ -16,8 +25,8 @@ def main(config: DictConfig):  # pragma: no cover
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934
     from lidar_prod.commons.commons import extras
-    from lidar_prod.application import apply, applying, detect_vegetation_unclassified, just_clean
-    from lidar_prod.tasks.basic_identification_optimization import BasicIdentifierOptimizer
+    from lidar_prod.application import apply, identify_vegetation_unclassified, just_clean
+    from lidar_prod.optimization import optimize_building, optimize_vegetation, optimize_unclassified
 
     log = logging.getLogger(__name__)
 
@@ -25,44 +34,24 @@ def main(config: DictConfig):  # pragma: no cover
 
     assert os.path.exists(config.paths.src_las)
 
-    if config.get("task") == "optimize_veg_id":
-        log.info("Starting optimizing vegetation identifier")
-        data_format = config["data_format"]
-        vegetation_identification_optimiser = BasicIdentifierOptimizer(
-            config,
-            data_format["las_dimensions"]["ai_vegetation_proba"],
-            data_format["las_dimensions"]["ai_vegetation_unclassified_groups"],
-            data_format["codes"]["vegetation"],
-            data_format["las_dimensions"]["classification"],
-            config["basic_identification"]["vegetation_nb_trial"],
-            data_format["codes"]["vegetation_truth"],
-            )
-        vegetation_identification_optimiser.optimize()
+    if config["task"] == POSSIBLE_TASK.OPT_VEGETATION.value:
+        optimize_vegetation(config)
 
-    elif config.get("task") == "optimize_unc_id":
-        log.info("Starting optimizing unclassifier identifier")
-        data_format = config["data_format"]
-        unclassified_identification_optimiser = BasicIdentifierOptimizer(
-            config,
-            data_format["las_dimensions"]["ai_unclassified_proba"],
-            data_format["las_dimensions"]["ai_vegetation_unclassified_groups"],
-            data_format["codes"]["unclassified"],
-            data_format["las_dimensions"]["classification"],
-            config["basic_identification"]["unclassified_nb_trial"]
-            )
-        unclassified_identification_optimiser.optimize()
+    elif config["task"] == POSSIBLE_TASK.OPT_UNCLASSIFIED.value:
+        optimize_unclassified(config)
 
-    elif config.get("task") == "identify_vegetation_unclassified":
-        logic = detect_vegetation_unclassified
-        applying(config, logic)
+    elif config["task"] == POSSIBLE_TASK.ID_VEGETATION_UNCLASSIFIED.value:
+        apply(config, identify_vegetation_unclassified)
 
-    elif config.get("task") == "cleaning":
-        logic = just_clean
-        applying(config, logic)
+    elif config["task"] == POSSIBLE_TASK.CLEANING.value:
+        apply(config, just_clean)
+
+    elif config["task"] == POSSIBLE_TASK.OPT_BUIlDING.value:
+        optimize_building(config)
 
     else:
         log.info("Starting applying the default process")
-        apply(config)
+        optimize_building(config)
 
 
 if __name__ == "__main__":  # pragma: no cover

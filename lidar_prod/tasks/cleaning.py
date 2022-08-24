@@ -82,6 +82,9 @@ class Cleaner:
         dimensions_to_add = []
         for dimension, type in self.extra_dims_as_dict.items():
             if not type:    # we only add the dimensions we know the type of
+                log.warning(
+                    f"{dimension} has no type and thus is not added as a column."
+                )
                 continue
 
             if dimension not in las_data.point_format.extra_dimension_names:
