@@ -53,6 +53,7 @@ jobs:
         python 
         lidar_prod/run.py
         data_format=legacy.yaml
+        task=apply_on_building
         paths.src_las=/inputs/730000_6360000.subset.prototype_format202.las
         paths.output_dir=/outputs/
 
