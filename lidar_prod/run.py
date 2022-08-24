@@ -34,19 +34,19 @@ def main(config: DictConfig):  # pragma: no cover
 
     assert os.path.exists(config.paths.src_las)
 
-    if config["task"] == POSSIBLE_TASK.OPT_VEGETATION.value:
+    if config.get("task") == POSSIBLE_TASK.OPT_VEGETATION.value:
         optimize_vegetation(config)
 
-    elif config["task"] == POSSIBLE_TASK.OPT_UNCLASSIFIED.value:
+    elif config.get("task") == POSSIBLE_TASK.OPT_UNCLASSIFIED.value:
         optimize_unclassified(config)
 
-    elif config["task"] == POSSIBLE_TASK.ID_VEGETATION_UNCLASSIFIED.value:
+    elif config.get("task")  == POSSIBLE_TASK.ID_VEGETATION_UNCLASSIFIED.value:
         apply(config, identify_vegetation_unclassified)
 
-    elif config["task"] == POSSIBLE_TASK.CLEANING.value:
+    elif config.get("task")  == POSSIBLE_TASK.CLEANING.value:
         apply(config, just_clean)
 
-    elif config["task"] == POSSIBLE_TASK.OPT_BUIlDING.value:
+    elif config.get("task")  == POSSIBLE_TASK.OPT_BUIlDING.value:
         optimize_building(config)
 
     else:
