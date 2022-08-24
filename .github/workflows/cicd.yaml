@@ -44,7 +44,7 @@ jobs:
         python -m
         pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
 
-    - name: Test default run from CLI on a LAS subset.
+    - name: Test detection of building.
       run: >
         docker run 
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
@@ -53,7 +53,7 @@ jobs:
         python 
         lidar_prod/run.py
         data_format=legacy.yaml
-        task=apply_on_building
+        +task=apply_on_building
         paths.src_las=/inputs/730000_6360000.subset.prototype_format202.las
         paths.output_dir=/outputs/
 
