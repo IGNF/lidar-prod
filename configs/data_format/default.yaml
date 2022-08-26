@@ -85,5 +85,5 @@ cleaning:
     _target_: lidar_prod.tasks.cleaning.Cleaner
     extra_dims:
       - "${data_format.las_dimensions.entropy}=float"
-      - "${data_format.las_dimensions.ai_building_identified}=uint"
+      - "${data_format.las_dimensions.ai_building_proba}=uint"
       - "${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint"
