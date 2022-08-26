@@ -85,7 +85,7 @@ def identify_vegetation_unclassified(config, src_las_path: str, dest_las_path: s
 
 @commons.eval_time
 def just_clean(config, src_las_path: str, dest_las_path: str):
-    """Add/remove columns (mostly used for development, to prepare files and 
+    """Add/remove columns (mostly used for development, to prepare files and
     avoid delays when doing the same operations over and over again )"""
     log.info(f"Cleaning {src_las_path}")
     data_format = config["data_format"]
