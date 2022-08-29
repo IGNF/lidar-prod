@@ -25,9 +25,9 @@ las_dimensions:
 codes:
   vegetation: 3
   vegetation_target:
-  - 3    
-  - 4
-  - 5
+      vegetation_low: 3
+      vegetation_medium: 4
+      vegetation_high: 5
   unclassified: 1
   building:
     candidates: [202]  # found by rules-based classification (TerraScan)

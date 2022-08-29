@@ -88,8 +88,8 @@ class BasicIdentifier:
         self.result_column = result_column
         self.result_code = result_code
         self.evaluate_iou = evaluate_iou
-        self.truth_column = target_column
-        self.truth_result_code = target_result_code if target_result_code else result_code
+        self.target_column = target_column
+        self.target_result_code = target_result_code if target_result_code else result_code
 
     def identify(self, las_data: laspy.lasdata.LasData) -> None:
         """Identify the points above the threshold and set them to the wanted value."""
@@ -105,13 +105,13 @@ class BasicIdentifier:
 
         # calculate ious if necessary
         if self.evaluate_iou:
-            if isinstance(self.truth_result_code, int):
-                target_mask = las_data.points[self.truth_column] == self.truth_result_code
+            if isinstance(self.target_result_code, int):
+                target_mask = las_data.points[self.target_column] == self.target_result_code
             else:   # if not an int, truth_mask should be a list
-                target_mask = np.isin(las_data.points[self.truth_column], self.truth_result_code)
+                target_mask = np.isin(las_data.points[self.target_column], self.target_result_code)
             self.iou = IoU.iou_by_mask(threshold_mask, target_mask)
 
-        # # MONKEY PATCHING !!! for debugging
+        # MONKEY PATCHING !!! for debugging
         # if self.result_code == 1:   # unclassified
         #     truth_mask = las_data.points["classification"] == 1
         # else:   # vegetation
@@ -119,9 +119,11 @@ class BasicIdentifier:
 
         # print("threshold_mask size: ", np.count_nonzero(threshold_mask), "truth_mask size: ", np.count_nonzero(truth_mask))
 
+        # self.result_code = self.result_code if self.result_code ==1 else 11
+
         # las_data.points[self.result_column][np.logical_and(truth_mask, threshold_mask)] = self.result_code # correct values
-        # las_data.points[self.result_column][np.logical_and(truth_mask, ~threshold_mask)] = self.result_code+10 # false positive
-        # las_data.points[self.result_column][np.logical_and(~truth_mask, threshold_mask)] = self.result_code+20 # false negative
+        # las_data.points[self.result_column][np.logical_and(truth_mask, ~threshold_mask)] = self.result_code+1 # false positive
+        # las_data.points[self.result_column][np.logical_and(~truth_mask, threshold_mask)] = self.result_code+2 # false negative
         # print(
         #     "true positive: ", np.count_nonzero(np.logical_and(truth_mask, threshold_mask)),
         #     "False positive: ", np.count_nonzero(np.logical_and(truth_mask, ~threshold_mask)),

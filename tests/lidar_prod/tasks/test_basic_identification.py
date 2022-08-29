@@ -16,7 +16,7 @@ def test_basic_identifier(vegetation_unclassifed_hydra_cfg):
         vegetation_unclassifed_hydra_cfg["data_format"]["codes"]["vegetation"],
         True,
         vegetation_unclassifed_hydra_cfg["data_format"]["las_dimensions"]["classification"],
-        vegetation_unclassifed_hydra_cfg["data_format"]["codes"]["vegetation_target"],
+        list(vegetation_unclassifed_hydra_cfg["data_format"]["codes"]["vegetation_target"].values()),
         )
     basic_identifier.identify(las_data)
     vegetation_count = np.count_nonzero(

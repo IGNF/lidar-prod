@@ -38,7 +38,7 @@ def optimize_vegetation(config: DictConfig):  # pragma: no cover  (it's just an 
         data_format["codes"]["vegetation"],
         data_format["las_dimensions"]["classification"],
         config["basic_identification"]["vegetation_nb_trials"],
-        data_format["codes"]["vegetation_target"],
+        list(data_format["codes"]["vegetation_target"].values()),
         )
     vegetation_identification_optimiser.optimize()
 
