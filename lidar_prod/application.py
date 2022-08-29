@@ -36,15 +36,11 @@ def get_list_las_path_from_src(src_path: str):
         return [src_path]
 
     # src_path is a directory
-    if os.path.isdir(src_path):
-        src_las_path = []
-        for (root, _, files) in os.walk(src_path):
-            for file in files:
-                _, file_extension = os.path.splitext(file)
-                if file_extension.lower() != ".las":    # only LAS files are selected (the extension might be in uppercase)
-                    continue
-                src_las_path.append(os.path.join(root, file))
-        return src_las_path
+    src_las_path = []
+    for path in os.scandir(src_path):
+        if os.path.isfile(path) and os.path.splitext(path)[1] == ".las":
+            src_las_path.append(path)
+    return src_las_path
 
 
 @commons.eval_time
