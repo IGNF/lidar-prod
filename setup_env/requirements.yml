@@ -13,7 +13,6 @@ dependencies:
   # --------- geo --------- #
   - conda-forge:pdal==2.3.*
   - conda-forge:python-pdal==3.0.*
-  - conda-forge:laspy==2.1.*
   - numpy
   - scikit-learn
   - geopandas
