@@ -1,5 +1,9 @@
+# --------- laspy with LAZ backend support --------- #
+laspy[lazrs,laszip]==2.1.*
+
 # --------- postgis-toolkit --------- #
 postgis-toolkit
+
 # --------- hydra --------- #
 hydra-core==1.1.*
 hydra-colorlog==1.1.*
