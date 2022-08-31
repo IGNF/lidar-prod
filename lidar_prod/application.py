@@ -12,7 +12,8 @@ from lidar_prod.tasks.building_validation import BuildingValidator
 from lidar_prod.tasks.building_identification import BuildingIdentifier
 from lidar_prod.tasks.basic_identification import BasicIdentifier
 
-from lidar_prod.tasks.utils import get_las_data_from_las, save_las_data_to_las
+import pdal
+from lidar_prod.tasks.utils import get_las_data_from_las, save_las_data_to_las, get_pdal_reader
 
 log = logging.getLogger(__name__)
 
@@ -115,14 +116,19 @@ def apply_building_module(config: DictConfig, src_las_path: str, dest_las_path: 
         bv: BuildingValidator = hydra.utils.instantiate(
             config.building_validation.application
         )
+        pipeline = pdal.Pipeline()
+        pipeline |= get_pdal_reader(tmp_las_path)
+        bv.pipeline = pipeline
         bv.run(tmp_las_path, tmp_las_path)
 
         # Complete buildings with non-candidates that were nevertheless confirmed
         bc: BuildingCompletor = hydra.utils.instantiate(config.building_completion)
+        bc.pipeline = bv.pipeline
         bc.run(tmp_las_path, tmp_las_path)
 
         # Define groups of confirmed building points among non-candidates
         bi: BuildingIdentifier = hydra.utils.instantiate(config.building_identification)
+        bi.pipeline = bc.pipeline
         bi.run(tmp_las_path, tmp_las_path)
 
         # Remove unnecessary intermediary dimensions

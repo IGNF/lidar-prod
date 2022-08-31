@@ -10,14 +10,14 @@ from typing import Any, Dict, List
 import optuna
 from tqdm import tqdm
 import os.path as osp
-import laspy
+import pdal
 
 from lidar_prod.tasks.building_validation import (
     BuildingValidator,
     BuildingValidationClusterInfo,
     thresholds,
 )
-from lidar_prod.tasks.utils import split_idx_by_dim
+from lidar_prod.tasks.utils import split_idx_by_dim, get_pdal_reader
 
 log = logging.getLogger(__name__)
 
@@ -138,7 +138,7 @@ class BuildingValidationOptimizer:
             total=len(self.las_filepaths),
             unit="tiles",
         ):
-            self.bv.prepare(src_las_path, prepared_las_path)
+            self.bv.prepare(src_las_path, prepared_las_path, True)
             clusters += self._extract_clusters_from_las(prepared_las_path)
         self._dump_clusters(clusters)
 
@@ -212,7 +212,7 @@ class BuildingValidationOptimizer:
             desc="Update.",
             unit="tiles",
         ):
-            self.bv.update(prepared_las_path, target_las_path)
+            self.bv.update(target_las_path, prepared_las_path)
             log.info(f"Saved to {target_las_path}")
 
     def _extract_clusters_from_las(
@@ -227,7 +227,11 @@ class BuildingValidationOptimizer:
             List[BuildingValidationClusterInfo]: cluster information for each cluster of candidate buildings
 
         """
-        las: laspy.LasData = laspy.read(prepared_las_path)
+        pipeline = pdal.Pipeline()
+        pipeline |= get_pdal_reader(prepared_las_path)
+        pipeline.execute()
+        las = pipeline.arrays[0]
+        # las: laspy.LasData = laspy.read(prepared_las_path)
         dim_cluster_id = las[
             self.bv.data_format.las_dimensions.ClusterID_candidate_building
         ]

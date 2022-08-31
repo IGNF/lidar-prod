@@ -1,7 +1,7 @@
 # Those names connect the logics between successive tasks
 las_dimensions:
   # input
-  classification: classification  # las format
+  classification: Classification  # las format
 
   # Extra dims
   # ATTENTION: If extra dimensions are added, you may want to add them in cleaning.in parameter as well.

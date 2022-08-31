@@ -10,7 +10,6 @@ from tempfile import TemporaryDirectory
 from tempfile import mkdtemp
 import shutil
 import geopandas
-import laspy
 from tqdm import tqdm
 from lidar_prod.tasks.utils import (
     BDUniConnectionParams,
@@ -65,7 +64,7 @@ class BuildingValidator:
         # For easier access
         self.codes = data_format.codes.building
         self.candidate_buildings_codes = data_format.codes.building.candidates
-
+        self.pipeline: pdal.pipeline.Pipeline = None
         self.setup()
 
     def setup(self):
@@ -101,10 +100,10 @@ class BuildingValidator:
             temp_f = osp.join(td, osp.basename(src_las_path))
             self.prepare(src_las_path, temp_f)
             log.info("Using AI and Databases to update cloud Classification")
-            self.update(temp_f, target_las_path)
+            self.update(target_las_path)
         return target_las_path
 
-    def prepare(self, src_las_path: str, prepared_las_path: str) -> None:
+    def prepare(self, src_las_path: str, prepared_las_path: str, save_result: bool = False) -> None:
         f"""
         Prepare las for later decision process. .
         1. Cluster candidates points, in a new `{self.data_format.las_dimensions.ClusterID_candidate_building}`
@@ -122,6 +121,7 @@ class BuildingValidator:
         Args:
             src_las_path (str): path to input LAS file with a building probability channel
             target_las_path (str): path for saving prepared LAS file.
+            save_result (bool): True to save a las instead of propagating a pipeline
 
         """
 
@@ -132,10 +132,11 @@ class BuildingValidator:
         )
         dim_overlay = self.data_format.las_dimensions.uni_db_overlay
 
-        pipeline = pdal.Pipeline()
-        pipeline |= get_pdal_reader(src_las_path)
+        if not self.pipeline:
+            self.pipeline = pdal.Pipeline()
+            self.pipeline |= get_pdal_reader(src_las_path)
         # Identify candidates buildings points with a boolean flag
-        pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_candidate_flag}")
+        self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_candidate_flag}")
         _is_candidate_building = (
             "("
             + " || ".join(
@@ -144,24 +145,24 @@ class BuildingValidator:
             )
             + ")"
         )
-        pipeline |= pdal.Filter.assign(
+        self.pipeline |= pdal.Filter.assign(
             value=f"{dim_candidate_flag} = 1 WHERE {_is_candidate_building}"
         )
         # Cluster candidates buildings points. This creates a ClusterID dimension (int)
         # in which unclustered points have index 0.
-        pipeline |= pdal.Filter.cluster(
+        self.pipeline |= pdal.Filter.cluster(
             min_points=self.cluster.min_points,
             tolerance=self.cluster.tolerance,
             where=f"{dim_candidate_flag} == 1",
         )
 
         # Copy ClusterID into a new dim and reset it to 0 to avoid conflict with later tasks.
-        pipeline |= pdal.Filter.ferry(
+        self.pipeline |= pdal.Filter.ferry(
             dimensions=f"{dim_cluster_id_pdal}=>{dim_cluster_id_candidates}"
         )
-        pipeline |= pdal.Filter.assign(value=f"{dim_cluster_id_pdal} = 0")
+        self.pipeline |= pdal.Filter.assign(value=f"{dim_cluster_id_pdal} = 0")
         bbox = get_integer_bbox(src_las_path, buffer=self.bd_uni_request.buffer)
-        pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_overlay}")
+        self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_overlay}")
 
         if self.shp_path:
             temp_dirpath = None     # no need for a temporay directory to add the shapefile in it, we already have the shapefile
@@ -183,20 +184,26 @@ class BuildingValidator:
         # dimension to reflect it.
 
         if buildings_in_bd_topo:
-            pipeline |= pdal.Filter.overlay(
+            self.pipeline |= pdal.Filter.overlay(
                 column="PRESENCE", datasource=_shp_p, dimension=dim_overlay
             )
-        pipeline |= get_pdal_writer(prepared_las_path)
-        os.makedirs(osp.dirname(prepared_las_path), exist_ok=True)
-        pipeline.execute()
+
+        if save_result:
+            self.pipeline |= get_pdal_writer(prepared_las_path)
+            os.makedirs(osp.dirname(prepared_las_path), exist_ok=True)
+        self.pipeline.execute()
 
         if temp_dirpath:
             shutil.rmtree(temp_dirpath)
 
-    def update(self, prepared_las_path: str, target_las_path: str) -> None:
+    def update(self, target_las_path: str, src_las_path: str = None) -> None:
         """Updates point cloud classification channel."""
+        if src_las_path:
+            self.pipeline = pdal.Pipeline()
+            self.pipeline |= get_pdal_reader(src_las_path)
+            self.pipeline.execute()
 
-        las = laspy.read(prepared_las_path)
+        las = self.pipeline.arrays[0]
 
         # 1) Map all points to a single "not_building" class
         # to be sure that they will all be modified.
@@ -235,23 +242,30 @@ class BuildingValidator:
         unclustered_mask = cluster_id_dim == 0
         unclustered_candidates_mask = candidates_mask & (unclustered_mask)
         las[dim_flag][unclustered_candidates_mask] = 0
+
+        # UGLY !!!
+        self.pipeline = get_pdal_writer(target_las_path).pipeline(las)
         os.makedirs(osp.dirname(target_las_path), exist_ok=True)
-        las.write(target_las_path)
+        self.pipeline.execute()
+
+        self.pipeline = pdal.Pipeline()
+        self.pipeline |= get_pdal_reader(target_las_path)
+        # END OF UGLYNESS
 
     def _extract_cluster_info_by_idx(
-        self, las: laspy.LasData, pts_idx: np.ndarray
+        self, las: np.ndarray, pts_idx: np.ndarray
     ) -> BuildingValidationClusterInfo:
         """Extracts all necessary information to make a decision based on points indices.
 
         Args:
-            las (laspy.LasData): point cloud of interest
+            las (np.ndarray): point cloud of interest
             pts_idx (np.ndarray): indices of points in considered clusters
 
         Returns:
             BuildingValidationClusterInfo: data necessary to make a decision at cluster level.
 
         """
-        pts = las.points[pts_idx]
+        pts = las[pts_idx]
         probabilities = pts[self.data_format.las_dimensions.ai_building_proba]
         overlays = pts[self.data_format.las_dimensions.uni_db_overlay]
         entropies = pts[self.data_format.las_dimensions.entropy]

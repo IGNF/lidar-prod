@@ -33,6 +33,7 @@ class BuildingIdentifier:
         self.min_frac_confirmation_factor_if_bd_uni_overlay = (
             min_frac_confirmation_factor_if_bd_uni_overlay
         )
+        self.pipeline: pdal.pipeline.Pipeline = None
 
     def run(self, src_las_path: str, target_las_path: str) -> str:
         """Application.
@@ -62,8 +63,9 @@ class BuildingIdentifier:
             src_las_path (str): input LAS
             target_las_path (str): output LAS
         """
-        pipeline = pdal.Pipeline()
-        pipeline |= get_pdal_reader(src_las_path)
+        if not self.pipeline:
+            self.pipeline = pdal.Pipeline()
+            self.pipeline |= get_pdal_reader(src_las_path)
         non_candidates = (
             f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
         )
@@ -72,20 +74,20 @@ class BuildingIdentifier:
         B = f"({self.data_format.las_dimensions.uni_db_overlay} > 0)"
         p_heq_modified_threshold_under_bd_uni = f"({A} && {B})"
         where = f"{non_candidates} && ({p_heq_threshold} || {p_heq_modified_threshold_under_bd_uni})"
-        pipeline |= pdal.Filter.cluster(
+        self.pipeline |= pdal.Filter.cluster(
             min_points=self.cluster.min_points,
             tolerance=self.cluster.tolerance,
             is3d=self.cluster.is3d,
             where=where,
         )
         # Always move and reset ClusterID to avoid conflict with later tasks.
-        pipeline |= pdal.Filter.ferry(
+        self.pipeline |= pdal.Filter.ferry(
             dimensions=f"{self.data_format.las_dimensions.cluster_id}=>{self.data_format.las_dimensions.ai_building_identified}"
         )
-        pipeline |= pdal.Filter.assign(
+        self.pipeline |= pdal.Filter.assign(
             value=f"{self.data_format.las_dimensions.cluster_id} = 0"
         )
 
-        pipeline |= get_pdal_writer(target_las_path)
+        self.pipeline |= get_pdal_writer(target_las_path)
         os.makedirs(osp.dirname(target_las_path), exist_ok=True)
-        pipeline.execute()
+        self.pipeline.execute()
