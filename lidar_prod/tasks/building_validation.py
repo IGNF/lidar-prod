@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Union
 import logging
 import os
 import os.path as osp
@@ -17,6 +18,7 @@ from lidar_prod.tasks.utils import (
     get_pdal_reader,
     get_pdal_writer,
     split_idx_by_dim,
+    get_pipeline
 )
 
 log = logging.getLogger(__name__)
@@ -76,34 +78,38 @@ class BuildingValidator:
 
     def run(
         self,
-        src_las_path: str,
+        input_values: Union[str, pdal.pipeline.Pipeline],
         target_las_path: str,
     ) -> str:
         """Runs application.
 
-        Transforms cloud at `src_las_path` following building validation logic,
+        Transforms cloud at `input_values` following building validation logic,
         and saves it to `target_las_path`
 
         Args:
-            src_las_path (str): path to input LAS file with a building probability channel
+            input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with a building probability channel
             target_las_path (str): path for saving updated LAS file.
 
         Returns:
             str: returns `target_las_path`
 
         """
+        self.pipeline = get_pipeline(input_values)
         with TemporaryDirectory() as td:
-            log.info(f"Applying Building Validation to file \n{src_las_path}")
             log.info(
                 "Preparation : Clustering of candidates buildings & Requesting BDUni"
             )
-            temp_f = osp.join(td, osp.basename(src_las_path))
-            self.prepare(src_las_path, temp_f)
+            if type(input_values) == str:
+                log.info(f"Applying Building Validation to file \n{input_values}")
+                temp_f = osp.join(td, osp.basename(input_values))
+            else:
+                temp_f = ""
+            self.prepare(input_values, temp_f)
             log.info("Using AI and Databases to update cloud Classification")
-            self.update(target_las_path)
+            self.update()
         return target_las_path
 
-    def prepare(self, src_las_path: str, prepared_las_path: str, save_result: bool = False) -> None:
+    def prepare(self, input_values: Union[str, pdal.pipeline.Pipeline], prepared_las_path: str, save_result: bool = False) -> None:
         f"""
         Prepare las for later decision process. .
         1. Cluster candidates points, in a new `{self.data_format.las_dimensions.ClusterID_candidate_building}`
@@ -119,7 +125,7 @@ class BuildingValidator:
         do this step once before testing multiple decision parameters on the same prepared data.
 
         Args:
-            src_las_path (str): path to input LAS file with a building probability channel
+            input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with a building probability channel
             target_las_path (str): path for saving prepared LAS file.
             save_result (bool): True to save a las instead of propagating a pipeline
 
@@ -132,9 +138,7 @@ class BuildingValidator:
         )
         dim_overlay = self.data_format.las_dimensions.uni_db_overlay
 
-        if not self.pipeline:
-            self.pipeline = pdal.Pipeline()
-            self.pipeline |= get_pdal_reader(src_las_path)
+        self.pipeline = get_pipeline(input_values)
         # Identify candidates buildings points with a boolean flag
         self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_candidate_flag}")
         _is_candidate_building = (
@@ -161,7 +165,9 @@ class BuildingValidator:
             dimensions=f"{dim_cluster_id_pdal}=>{dim_cluster_id_candidates}"
         )
         self.pipeline |= pdal.Filter.assign(value=f"{dim_cluster_id_pdal} = 0")
-        bbox = get_integer_bbox(src_las_path, buffer=self.bd_uni_request.buffer)
+        self.pipeline.execute()
+        bbox = get_integer_bbox(self.pipeline, buffer=self.bd_uni_request.buffer)
+
         self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_overlay}")
 
         if self.shp_path:
@@ -196,7 +202,7 @@ class BuildingValidator:
         if temp_dirpath:
             shutil.rmtree(temp_dirpath)
 
-    def update(self, target_las_path: str, src_las_path: str = None) -> None:
+    def update(self, src_las_path: str = None, target_las_path: str = None) -> None:
         """Updates point cloud classification channel."""
         if src_las_path:
             self.pipeline = pdal.Pipeline()
@@ -244,12 +250,15 @@ class BuildingValidator:
         las[dim_flag][unclustered_candidates_mask] = 0
 
         # UGLY !!!
-        self.pipeline = get_pdal_writer(target_las_path).pipeline(las)
-        os.makedirs(osp.dirname(target_las_path), exist_ok=True)
-        self.pipeline.execute()
+        self.pipeline = pdal.Pipeline(arrays=[las])
 
-        self.pipeline = pdal.Pipeline()
-        self.pipeline |= get_pdal_reader(target_las_path)
+        if target_las_path and type(target_las_path) == str:
+            self.pipeline = get_pdal_writer(target_las_path).pipeline(las)
+            os.makedirs(osp.dirname(target_las_path), exist_ok=True)
+            self.pipeline.execute()
+
+        # self.pipeline = pdal.Pipeline()
+        # self.pipeline |= get_pdal_reader(target_las_path)
         # END OF UGLYNESS
 
     def _extract_cluster_info_by_idx(

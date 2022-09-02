@@ -85,8 +85,8 @@ def check_format_of_application_output_las(output_las_path: str, expected_codes:
     assert actual_codes.issubset(expected_codes)
 
 
-def check_las_format_versions_and_srs(las_path):
-    metadata = get_las_metadata(las_path)
+def check_las_format_versions_and_srs(pipeline: pdal.pipeline.Pipeline):
+    metadata = get_las_metadata(pipeline)
     assert metadata["minor_version"] == 4
     assert metadata["dataformat_id"] == 8
     # Ensure that the final spatial reference is French CRS Lambert-93

@@ -39,7 +39,7 @@ def get_list_las_path_from_src(src_path: str):
     # src_path is a directory
     src_las_path = []
     for path in os.scandir(src_path):
-        if os.path.isfile(path) and os.path.splitext(path)[1] == ".las":
+        if os.path.isfile(path) and os.path.splitext(path)[1] in [".las", ".laz"]:
             src_las_path.append(path)
     return src_las_path
 
@@ -116,20 +116,15 @@ def apply_building_module(config: DictConfig, src_las_path: str, dest_las_path: 
         bv: BuildingValidator = hydra.utils.instantiate(
             config.building_validation.application
         )
-        pipeline = pdal.Pipeline()
-        pipeline |= get_pdal_reader(tmp_las_path)
-        bv.pipeline = pipeline
         bv.run(tmp_las_path, tmp_las_path)
 
         # Complete buildings with non-candidates that were nevertheless confirmed
         bc: BuildingCompletor = hydra.utils.instantiate(config.building_completion)
-        bc.pipeline = bv.pipeline
-        bc.run(tmp_las_path, tmp_las_path)
+        bc.run(bv.pipeline, tmp_las_path)
 
         # Define groups of confirmed building points among non-candidates
         bi: BuildingIdentifier = hydra.utils.instantiate(config.building_identification)
-        bi.pipeline = bc.pipeline
-        bi.run(tmp_las_path, tmp_las_path)
+        bi.run(bc.pipeline, tmp_las_path)
 
         # Remove unnecessary intermediary dimensions
         cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.output_building)

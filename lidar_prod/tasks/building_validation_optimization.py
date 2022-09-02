@@ -212,7 +212,7 @@ class BuildingValidationOptimizer:
             desc="Update.",
             unit="tiles",
         ):
-            self.bv.update(target_las_path, prepared_las_path)
+            self.bv.update(prepared_las_path, target_las_path)
             log.info(f"Saved to {target_las_path}")
 
     def _extract_clusters_from_las(

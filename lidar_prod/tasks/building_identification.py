@@ -2,8 +2,9 @@ import logging
 import os
 import os.path as osp
 import pdal
+from typing import Union
 
-from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer
+from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer, get_pipeline
 
 log = logging.getLogger(__name__)
 
@@ -35,37 +36,34 @@ class BuildingIdentifier:
         )
         self.pipeline: pdal.pipeline.Pipeline = None
 
-    def run(self, src_las_path: str, target_las_path: str) -> str:
+    def run(self, input_values: Union[str, pdal.pipeline.Pipeline], target_las_path: str) -> str:
         """Application.
 
         Transform cloud at `src_las_path` following identification logic, and save it to
         `target_las_path`
 
         Args:
-            src_las_path (str): path to input LAS file with a building probability channel
+            input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with a building probability channel
             target_las_path (str): path for saving updated LAS file.
 
         Returns:
             str:  `target_las_path`
 
         """
-        log.info(f"Applying Building Identification to file \n{src_las_path}")
         log.info("Clustering of points with high building proba.")
-        self.prepare(src_las_path, target_las_path)
+        self.prepare(input_values, target_las_path)
         return target_las_path
 
-    def prepare(self, src_las_path: str, target_las_path: str) -> None:
+    def prepare(self, input_values: Union[str, pdal.pipeline.Pipeline], target_las_path: str) -> None:
         """Identify potential buildings in a new channel, excluding former candidates from
         search based on their group ID. ClusterID needs to be reset to avoid unwanted merge
         of information from previous VuildingValidation clustering.
 
         Args:
-            src_las_path (str): input LAS
+            input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with a building probability channel
             target_las_path (str): output LAS
         """
-        if not self.pipeline:
-            self.pipeline = pdal.Pipeline()
-            self.pipeline |= get_pdal_reader(src_las_path)
+        self.pipeline = get_pipeline(input_values)
         non_candidates = (
             f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
         )
