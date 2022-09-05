@@ -21,6 +21,7 @@ We apply different "mutations" to the data in order to test for multiple scenari
 LAS_SUBSET_FILE_BUILDING = "tests/files/870000_6618000.subset.postIA.las"
 SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
 LAS_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.las"
+LAZ_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.laz"
 DUMMY_DIRECTORY_PATH = "tests/files/dummy_folder"
 DUMMY_FILE_PATH = "tests/files/dummy_folder/dummy_file1.las"
 
@@ -92,10 +93,16 @@ def check_las_format_versions_and_srs(pipeline: pdal.pipeline.Pipeline):
     # Ensure that the final spatial reference is French CRS Lambert-93
     assert "Lambert-93" in metadata["spatialreference"]
 
-
-def test_just_clean(vegetation_unclassifed_hydra_cfg):
+@pytest.mark.parametrize(
+    "las_file",
+    [
+        LAS_SUBSET_FILE_VEGETATION,
+        LAZ_SUBSET_FILE_VEGETATION
+    ],
+)
+def test_just_clean(vegetation_unclassifed_hydra_cfg, las_file):
     destination_path = tempfile.NamedTemporaryFile().name
-    just_clean(vegetation_unclassifed_hydra_cfg, LAS_SUBSET_FILE_VEGETATION, destination_path)
+    just_clean(vegetation_unclassifed_hydra_cfg, las_file, destination_path)
     las_data = get_las_data_from_las(destination_path)
     assert [dim for dim in las_data.point_format.extra_dimension_names] == ['entropy', 'vegetation', 'unclassified']
 
