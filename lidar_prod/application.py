@@ -12,8 +12,7 @@ from lidar_prod.tasks.building_validation import BuildingValidator
 from lidar_prod.tasks.building_identification import BuildingIdentifier
 from lidar_prod.tasks.basic_identification import BasicIdentifier
 
-import pdal
-from lidar_prod.tasks.utils import get_las_data_from_las, save_las_data_to_las, get_pdal_reader
+from lidar_prod.tasks.utils import get_las_data_from_las, save_las_data_to_las
 
 log = logging.getLogger(__name__)
 

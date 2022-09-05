@@ -3,8 +3,6 @@ from typing import Union
 import json
 import math
 from numbers import Number
-import subprocess
-import tempfile
 from typing import Any, Dict, Iterable
 import numpy as np
 import pdal
@@ -30,6 +28,7 @@ def split_idx_by_dim(dim_array):
     sorted_dim_array = dim_array[idx]
     group_idx = np.array_split(idx, np.where(np.diff(sorted_dim_array) != 0)[0] + 1)
     return group_idx
+
 
 def get_pipeline(entry_value: Union[pdal.pipeline.Pipeline, str]):
     if type(entry_value) == str:

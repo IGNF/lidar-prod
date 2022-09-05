@@ -4,7 +4,7 @@ import os.path as osp
 import pdal
 from typing import Union
 
-from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer, get_pipeline
+from lidar_prod.tasks.utils import get_pdal_writer, get_pipeline
 
 log = logging.getLogger(__name__)
 
