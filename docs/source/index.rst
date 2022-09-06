@@ -11,6 +11,7 @@ Lidar-Prod > Documentation
    :maxdepth: 1
    :caption: Background
 
+   background/overview
    background/production_process
    background/thresholds_optimization_process
 
