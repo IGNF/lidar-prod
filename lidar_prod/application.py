@@ -39,7 +39,7 @@ def get_list_las_path_from_src(src_path: str):
     src_las_path = []
     for path in os.scandir(src_path):
         if os.path.isfile(path) and os.path.splitext(path)[1] in [".las", ".laz"]:
-            src_las_path.append(path)
+            src_las_path.append(os.path.join(src_path, path))
     return src_las_path
 
 
