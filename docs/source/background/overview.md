@@ -2,8 +2,8 @@
 
 A las file goes through several steps, which alter its content. 
 At first we have a `Raw` las file, sent to another process (`Myria3D`) that infers the probabilities of various classes.
-From there, the las file is used a first time by this module to decide if the points are vegetation, unclassified or something else, and sent to an exterior process, a `rule based segmentation`.
-The las file is used a second time by this module to decide if the points are buldings or not. 
+From there, the las file is used a first time by this module to decide if the points are vegetation, unclassified or something else, and sent to an exterinal process, a `rule-based segmentation`.
+The las file is used a second time by this module to decide if the points are buildings or not. 
 
 # schema of the overall process
 The arrows represent dimensions in the las file, where they come from and where they are consumed.

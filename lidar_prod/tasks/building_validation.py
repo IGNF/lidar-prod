@@ -79,7 +79,7 @@ class BuildingValidator:
     def run(
         self,
         input_values: Union[str, pdal.pipeline.Pipeline],
-        target_las_path: str,
+        target_las_path: str = None,
     ) -> str:
         """Runs application.
 
@@ -249,17 +249,13 @@ class BuildingValidator:
         unclustered_candidates_mask = candidates_mask & (unclustered_mask)
         las[dim_flag][unclustered_candidates_mask] = 0
 
-        # UGLY !!!
         self.pipeline = pdal.Pipeline(arrays=[las])
 
-        if target_las_path and type(target_las_path) == str:
+        if target_las_path:
             self.pipeline = get_pdal_writer(target_las_path).pipeline(las)
             os.makedirs(osp.dirname(target_las_path), exist_ok=True)
             self.pipeline.execute()
 
-        # self.pipeline = pdal.Pipeline()
-        # self.pipeline |= get_pdal_reader(target_las_path)
-        # END OF UGLYNESS
 
     def _extract_cluster_info_by_idx(
         self, las: np.ndarray, pts_idx: np.ndarray

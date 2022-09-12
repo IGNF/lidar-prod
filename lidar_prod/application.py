@@ -115,11 +115,11 @@ def apply_building_module(config: DictConfig, src_las_path: str, dest_las_path: 
         bv: BuildingValidator = hydra.utils.instantiate(
             config.building_validation.application
         )
-        bv.run(tmp_las_path, tmp_las_path)
+        bv.run(tmp_las_path)
 
         # Complete buildings with non-candidates that were nevertheless confirmed
         bc: BuildingCompletor = hydra.utils.instantiate(config.building_completion)
-        bc.run(bv.pipeline, tmp_las_path)
+        bc.run(bv.pipeline)
 
         # Define groups of confirmed building points among non-candidates
         bi: BuildingIdentifier = hydra.utils.instantiate(config.building_identification)

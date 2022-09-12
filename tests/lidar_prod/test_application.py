@@ -93,6 +93,7 @@ def check_las_format_versions_and_srs(pipeline: pdal.pipeline.Pipeline):
     # Ensure that the final spatial reference is French CRS Lambert-93
     assert "Lambert-93" in metadata["spatialreference"]
 
+
 @pytest.mark.parametrize(
     "las_file",
     [

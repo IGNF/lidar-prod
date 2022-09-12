@@ -36,11 +36,10 @@ class BuildingCompletor:
         self.codes = data_format.codes.building  # easier access
         self.pipeline: pdal.pipeline.Pipeline = None
 
-    def run(self, input_values: Union[str, pdal.pipeline.Pipeline], target_las_path: str):
+    def run(self, input_values: Union[str, pdal.pipeline.Pipeline]):
         """Application.
 
-        Transform cloud at `src_las_path` following building completion logic, and save it to
-        `target_las_path`
+        Transform cloud at `src_las_path` following building completion logic
 
         Args:
             input_values (str|pdal.pipeline.Pipeline): path to either input LAS file or a pipeline
@@ -56,10 +55,9 @@ class BuildingCompletor:
         pipeline = get_pipeline(input_values)
         self.prepare_for_building_completion(pipeline)
         self.update_classification()
-        return target_las_path
 
     def prepare_for_building_completion(
-        self, pipeline: pdal.pipeline.Pipeline, target_las_path: str = None
+        self, pipeline: pdal.pipeline.Pipeline
     ) -> None:
         f"""Prepare for building completion.
 
@@ -136,7 +134,6 @@ class BuildingCompletor:
         for pts_idx in tqdm(
             split_idx, desc="Complete buildings with isolated points", unit="grp"
         ):
-            # pts = las.points[pts_idx]
             pts = las[pts_idx]
             if self.codes.final.building in pts[_clf]:
                 las[_clf][pts_idx] = self.codes.final.building
