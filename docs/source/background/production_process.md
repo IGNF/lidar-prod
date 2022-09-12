@@ -2,7 +2,7 @@
 
 The end goal of the tool is to edit the input (rules-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for human inspection.
 
-**Input**: point cloud that went through a first geometric algorithm that identified `candidates building points` based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building. The default name for this extra dimension is `building`. You can leverage this [package for aerial lidar deep learning segmentation](https://github.com/IGNF/lidar-deep-segmentation).
+**Input**: point cloud that went through a first geometric algorithm that identified `candidates building points` based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building, vegetation and/or unclassified, and calculate the associated entropy. The default name for those extra dimensions are `building`, `vegetation`, `unclassified` and `entropy` respectively. You can leverage this [package for aerial lidar deep learning segmentation](https://github.com/IGNF/lidar-deep-segmentation).
 
 ## A.1) Vegetation detection
 **Goal**: Confirm or refute points as vegetation.
