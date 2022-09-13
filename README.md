@@ -35,3 +35,8 @@ Right now, the class `building` is the only one that is addressed. The extension
 > Please refer to the documentation for [installation and usage](https://ignf.github.io/lidar-prod-quality-control/tutorials/install.html).
     
 > Please refer to the documentation to understand the [production process](https://ignf.github.io/lidar-prod-quality-control/background/production_process.html).
+
+## Version
+
+Decision thresholds for building validation should be optimized for the trained deep learning model which will produce the probabilities.
+Current model version: proto151_V0.0_epoch_056_Myria3DV2.3.0.ckpt (accessible at this [Myria3D Production Release](https://github.com/IGNF/myria3d/releases/tag/prod-release-tag) - if up to date).
