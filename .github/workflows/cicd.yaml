@@ -44,7 +44,7 @@ jobs:
         python -m
         pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
 
-    - name: Test run from CLI on a LAS subset.
+    - name: Test detection of building.
       run: >
         docker run 
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
@@ -52,8 +52,22 @@ jobs:
         lidar_prod_im
         python 
         lidar_prod/run.py
-        print_config=true
+        data_format=legacy.yaml
+        +task=apply_on_building
         paths.src_las=/inputs/730000_6360000.subset.prototype_format202.las
+        paths.output_dir=/outputs/
+
+    - name: Test vegetation/unclassified detection from CLI on a LAS subset.
+      run: >
+        docker run 
+        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
+        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/
+        lidar_prod_im
+        python 
+        lidar_prod/run.py
+        +task=identify_vegetation_unclassified
+        data_format=vegetation_unclassified.yaml
+        paths.src_las=/inputs/888000_6614000.subset.las
         paths.output_dir=/outputs/
 
     # Everything ran so we tag the valid docker image to keep it

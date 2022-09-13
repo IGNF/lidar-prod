@@ -6,9 +6,20 @@ from lidar_prod.tasks.utils import pdal_read_las_array
 
 
 @pytest.fixture
-def default_hydra_cfg():
+def vegetation_unclassifed_hydra_cfg():
     with initialize(config_path="./../configs/", job_name="config"):
-        return compose(config_name="config")
+        return compose(
+            config_name="config",
+            overrides=[
+                "data_format=vegetation_unclassified.yaml",
+                "basic_identification=for_testing.yaml",
+                "paths.src_las=tests/files/436000_6478000.subset.postIA.las"])
+
+
+@pytest.fixture
+def legacy_hydra_cfg():
+    with initialize(config_path="./../configs/", job_name="config"):
+        return compose(config_name="config", overrides=["data_format=legacy.yaml"])
 
 
 def check_las_invariance(las_path1, las_path2):

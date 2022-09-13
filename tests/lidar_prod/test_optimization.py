@@ -56,14 +56,14 @@ LARGE_EXPECTED_METRICS = {
 RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS = 0.05
 
 
-def test_BVOptimization_on_subset(default_hydra_cfg):
+def test_BVOptimization_on_subset(legacy_hydra_cfg):
     with tempfile.TemporaryDirectory() as td:
         # Optimization output (thresholds and prepared/updated LASfiles) saved to td
-        default_hydra_cfg.building_validation.optimization.paths.results_output_dir = td
+        legacy_hydra_cfg.building_validation.optimization.paths.results_output_dir = td
 
         # We isolate the input file in a subdir, and prepare it for optimization
         input_las_dir = osp.join(td, "inputs/")
-        default_hydra_cfg.building_validation.optimization.paths.input_las_dir = (
+        legacy_hydra_cfg.building_validation.optimization.paths.input_las_dir = (
             input_las_dir
         )
         os.makedirs(input_las_dir, exist_ok=False)
@@ -72,7 +72,7 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
 
         # Check that a full optimization run can pass successfully
         bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
-            default_hydra_cfg.building_validation.optimization
+            legacy_hydra_cfg.building_validation.optimization
         )
         bvo.run()
 
@@ -98,7 +98,7 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
         arr = pdal_read_las_array(updated_las_path)
         # Check that we have either 1/2 (ground/unclassified), or one of
         # the final classification code of the module.
-        final_codes = default_hydra_cfg.data_format.codes.building.final
+        final_codes = legacy_hydra_cfg.data_format.codes.building.final
         expected_codes = {
             1,
             2,
@@ -111,18 +111,18 @@ def test_BVOptimization_on_subset(default_hydra_cfg):
 
 
 @pytest.mark.slow()
-def test_BVOptimization_on_large_file(default_hydra_cfg):
+def test_BVOptimization_on_large_file(legacy_hydra_cfg):
 
     if not os.path.isfile(LAS_LARGE_FILE):
         pytest.xfail(reason=f"File {LAS_LARGE_FILE} is not present in environment.")
 
     with tempfile.TemporaryDirectory() as td:
         # Optimization output (thresholds and prepared/updated LASfiles) saved to td
-        default_hydra_cfg.building_validation.optimization.paths.results_output_dir = td
+        legacy_hydra_cfg.building_validation.optimization.paths.results_output_dir = td
 
         # We isolate the input file in a subdir, and prepare it for optimization
         input_las_dir = osp.join(td, "inputs/")
-        default_hydra_cfg.building_validation.optimization.paths.input_las_dir = (
+        legacy_hydra_cfg.building_validation.optimization.paths.input_las_dir = (
             input_las_dir
         )
         os.makedirs(input_las_dir, exist_ok=False)
@@ -131,7 +131,7 @@ def test_BVOptimization_on_large_file(default_hydra_cfg):
 
         # Check that a full optimization run can pass successfully
         bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
-            default_hydra_cfg.building_validation.optimization
+            legacy_hydra_cfg.building_validation.optimization
         )
         bvo.prepare()
         metrics_dict = bvo.evaluate()

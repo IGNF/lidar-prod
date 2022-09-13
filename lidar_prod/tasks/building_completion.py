@@ -1,12 +1,9 @@
 import logging
-import os
-import os.path as osp
-from tempfile import TemporaryDirectory
 import pdal
-import laspy
 from tqdm import tqdm
+from typing import Union
 
-from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer, split_idx_by_dim
+from lidar_prod.tasks.utils import split_idx_by_dim, get_pipeline
 
 log = logging.getLogger(__name__)
 
@@ -37,33 +34,30 @@ class BuildingCompletor:
         )
         self.data_format = data_format
         self.codes = data_format.codes.building  # easier access
+        self.pipeline: pdal.pipeline.Pipeline = None
 
-    def run(self, src_las_path: str, target_las_path: str):
+    def run(self, input_values: Union[str, pdal.pipeline.Pipeline]):
         """Application.
 
-        Transform cloud at `src_las_path` following building completion logic, and save it to
-        `target_las_path`
+        Transform cloud at `src_las_path` following building completion logic
 
         Args:
-            src_las_path (str): path to input LAS file, output of BuildingValidator
+            input_values (str|pdal.pipeline.Pipeline): path to either input LAS file or a pipeline
             target_las_path (str): path for saving updated LAS file.
 
         Returns:
             str: returns `target_las_path` for potential terminal piping.
 
         """
-        log.info(f"Applying Building Completion to file \n{src_las_path}")
         log.info(
             "Completion of building with relatively distant points that have high enough probability"
         )
-        with TemporaryDirectory() as td:
-            tmp_las_path = osp.join(td, osp.basename(src_las_path))
-            self.prepare_for_building_completion(src_las_path, tmp_las_path)
-            self.update_classification(tmp_las_path, target_las_path)
-        return target_las_path
+        pipeline = get_pipeline(input_values)
+        self.prepare_for_building_completion(pipeline)
+        self.update_classification()
 
     def prepare_for_building_completion(
-        self, src_las_path: str, target_las_path: str
+        self, pipeline: pdal.pipeline.Pipeline
     ) -> None:
         f"""Prepare for building completion.
 
@@ -74,12 +68,11 @@ class BuildingCompletor:
         and they will be confirmed as well.
 
         Args:
-            src_las_path (str): input LAS
+            src_las_path (pdal.pipeline.Pipeline): input LAS pipeline
             target_las_path (str): output, prepared LAS with a new `{self.data_format.las_dimensions.ClusterID_isolated_plus_confirmed}`
             dimension.
         """
-        pipeline = pdal.Pipeline()
-        pipeline |= get_pdal_reader(src_las_path)
+        self.pipeline = pipeline
         candidates = (
             f"({self.data_format.las_dimensions.candidate_buildings_flag} == 1)"
         )
@@ -103,35 +96,33 @@ class BuildingCompletor:
         )
 
         where = f"{not_clustered_but_with_high_p} || {confirmed_buildings}"
-        pipeline |= pdal.Filter.cluster(
+        self.pipeline |= pdal.Filter.cluster(
             min_points=self.cluster.min_points,
             tolerance=self.cluster.tolerance,
             is3d=self.cluster.is3d,
             where=where,
         )
         # Always move and reset ClusterID to avoid conflict with later tasks.
-        pipeline |= pdal.Filter.ferry(
+        self.pipeline |= pdal.Filter.ferry(
             dimensions=f"{self.data_format.las_dimensions.cluster_id}=>{self.data_format.las_dimensions.ClusterID_isolated_plus_confirmed}"
         )
-        pipeline |= pdal.Filter.assign(
+        self.pipeline |= pdal.Filter.assign(
             value=f"{self.data_format.las_dimensions.cluster_id} = 0"
         )
-        pipeline |= get_pdal_writer(target_las_path)
-        os.makedirs(osp.dirname(target_las_path), exist_ok=True)
-        pipeline.execute()
+        self.pipeline.execute()
 
     def update_classification(
-        self, prepared_las_path: str, target_las_path: str
+        self
     ) -> None:
         """Updates Classification dimension by completing buildings with high probability points.
-
-        Args:
-            prepared_las_path (str): input, prepared LAS
-            target_las_path (str): output LAS, with updated Classification dimension.
         """
-        las = laspy.read(prepared_las_path)
+
+        las = self.pipeline.arrays[0]
+
+        # las = laspy.read(prepared_las_path)
         _clf = self.data_format.las_dimensions.classification
         _cid = self.data_format.las_dimensions.ClusterID_isolated_plus_confirmed
+
         # 2) Decide at the group-level
         split_idx = split_idx_by_dim(las[_cid])
         # Isolated/confirmed groups have a cluster index > 0
@@ -143,8 +134,7 @@ class BuildingCompletor:
         for pts_idx in tqdm(
             split_idx, desc="Complete buildings with isolated points", unit="grp"
         ):
-            pts = las.points[pts_idx]
+            pts = las[pts_idx]
             if self.codes.final.building in pts[_clf]:
                 las[_clf][pts_idx] = self.codes.final.building
-        os.makedirs(osp.dirname(target_las_path), exist_ok=True)
-        las.write(target_las_path)
+        self.pipeline = pdal.Pipeline(arrays=[las])

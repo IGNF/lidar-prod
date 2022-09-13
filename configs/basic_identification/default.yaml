@@ -1,0 +1,6 @@
+# parameters
+vegetation_threshold: 0.3923
+unclassified_threshold: 0.2455
+
+vegetation_nb_trials: 100
+unclassified_nb_trials: 100
