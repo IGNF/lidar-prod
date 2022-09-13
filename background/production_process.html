@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Production process used to transform point clouds classification &mdash; lidar_prod 1.6.2 documentation</title>
+  <title>Production process used to transform point clouds classification &mdash; lidar_prod 1.7.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Strategy to find optimal decision thresholds for Building validation" href="thresholds_optimization_process.html" />
-    <link rel="prev" title="Lidar-Prod &gt; Documentation" href="../index.html" /> 
+    <link rel="prev" title="Overview of the process" href="overview.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,10 +40,14 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Background</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of the process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html#schema-of-the-overall-process">schema of the overall process</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Production process used to transform point clouds classification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#a-building-validation">A) Building Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#b-building-completion">B) Building Completion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#c-building-identification">C) Building Identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#b-1-building-validation">B.1) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#b-2-building-completion">B.2) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#b-3-building-identification">B.3) Building Identification</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="thresholds_optimization_process.html">Strategy to find optimal decision thresholds for Building validation</a><ul>
@@ -63,6 +67,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-within-a-docker-container">Run within a docker container</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-as-a-python-module">Run as a python module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-from-source-directly">Run from source directly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-different-tasks">Run Different tasks</a></li>
 </ul>
 </li>
 </ul>
@@ -127,9 +132,19 @@
   <section id="production-process-used-to-transform-point-clouds-classification">
 <h1>Production process used to transform point clouds classification<a class="headerlink" href="#production-process-used-to-transform-point-clouds-classification" title="Permalink to this headline"></a></h1>
 <p>The end goal of the tool is to edit the input (rules-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for human inspection.</p>
-<p><strong>Input</strong>: point cloud that went through a first geometric algorithm that identified <code class="docutils literal notranslate"><span class="pre">candidates</span> <span class="pre">building</span> <span class="pre">points</span></code> based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building. The default name for this extra dimension is <code class="docutils literal notranslate"><span class="pre">building</span></code>. You can leverage this <a class="reference external" href="https://github.com/IGNF/lidar-deep-segmentation">package for aerial lidar deep learning segmentation</a>.</p>
-<section id="a-building-validation">
-<h2>A) Building Validation<a class="headerlink" href="#a-building-validation" title="Permalink to this headline"></a></h2>
+<p><strong>Input</strong>: point cloud that went through a first geometric algorithm that identified <code class="docutils literal notranslate"><span class="pre">candidates</span> <span class="pre">building</span> <span class="pre">points</span></code> based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building, vegetation and/or unclassified, and calculate the associated entropy. The default name for those extra dimensions are <code class="docutils literal notranslate"><span class="pre">building</span></code>, <code class="docutils literal notranslate"><span class="pre">vegetation</span></code>, <code class="docutils literal notranslate"><span class="pre">unclassified</span></code> and <code class="docutils literal notranslate"><span class="pre">entropy</span></code> respectively. You can leverage this <a class="reference external" href="https://github.com/IGNF/lidar-deep-segmentation">package for aerial lidar deep learning segmentation</a>.</p>
+<section id="a-1-vegetation-detection">
+<h2>A.1) Vegetation detection<a class="headerlink" href="#a-1-vegetation-detection" title="Permalink to this headline"></a></h2>
+<p><strong>Goal</strong>: Confirm or refute points as vegetation.</p>
+<p>The identification is done by comparing the vegetation probability  of a point against a <code class="docutils literal notranslate"><span class="pre">threshold</span></code>. That threshold has been previously established as the best on a test set of las files.</p>
+</section>
+<section id="a-2-unclassified-detection">
+<h2>A.2) Unclassified detection<a class="headerlink" href="#a-2-unclassified-detection" title="Permalink to this headline"></a></h2>
+<p><strong>Goal</strong>: Confirm or refute points as unclassified.</p>
+<p>Exactly as with vegetation detection, the identification is done by comparing the unclassified probability of a point against a <code class="docutils literal notranslate"><span class="pre">threshold</span></code>. That threshold has been previously established as the best on a test set of las files.</p>
+</section>
+<section id="b-1-building-validation">
+<h2>B.1) Building Validation<a class="headerlink" href="#b-1-building-validation" title="Permalink to this headline"></a></h2>
 <p><strong>Goal</strong>: Confirm or refute groups of candidate building points when possible, mark them as unsure elsewise.</p>
 <ol class="arabic simple">
 <li><p>Clustering of <em>candidate buildings points</em> into connected components.</p></li>
@@ -169,8 +184,8 @@ Current performances on a 15km² validation dataset, expressed as percentages of
 </ul>
 <p><img alt="" src="../_images/LidarBati-BuildingValidationM7.1V2.0.png" /></p>
 </section>
-<section id="b-building-completion">
-<h2>B) Building Completion<a class="headerlink" href="#b-building-completion" title="Permalink to this headline"></a></h2>
+<section id="b-2-building-completion">
+<h2>B.2) Building Completion<a class="headerlink" href="#b-2-building-completion" title="Permalink to this headline"></a></h2>
 <p><strong>Goal</strong>: Confirm points that were too isolated to make up a group but have high-enough probability nevertheless (e.g. walls)</p>
 <p>Among  <em>candidate buildings points</em> that have not been clustered in previous step due, identify those which nevertheless meet the requirement to be <code class="docutils literal notranslate"><span class="pre">confirmed</span></code>.
 Cluster them together with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
@@ -178,8 +193,8 @@ For each cluster, if some points were confirmed, the others are considered to be
 therefore confirmed as well.</p>
 <p><img alt="" src="../_images/LidarBati-BuildingCompletion.png" /></p>
 </section>
-<section id="c-building-identification">
-<h2>C) Building Identification<a class="headerlink" href="#c-building-identification" title="Permalink to this headline"></a></h2>
+<section id="b-3-building-identification">
+<h2>B.3) Building Identification<a class="headerlink" href="#b-3-building-identification" title="Permalink to this headline"></a></h2>
 <p><strong>Goal</strong>: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection.</p>
 <p>Among points that were <strong>not</strong> <em>candidate buildings points</em> identify those which meet the requirement to be <code class="docutils literal notranslate"><span class="pre">confirmed</span></code>, and cluster them.</p>
 <p>This clustering defines a LAS extra dimensions (<code class="docutils literal notranslate"><span class="pre">Group</span></code>) which indexes newly found cluster that may be some missed buildings.</p>
@@ -191,7 +206,7 @@ therefore confirmed as well.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../index.html" class="btn btn-neutral float-left" title="Lidar-Prod &gt; Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview of the process" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="thresholds_optimization_process.html" class="btn btn-neutral float-right" title="Strategy to find optimal decision thresholds for Building validation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

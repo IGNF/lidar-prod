@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.utils &mdash; lidar_prod 1.6.2 documentation</title>
+  <title>lidar_prod.tasks.utils &mdash; lidar_prod 1.7.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -37,10 +37,14 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Background</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../background/overview.html">Overview of the process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../background/overview.html#schema-of-the-overall-process">schema of the overall process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../background/production_process.html">Production process used to transform point clouds classification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-building-validation">A) Building Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-building-completion">B) Building Completion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#c-building-identification">C) Building Identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-1-building-validation">B.1) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-2-building-completion">B.2) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-3-building-identification">B.3) Building Identification</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../background/thresholds_optimization_process.html">Strategy to find optimal decision thresholds for Building validation</a><ul>
@@ -60,6 +64,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/use.html#run-within-a-docker-container">Run within a docker container</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/use.html#run-as-a-python-module">Run as a python module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/use.html#run-from-source-directly">Run from source directly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/use.html#run-different-tasks">Run Different tasks</a></li>
 </ul>
 </li>
 </ul>
@@ -123,14 +128,14 @@
              
   <h1>Source code for lidar_prod.tasks.utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pdal</span>
+<span class="kn">import</span> <span class="nn">laspy</span>
 
 
 <div class="viewcode-block" id="BDUniConnectionParams"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.BDUniConnectionParams">[docs]</a><span class="nd">@dataclass</span>
@@ -154,55 +159,31 @@
     <span class="k">return</span> <span class="n">group_idx</span></div>
 
 
-<div class="viewcode-block" id="run_pdal_info"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.run_pdal_info">[docs]</a><span class="k">def</span> <span class="nf">run_pdal_info</span><span class="p">(</span><span class="n">in_las</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_stats_json</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">command</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;pdal info </span><span class="si">{</span><span class="n">in_las</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="s2">&quot; --metadata&quot;</span>
-        <span class="s2">&quot; --driver readers.las&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot; &gt; </span><span class="si">{</span><span class="n">out_stats_json</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="p">)</span>
-    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+<div class="viewcode-block" id="get_pipeline"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pipeline">[docs]</a><span class="k">def</span> <span class="nf">get_pipeline</span><span class="p">(</span><span class="n">entry_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">entry_value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">()</span> <span class="o">|</span> <span class="n">get_pdal_reader</span><span class="p">(</span><span class="n">entry_value</span><span class="p">)</span>
+        <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">entry_value</span>
+    <span class="k">return</span> <span class="n">pipeline</span></div>
 
 
-<div class="viewcode-block" id="get_las_metadata"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_las_metadata">[docs]</a><span class="k">def</span> <span class="nf">get_las_metadata</span><span class="p">(</span><span class="n">in_las</span><span class="p">):</span>
-    <span class="n">_tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
-    <span class="n">run_pdal_info</span><span class="p">(</span><span class="n">in_las</span><span class="p">,</span> <span class="n">_tmp</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_tmp</span><span class="p">)</span> <span class="k">as</span> <span class="n">mtd</span><span class="p">:</span>
-        <span class="n">metadata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">mtd</span><span class="p">)[</span><span class="s2">&quot;metadata&quot;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">metadata</span></div>
+<div class="viewcode-block" id="get_las_metadata"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_las_metadata">[docs]</a><span class="k">def</span> <span class="nf">get_las_metadata</span><span class="p">(</span><span class="n">entry_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">entry_value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">metadata</span><span class="p">)[</span><span class="s2">&quot;metadata&quot;</span><span class="p">][</span><span class="s2">&quot;readers.las&quot;</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="get_bbox"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_bbox">[docs]</a><span class="k">def</span> <span class="nf">get_bbox</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">buffer</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Get XY bounding box of a cloud using pdal info --metadata.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        las_path (str): path to input LAS cloud.</span>
-<span class="sd">        buffer (int): expand bbox with a buffer. Default: no buffer.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        float: coordinates of bounding box : xmin, ymin, xmax, ymax</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">metadata</span> <span class="o">=</span> <span class="n">get_las_metadata</span><span class="p">(</span><span class="n">las_path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">{</span>
+<div class="viewcode-block" id="get_integer_bbox"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_integer_bbox">[docs]</a><span class="k">def</span> <span class="nf">get_integer_bbox</span><span class="p">(</span><span class="n">entry_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">buffer</span><span class="p">:</span> <span class="n">Number</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">entry_value</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;Get XY bounding box of a cloud, cast x/y min/max to integers.&quot;&quot;&quot;</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">get_las_metadata</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;x_min&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;minx&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">buffer</span><span class="p">),</span>
         <span class="s2">&quot;y_min&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;miny&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">buffer</span><span class="p">),</span>
         <span class="s2">&quot;x_max&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;maxx&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">buffer</span><span class="p">),</span>
         <span class="s2">&quot;y_max&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;maxy&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">buffer</span><span class="p">),</span>
-    <span class="p">}</span></div>
-
-
-<div class="viewcode-block" id="get_integer_bbox"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_integer_bbox">[docs]</a><span class="k">def</span> <span class="nf">get_integer_bbox</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">buffer</span><span class="p">:</span> <span class="n">Number</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Get XY bounding box of a cloud, cast x/y min/max to integers.&quot;&quot;&quot;</span>
-
-    <span class="n">bbox</span> <span class="o">=</span> <span class="n">get_bbox</span><span class="p">(</span><span class="n">las_path</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="n">buffer</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;x_min&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;x_min&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;y_min&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;y_min&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;x_max&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;x_max&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;y_max&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;y_max&quot;</span><span class="p">]),</span>
-    <span class="p">}</span></div>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">bbox</span></div>
 
 
 <div class="viewcode-block" id="get_pdal_reader"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pdal_reader">[docs]</a><span class="k">def</span> <span class="nf">get_pdal_reader</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Reader</span><span class="o">.</span><span class="n">las</span><span class="p">:</span>
@@ -220,6 +201,11 @@
         <span class="n">nosrs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">override_srs</span><span class="o">=</span><span class="s2">&quot;EPSG:2154&quot;</span><span class="p">,</span>
     <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_las_data_from_las"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_las_data_from_las">[docs]</a><span class="k">def</span> <span class="nf">get_las_data_from_las</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Load las data from a las file &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">laspy</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">las_path</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_pdal_writer"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pdal_writer">[docs]</a><span class="k">def</span> <span class="nf">get_pdal_writer</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extra_dims</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Writer</span><span class="o">.</span><span class="n">las</span><span class="p">:</span>
@@ -240,6 +226,11 @@
         <span class="n">forward</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span>
         <span class="n">extra_dims</span><span class="o">=</span><span class="n">extra_dims</span><span class="p">,</span>
     <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save_las_data_to_las"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.save_las_data_to_las">[docs]</a><span class="k">def</span> <span class="nf">save_las_data_to_las</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">las_data</span><span class="p">:</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; save las data to a las file&quot;&quot;&quot;</span>
+    <span class="n">las_data</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">las_path</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_a_las_to_las_pdal_pipeline"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_a_las_to_las_pdal_pipeline">[docs]</a><span class="k">def</span> <span class="nf">get_a_las_to_las_pdal_pipeline</span><span class="p">(</span>

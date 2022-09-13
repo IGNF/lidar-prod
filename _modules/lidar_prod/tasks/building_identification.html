@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_identification &mdash; lidar_prod 1.6.2 documentation</title>
+  <title>lidar_prod.tasks.building_identification &mdash; lidar_prod 1.7.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -37,10 +37,14 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Background</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../background/overview.html">Overview of the process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../background/overview.html#schema-of-the-overall-process">schema of the overall process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../background/production_process.html">Production process used to transform point clouds classification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-building-validation">A) Building Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-building-completion">B) Building Completion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#c-building-identification">C) Building Identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-1-building-validation">B.1) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-2-building-completion">B.2) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-3-building-identification">B.3) Building Identification</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../background/thresholds_optimization_process.html">Strategy to find optimal decision thresholds for Building validation</a><ul>
@@ -60,6 +64,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/use.html#run-within-a-docker-container">Run within a docker container</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/use.html#run-as-a-python-module">Run as a python module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/use.html#run-from-source-directly">Run from source directly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/use.html#run-different-tasks">Run Different tasks</a></li>
 </ul>
 </li>
 </ul>
@@ -126,8 +131,9 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
 <span class="kn">import</span> <span class="nn">pdal</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">lidar_prod.tasks.utils</span> <span class="kn">import</span> <span class="n">get_pdal_reader</span><span class="p">,</span> <span class="n">get_pdal_writer</span>
+<span class="kn">from</span> <span class="nn">lidar_prod.tasks.utils</span> <span class="kn">import</span> <span class="n">get_pdal_writer</span><span class="p">,</span> <span class="n">get_pipeline</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -157,37 +163,36 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">min_frac_confirmation_factor_if_bd_uni_overlay</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">min_frac_confirmation_factor_if_bd_uni_overlay</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="BuildingIdentifier.run"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_identification.BuildingIdentifier.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="BuildingIdentifier.run"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_identification.BuildingIdentifier.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">],</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Application.</span>
 
 <span class="sd">        Transform cloud at `src_las_path` following identification logic, and save it to</span>
 <span class="sd">        `target_las_path`</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            src_las_path (str): path to input LAS file with a building probability channel</span>
+<span class="sd">            input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with a building probability channel</span>
 <span class="sd">            target_las_path (str): path for saving updated LAS file.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str:  `target_las_path`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applying Building Identification to file </span><span class="se">\n</span><span class="si">{</span><span class="n">src_las_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Clustering of points with high building proba.&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">input_values</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">target_las_path</span></div>
 
-<div class="viewcode-block" id="BuildingIdentifier.prepare"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_identification.BuildingIdentifier.prepare">[docs]</a>    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="BuildingIdentifier.prepare"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_identification.BuildingIdentifier.prepare">[docs]</a>    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">],</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Identify potential buildings in a new channel, excluding former candidates from</span>
 <span class="sd">        search based on their group ID. ClusterID needs to be reset to avoid unwanted merge</span>
 <span class="sd">        of information from previous VuildingValidation clustering.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            src_las_path (str): input LAS</span>
+<span class="sd">            input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with a building probability channel</span>
 <span class="sd">            target_las_path (str): output LAS</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">()</span>
-        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">get_pdal_reader</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">input_values</span><span class="p">)</span>
         <span class="n">non_candidates</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">candidate_buildings_flag</span><span class="si">}</span><span class="s2"> == 0)&quot;</span>
         <span class="p">)</span>
@@ -196,23 +201,23 @@
         <span class="n">B</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">uni_db_overlay</span><span class="si">}</span><span class="s2"> &gt; 0)&quot;</span>
         <span class="n">p_heq_modified_threshold_under_bd_uni</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">A</span><span class="si">}</span><span class="s2"> &amp;&amp; </span><span class="si">{</span><span class="n">B</span><span class="si">}</span><span class="s2">)&quot;</span>
         <span class="n">where</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">non_candidates</span><span class="si">}</span><span class="s2"> &amp;&amp; (</span><span class="si">{</span><span class="n">p_heq_threshold</span><span class="si">}</span><span class="s2"> || </span><span class="si">{</span><span class="n">p_heq_modified_threshold_under_bd_uni</span><span class="si">}</span><span class="s2">)&quot;</span>
-        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span>
             <span class="n">min_points</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">min_points</span><span class="p">,</span>
             <span class="n">tolerance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span>
             <span class="n">is3d</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">is3d</span><span class="p">,</span>
             <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="c1"># Always move and reset ClusterID to avoid conflict with later tasks.</span>
-        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span>
             <span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2">=&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ai_building_identified</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
-        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
             <span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2"> = 0&quot;</span>
         <span class="p">)</span>
-
-        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">get_pdal_writer</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span></div></div>
+        <span class="k">if</span> <span class="n">target_las_path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">|=</span> <span class="n">get_pdal_writer</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>

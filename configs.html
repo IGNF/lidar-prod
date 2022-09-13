@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Default configuration &mdash; lidar_prod 1.6.2 documentation</title>
+  <title>Default configuration &mdash; lidar_prod 1.7.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/sphinx_paramlinks.css" type="text/css" />
@@ -39,10 +39,14 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Background</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="background/overview.html">Overview of the process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="background/overview.html#schema-of-the-overall-process">schema of the overall process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="background/production_process.html">Production process used to transform point clouds classification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="background/production_process.html#a-building-validation">A) Building Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-building-completion">B) Building Completion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="background/production_process.html#c-building-identification">C) Building Identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background/production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background/production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-1-building-validation">B.1) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-2-building-completion">B.2) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-3-building-identification">B.3) Building Identification</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="background/thresholds_optimization_process.html">Strategy to find optimal decision thresholds for Building validation</a><ul>
@@ -62,6 +66,7 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/use.html#run-within-a-docker-container">Run within a docker container</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/use.html#run-as-a-python-module">Run as a python module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/use.html#run-from-source-directly">Run from source directly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/use.html#run-different-tasks">Run Different tasks</a></li>
 </ul>
 </li>
 </ul>
@@ -132,7 +137,9 @@
 <span class="w">  </span><span class="nt">output_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${hydra:runtime.cwd}/outputs/</span><span class="w"></span>
 <span class="nt">data_format</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">las_dimensions</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">classification</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">classification</span><span class="w"></span>
+<span class="w">    </span><span class="nt">classification</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Classification</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ai_vegetation_proba</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vegetation</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ai_unclassified_proba</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unclassified</span><span class="w"></span>
 <span class="w">    </span><span class="nt">ai_building_proba</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">building</span><span class="w"></span>
 <span class="w">    </span><span class="nt">entropy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">entropy</span><span class="w"></span>
 <span class="w">    </span><span class="nt">cluster_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ClusterID</span><span class="w"></span>
@@ -141,7 +148,14 @@
 <span class="w">    </span><span class="nt">ClusterID_candidate_building</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CID_CandidateB</span><span class="w"></span>
 <span class="w">    </span><span class="nt">ClusterID_isolated_plus_confirmed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CID_IsolatedOrConfirmed</span><span class="w"></span>
 <span class="w">    </span><span class="nt">ai_building_identified</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Group</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ai_vegetation_unclassified_groups</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Group</span><span class="w"></span>
 <span class="w">  </span><span class="nt">codes</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">unclassified</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+<span class="w">    </span><span class="nt">vegetation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
+<span class="w">    </span><span class="nt">vegetation_target</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">vegetation_low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
+<span class="w">      </span><span class="nt">vegetation_medium</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w"></span>
+<span class="w">      </span><span class="nt">vegetation_high</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"></span>
 <span class="w">    </span><span class="nt">building</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="nt">candidates</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">202</span><span class="w"></span>
@@ -176,17 +190,26 @@
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.codes.building.detailed.both_confirmed}</span><span class="w"></span>
 <span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.codes.building.final.building}</span><span class="w"></span>
 <span class="w">  </span><span class="nt">cleaning</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">input</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">input_building</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar_prod.tasks.cleaning.Cleaner</span><span class="w"></span>
 <span class="w">      </span><span class="nt">extra_dims</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.ai_building_proba}=float</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.entropy}=float</span><span class="w"></span>
-<span class="w">    </span><span class="nt">output</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">output_building</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar_prod.tasks.cleaning.Cleaner</span><span class="w"></span>
 <span class="w">      </span><span class="nt">extra_dims</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.ai_building_proba}=float</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.entropy}=float</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.ai_building_identified}=uint</span><span class="w"></span>
+<span class="w">    </span><span class="nt">input_vegetation_unclassified</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar_prod.tasks.cleaning.Cleaner</span><span class="w"></span>
+<span class="w">      </span><span class="nt">extra_dims</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint32</span><span class="w"></span>
+<span class="w">    </span><span class="nt">output_vegetation_unclassified</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar_prod.tasks.cleaning.Cleaner</span><span class="w"></span>
+<span class="w">      </span><span class="nt">extra_dims</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.entropy}=float</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.ai_building_proba}=uint</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint</span><span class="w"></span>
 <span class="nt">building_validation</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">application</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar_prod.tasks.building_validation.BuildingValidator</span><span class="w"></span>
@@ -297,6 +320,11 @@
 <span class="w">    </span><span class="nt">min_points</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w"></span>
 <span class="w">    </span><span class="nt">tolerance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
 <span class="w">    </span><span class="nt">is3d</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
+<span class="nt">basic_identification</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">vegetation_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3923</span><span class="w"></span>
+<span class="w">  </span><span class="nt">unclassified_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2455</span><span class="w"></span>
+<span class="w">  </span><span class="nt">vegetation_nb_trials</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span><span class="w"></span>
+<span class="w">  </span><span class="nt">unclassified_nb_trials</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span><span class="w"></span>
 <span class="nt">print_config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
 <span class="nt">ignore_warnings</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
 </pre></div>

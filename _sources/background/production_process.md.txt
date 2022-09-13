@@ -2,9 +2,19 @@
 
 The end goal of the tool is to edit the input (rules-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for human inspection.
 
-**Input**: point cloud that went through a first geometric algorithm that identified `candidates building points` based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building. The default name for this extra dimension is `building`. You can leverage this [package for aerial lidar deep learning segmentation](https://github.com/IGNF/lidar-deep-segmentation).
+**Input**: point cloud that went through a first geometric algorithm that identified `candidates building points` based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building, vegetation and/or unclassified, and calculate the associated entropy. The default name for those extra dimensions are `building`, `vegetation`, `unclassified` and `entropy` respectively. You can leverage this [package for aerial lidar deep learning segmentation](https://github.com/IGNF/lidar-deep-segmentation).
 
-## A) Building Validation
+## A.1) Vegetation detection
+**Goal**: Confirm or refute points as vegetation.
+
+The identification is done by comparing the vegetation probability  of a point against a `threshold`. That threshold has been previously established as the best on a test set of las files.
+
+## A.2) Unclassified detection
+**Goal**: Confirm or refute points as unclassified.
+
+Exactly as with vegetation detection, the identification is done by comparing the unclassified probability of a point against a `threshold`. That threshold has been previously established as the best on a test set of las files.
+
+## B.1) Building Validation
 
 **Goal**: Confirm or refute groups of candidate building points when possible, mark them as unsure elsewise.
 
@@ -32,7 +42,7 @@ Current performances on a 15km² validation dataset, expressed as percentages of
 
 ![](/img/LidarBati-BuildingValidationM7.1V2.0.png)
 
-## B) Building Completion
+## B.2) Building Completion
 
 **Goal**: Confirm points that were too isolated to make up a group but have high-enough probability nevertheless (e.g. walls)
 
@@ -44,7 +54,7 @@ therefore confirmed as well.
 ![](/img/LidarBati-BuildingCompletion.png)
 
 
-## C) Building Identification
+## B.3) Building Identification
 
 **Goal**: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection. 
 

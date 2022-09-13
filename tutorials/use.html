@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Using the app &mdash; lidar_prod 1.6.2 documentation</title>
+  <title>Using the app &mdash; lidar_prod 1.7.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -40,10 +40,14 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Background</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../background/overview.html">Overview of the process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background/overview.html#schema-of-the-overall-process">schema of the overall process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../background/production_process.html">Production process used to transform point clouds classification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#a-building-validation">A) Building Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-building-completion">B) Building Completion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#c-building-identification">C) Building Identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-1-building-validation">B.1) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-2-building-completion">B.2) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-3-building-identification">B.3) Building Identification</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../background/thresholds_optimization_process.html">Strategy to find optimal decision thresholds for Building validation</a><ul>
@@ -63,6 +67,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#run-within-a-docker-container">Run within a docker container</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run-as-a-python-module">Run as a python module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run-from-source-directly">Run from source directly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-different-tasks">Run Different tasks</a></li>
 </ul>
 </li>
 </ul>
@@ -158,6 +163,22 @@ paths.output_dir<span class="o">=</span>/outputs/
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate an env matching ./bash/setup_env.sh requirements.</span>
 conda activate lidar_prod
 python lidar_prod/run.py paths.src_las<span class="o">=[</span>/path/to/file.las<span class="o">]</span>
+</pre></div>
+</div>
+</section>
+<section id="run-different-tasks">
+<h2>Run Different tasks<a class="headerlink" href="#run-different-tasks" title="Permalink to this headline"></a></h2>
+<p>Different tasks can be runned from the application. Currently, they are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">apply_on_building</span></code> to identify building</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">identify_vegetation_unclassified</span></code> to identify unclassified and vegetation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimize_building</span></code> to evaluate the best parameters for building detection</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimize_veg_id</span></code> to evaluate the best parameters for vegetation detection</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimize_unc_id</span></code> to evaluate the best parameters for unclassified detection</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cleaning</span></code> to prepare las file with the correct dimension (mostly useful in development)</p></li>
+</ul>
+<p>To use on of those tasks, simply add “+task=[task_name]” to the options list, like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python lidar_prod/run.py +task<span class="o">=</span>apply_on_building ...
 </pre></div>
 </div>
 </section>

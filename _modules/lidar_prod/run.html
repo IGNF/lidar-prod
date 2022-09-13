@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.run &mdash; lidar_prod 1.6.2 documentation</title>
+  <title>lidar_prod.run &mdash; lidar_prod 1.7.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -37,10 +37,14 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Background</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../background/overview.html">Overview of the process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../background/overview.html#schema-of-the-overall-process">schema of the overall process</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../background/production_process.html">Production process used to transform point clouds classification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../background/production_process.html#a-building-validation">A) Building Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../background/production_process.html#b-building-completion">B) Building Completion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../background/production_process.html#c-building-identification">C) Building Identification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../background/production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../background/production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../background/production_process.html#b-1-building-validation">B.1) Building Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../background/production_process.html#b-2-building-completion">B.2) Building Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../background/production_process.html#b-3-building-identification">B.3) Building Identification</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../background/thresholds_optimization_process.html">Strategy to find optimal decision thresholds for Building validation</a><ul>
@@ -60,6 +64,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/use.html#run-within-a-docker-container">Run within a docker container</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/use.html#run-as-a-python-module">Run as a python module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/use.html#run-from-source-directly">Run from source directly</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/use.html#run-different-tasks">Run Different tasks</a></li>
 </ul>
 </li>
 </ul>
@@ -122,14 +127,25 @@
            <div itemprop="articleBody">
              
   <h1>Source code for lidar_prod.run</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">hydra</span>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">hydra</span>
 <span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+
+<div class="viewcode-block" id="POSSIBLE_TASK"><a class="viewcode-back" href="../../apidoc/lidar_prod.html#lidar_prod.run.POSSIBLE_TASK">[docs]</a><span class="k">class</span> <span class="nc">POSSIBLE_TASK</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">CLEANING</span> <span class="o">=</span> <span class="s2">&quot;cleaning&quot;</span>
+    <span class="n">ID_VEGETATION_UNCLASSIFIED</span> <span class="o">=</span> <span class="s2">&quot;identify_vegetation_unclassified&quot;</span>
+    <span class="n">OPT_VEGETATION</span> <span class="o">=</span> <span class="s2">&quot;optimize_veg_id&quot;</span>
+    <span class="n">OPT_UNCLASSIFIED</span> <span class="o">=</span> <span class="s2">&quot;optimize_unc_id&quot;</span>
+    <span class="n">APPLY_BUILDING</span> <span class="o">=</span> <span class="s2">&quot;apply_on_building&quot;</span>
+    <span class="n">OPT_BUIlDING</span> <span class="o">=</span> <span class="s2">&quot;optimize_building&quot;</span></div>
 
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../apidoc/lidar_prod.html#lidar_prod.run.main">[docs]</a><span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../configs/&quot;</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
     <span class="sd">&quot;&quot;&quot;Main entry point to either apply or optimize thresholds.</span>
 
 <span class="sd">    Check the configurations files for usage.</span>
@@ -139,19 +155,40 @@
     <span class="c1"># Imports should be nested inside @hydra.main to optimize tab completion</span>
     <span class="c1"># Read more here: https://github.com/facebookresearch/hydra/issues/934</span>
     <span class="kn">from</span> <span class="nn">lidar_prod.commons.commons</span> <span class="kn">import</span> <span class="n">extras</span>
-    <span class="kn">from</span> <span class="nn">lidar_prod.application</span> <span class="kn">import</span> <span class="n">apply</span>
-    <span class="kn">from</span> <span class="nn">lidar_prod.optimization</span> <span class="kn">import</span> <span class="n">optimize</span>
+    <span class="kn">from</span> <span class="nn">lidar_prod.application</span> <span class="kn">import</span> <span class="n">apply</span><span class="p">,</span> <span class="n">identify_vegetation_unclassified</span><span class="p">,</span> <span class="n">just_clean</span><span class="p">,</span> <span class="n">apply_building_module</span>
+    <span class="kn">from</span> <span class="nn">lidar_prod.optimization</span> <span class="kn">import</span> <span class="n">optimize_building</span><span class="p">,</span> <span class="n">optimize_vegetation</span><span class="p">,</span> <span class="n">optimize_unclassified</span>
+
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
     <span class="n">extras</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;optimize&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">src_las</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">POSSIBLE_TASK</span><span class="o">.</span><span class="n">OPT_VEGETATION</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="n">optimize_vegetation</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">POSSIBLE_TASK</span><span class="o">.</span><span class="n">OPT_UNCLASSIFIED</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="n">optimize_unclassified</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">POSSIBLE_TASK</span><span class="o">.</span><span class="n">ID_VEGETATION_UNCLASSIFIED</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="n">apply</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">identify_vegetation_unclassified</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">POSSIBLE_TASK</span><span class="o">.</span><span class="n">CLEANING</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="n">apply</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">just_clean</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">POSSIBLE_TASK</span><span class="o">.</span><span class="n">APPLY_BUILDING</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="n">apply</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">apply_building_module</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">POSSIBLE_TASK</span><span class="o">.</span><span class="n">OPT_BUIlDING</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="n">optimize_building</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">apply</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></div>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting applying the default process&quot;</span><span class="p">)</span>
+        <span class="n">apply</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">apply_building_module</span><span class="p">)</span></div>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))</span>
     <span class="c1"># OmegaConf.register_new_resolver(&quot;get_method&quot;, hydra.utils.get_method)</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>

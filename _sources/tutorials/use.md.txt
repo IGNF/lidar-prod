@@ -41,3 +41,17 @@ For developments and debugging, you can run the package directly from python sou
 conda activate lidar_prod
 python lidar_prod/run.py paths.src_las=[/path/to/file.las]
 ```
+## Run Different tasks
+
+Different tasks can be runned from the application. Currently, they are:
+- `apply_on_building` to identify building
+- `identify_vegetation_unclassified` to identify unclassified and vegetation
+- `optimize_building` to evaluate the best parameters for building detection
+- `optimize_veg_id` to evaluate the best parameters for vegetation detection
+- `optimize_unc_id` to evaluate the best parameters for unclassified detection
+- `cleaning` to prepare las file with the correct dimension (mostly useful in development)
+
+To use on of those tasks, simply add "+task=[task_name]" to the options list, like this:
+```bash
+python lidar_prod/run.py +task=apply_on_building ...
+```
