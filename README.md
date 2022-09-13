@@ -6,11 +6,11 @@
 <a href="https://pytorchlightning.ai/"><img alt="Lightning" src="https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white"></a>
 <a href="https://hydra.cc/"><img alt="Config: Hydra" src="https://img.shields.io/badge/Config-Hydra-89b8cd"></a>
 
-[![Documentation Build](https://github.com/IGNF/lidar-prod-quality-control/actions/workflows/gh-pages.yaml/badge.svg?event=push)](https://github.com/IGNF/lidar-prod-quality-control/actions/workflows/gh-pages.yaml)
-[![CI/CD](https://github.com/IGNF/lidar-prod-quality-control/actions/workflows/cicd.yaml/badge.svg?event=push)](https://github.com/IGNF/lidar-prod-quality-control/actions/workflows/cicd.yaml)
+[![CI/CD](https://github.com/IGNF/lidar-prod/actions/workflows/cicd.yaml/badge.svg?event=push)](https://github.com/IGNF/lidar-prod/actions/workflows/cicd.yaml)
+[![Documentation Build](https://github.com/IGNF/lidar-prod/actions/workflows/gh-pages.yaml/badge.svg?event=push)](https://github.com/IGNF/lidar-prod/actions/workflows/gh-pages.yaml)
+
 
 </div>
-<br><br>
 
 ## Context
 The Lidar HD project ambitions to map France in 3D using 10 pulse/m² aerial Lidar. The data will be openly available, including a semantic segmentation with a minimal number of classes: ground, vegetation, buildings, vehicles, bridges, others.
@@ -32,9 +32,9 @@ Our strategy is to fuse together different sources of informations (rules-based 
 
 Right now, the class `building` is the only one that is addressed. The extension to other classes is dependent on the training of multiclass AI model, which requires high quality training datasets that are currently being produced.
 
-> Please refer to the documentation for [installation and usage](https://ignf.github.io/lidar-prod-quality-control/tutorials/install.html).
+> Please refer to the documentation for [installation and usage](https://ignf.github.io/lidar-prod/tutorials/install.html).
     
-> Please refer to the documentation to understand the [production process](https://ignf.github.io/lidar-prod-quality-control/background/production_process.html).
+> Please refer to the documentation to understand the [production process](https://ignf.github.io/lidar-prod/background/production_process.html).
 
 ## Version
 
