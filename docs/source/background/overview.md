@@ -7,8 +7,7 @@ The las file is used a second time by this module to decide if the points are bu
 
 # schema of the overall process
 The arrows represent dimensions in the las file, where they come from and where they are consumed.
-
-.. mermaid::
+```{mermaid}
 	sequenceDiagram
 		participant Raw
 		participant AI inference (Myria3D)
@@ -32,3 +31,4 @@ The arrows represent dimensions in the las file, where they come from and where 
 		Raw-->>Building module: Classification
 		note right of Building module: Building module updates Classification
 		Building module->>Human inspection: Classification
+```
