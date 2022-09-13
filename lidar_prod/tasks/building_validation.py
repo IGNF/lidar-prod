@@ -256,7 +256,6 @@ class BuildingValidator:
             os.makedirs(osp.dirname(target_las_path), exist_ok=True)
             self.pipeline.execute()
 
-
     def _extract_cluster_info_by_idx(
         self, las: np.ndarray, pts_idx: np.ndarray
     ) -> BuildingValidationClusterInfo:
