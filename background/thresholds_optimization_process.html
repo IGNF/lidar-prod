@@ -16,6 +16,8 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+        <script>mermaid.initialize({startOnLoad:true});</script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -40,8 +42,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Background</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of the process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#schema-of-the-overall-process">schema of the overall process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview of the process</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#schema-of-the-overall-process">schema of the overall process</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="production_process.html">Production process used to transform point clouds classification</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
@@ -133,7 +137,7 @@
 <h1>Strategy to find optimal decision thresholds for Building validation<a class="headerlink" href="#strategy-to-find-optimal-decision-thresholds-for-building-validation" title="Permalink to this headline"></a></h1>
 <section id="motivations">
 <h2>Motivations<a class="headerlink" href="#motivations" title="Permalink to this headline"></a></h2>
-<p>As described in section <span class="xref myst">Building Validation</span> of the production process, the decision to validate or not a group of candidate buildings is based on several decision thresholds. Those thresholds represents different levels of confidence, for different sources of data.</p>
+<p>As described in section <a class="reference internal" href="production_process.html"><span class="doc std std-doc">Building Validation</span></a> of the production process, the decision to validate or not a group of candidate buildings is based on several decision thresholds. Those thresholds represents different levels of confidence, for different sources of data.</p>
 <p>They may depend on the AI model which produces the probabilities as well as on the rule-based classification from which the clusters of candidates are derived. They are highly coupled. For instance, if a lower probability is required at the point level to be confirmed as a building (threshold <code class="docutils literal notranslate"><span class="pre">C1</span></code>), we might require a higher percentage of confirmed points in a cluster of candidates (thresholds <code class="docutils literal notranslate"><span class="pre">C2</span></code>) to validate it. There must therefore be optimized jointly.</p>
 <p>These thresholds define how much we automate decisions, but also the quantity of errors we may introduce: there is a balance to be found between <code class="docutils literal notranslate"><span class="pre">recall</span></code> (proportion of buildings group that were confirmed), <code class="docutils literal notranslate"><span class="pre">precision</span></code> (proportion of buildings among confirmed groups), and <code class="docutils literal notranslate"><span class="pre">automation</span></code> (proportion of groups for which a decision was made i.e. that are not flagged as “unsure”).</p>
 </section>

@@ -16,6 +16,8 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+        <script>mermaid.initialize({startOnLoad:true});</script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -40,8 +42,10 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Background</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview of the process</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#schema-of-the-overall-process">schema of the overall process</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview of the process</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#schema-of-the-overall-process">schema of the overall process</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="production_process.html">Production process used to transform point clouds classification</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
@@ -135,34 +139,34 @@
 At first we have a <code class="docutils literal notranslate"><span class="pre">Raw</span></code> las file, sent to another process (<code class="docutils literal notranslate"><span class="pre">Myria3D</span></code>) that infers the probabilities of various classes.
 From there, the las file is used a first time by this module to decide if the points are vegetation, unclassified or something else, and sent to an external process, a <code class="docutils literal notranslate"><span class="pre">rule-based</span> <span class="pre">segmentation</span></code>.
 The las file is used a second time by this module to decide if the points are buildings or not.</p>
-</section>
 <section id="schema-of-the-overall-process">
-<h1>schema of the overall process<a class="headerlink" href="#schema-of-the-overall-process" title="Permalink to this headline"></a></h1>
+<h2>schema of the overall process<a class="headerlink" href="#schema-of-the-overall-process" title="Permalink to this headline"></a></h2>
 <p>The arrows represent dimensions in the las file, where they come from and where they are consumed.</p>
-<p>.. mermaid::
-sequenceDiagram
-participant Raw
-participant AI inference (Myria3D)
-participant vegetation and unclassified detection
-participant Rule based segmentation
-participant Building module
-actor Human inspection
-Raw-&gt;&gt;AI inference (Myria3D): Intensity
-Raw-&gt;&gt;AI inference (Myria3D): ReturnNumber
-Raw-&gt;&gt;AI inference (Myria3D): NumberOfReturns
-Raw-&gt;&gt;AI inference (Myria3D): Red, Green, Blue
-Raw-&gt;&gt;AI inference (Myria3D): Infrared
-AI inference (Myria3D)-&gt;&gt;vegetation and unclassified detection: vegetation
-AI inference (Myria3D)-&gt;&gt;vegetation and unclassified detection: unclassified
-vegetation and unclassified detection-&gt;&gt;Rule based segmentation: Group (1: vegetation, 3: unclassified)
-note right of Rule based segmentation: uses vegetation and unclassified
-AI inference (Myria3D)-&gt;&gt;Building module: building
-AI inference (Myria3D)-&gt;&gt;Building module: entropy
-Building module-&gt;&gt;Human inspection: Group
-Raw–&gt;&gt;vegetation and unclassified detection: Classification
-Raw–&gt;&gt;Building module: Classification
-note right of Building module: Building module updates Classification
-Building module-&gt;&gt;Human inspection: Classification</p>
+<div class="mermaid">
+            	sequenceDiagram
+		participant Raw
+		participant AI inference (Myria3D)
+		participant vegetation and unclassified detection
+		participant Rule based segmentation
+		participant Building module
+		actor Human inspection
+		Raw-&gt;&gt;AI inference (Myria3D): Intensity
+		Raw-&gt;&gt;AI inference (Myria3D): ReturnNumber
+		Raw-&gt;&gt;AI inference (Myria3D): NumberOfReturns
+		Raw-&gt;&gt;AI inference (Myria3D): Red, Green, Blue
+		Raw-&gt;&gt;AI inference (Myria3D): Infrared
+		AI inference (Myria3D)-&gt;&gt;vegetation and unclassified detection: vegetation
+		AI inference (Myria3D)-&gt;&gt;vegetation and unclassified detection: unclassified
+		vegetation and unclassified detection-&gt;&gt;Rule based segmentation: Group (1: vegetation, 3: unclassified)
+		note right of Rule based segmentation: uses vegetation and unclassified
+		AI inference (Myria3D)-&gt;&gt;Building module: building
+		AI inference (Myria3D)-&gt;&gt;Building module: entropy
+		Building module-&gt;&gt;Human inspection: Group
+		Raw--&gt;&gt;vegetation and unclassified detection: Classification
+		Raw--&gt;&gt;Building module: Classification
+		note right of Building module: Building module updates Classification
+		Building module-&gt;&gt;Human inspection: Classification
+        </div></section>
 </section>
 
 
