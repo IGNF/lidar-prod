@@ -5,8 +5,8 @@ import math
 from numbers import Number
 from typing import Any, Dict, Iterable
 import numpy as np
-import pdal
 import laspy
+import pdal
 
 
 @dataclass
