@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod 1.7.0 documentation</title>
+  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod 1.7.1 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -375,12 +375,6 @@
         <span class="p">):</span>
             <span class="n">infos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_cluster_info_by_idx</span><span class="p">(</span><span class="n">las</span><span class="p">,</span> <span class="n">pts_idx</span><span class="p">)</span>
             <span class="n">las</span><span class="p">[</span><span class="n">dim_clf</span><span class="p">][</span><span class="n">pts_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">decision_func</span><span class="p">(</span><span class="n">infos</span><span class="p">)</span>
-
-        <span class="c1"># Candidate that were not clustered get their &quot;candidate flag&quot; set back to 0 so that they are considered</span>
-        <span class="c1"># in building completion/identification steps.</span>
-        <span class="n">unclustered_mask</span> <span class="o">=</span> <span class="n">cluster_id_dim</span> <span class="o">==</span> <span class="mi">0</span>
-        <span class="n">unclustered_candidates_mask</span> <span class="o">=</span> <span class="n">candidates_mask</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">unclustered_mask</span><span class="p">)</span>
-        <span class="n">las</span><span class="p">[</span><span class="n">dim_flag</span><span class="p">][</span><span class="n">unclustered_candidates_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">arrays</span><span class="o">=</span><span class="p">[</span><span class="n">las</span><span class="p">])</span>
 
