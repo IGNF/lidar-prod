@@ -243,12 +243,6 @@ class BuildingValidator:
             infos = self._extract_cluster_info_by_idx(las, pts_idx)
             las[dim_clf][pts_idx] = decision_func(infos)
 
-        # Candidate that were not clustered get their "candidate flag" set back to 0 so that they are considered
-        # in building completion/identification steps.
-        unclustered_mask = cluster_id_dim == 0
-        unclustered_candidates_mask = candidates_mask & (unclustered_mask)
-        las[dim_flag][unclustered_candidates_mask] = 0
-
         self.pipeline = pdal.Pipeline(arrays=[las])
 
         if target_las_path:
