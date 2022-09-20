@@ -13,7 +13,6 @@ on:
       - dev
       - prod
       - main
-      - nexus_push
 
 jobs:
   build_test_deploy:
@@ -38,12 +37,12 @@ jobs:
         pytest -rA -v -m "not slow" --ignore=actions-runner
 
     # - name: Run slow tests last (evaluation on large file)
-    #   run: >
-    #     docker run
-    #     -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
-    #     lidar_prod_im
-    #     python -m
-    #     pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
+      run: >
+        docker run
+        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
+        lidar_prod_im
+        python -m
+        pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
 
     - name: Test detection of building.
       run: >
@@ -78,6 +77,7 @@ jobs:
       if: github.event_name == 'push'
       uses: nelonoel/branch-name@v1.0.1
 
+    # show the branch name, for debugging purpose
     - name: Print the branch name
       if: github.event_name == 'push'
       run: echo ${BRANCH_NAME}
@@ -91,21 +91,23 @@ jobs:
       run: docker run lidar_prod_im:${BRANCH_NAME} bash
 
     # This needs writing rights to the mounted path
-    # - name: save the docker image since everything worked
-    #   if: github.event_name == 'push'
-    #   run: docker save lidar_prod_im:${BRANCH_NAME} -o /var/data/cicd/CICD_github_assets/CICD_docker_images/lidar_prod_im_${BRANCH_NAME}.tar
+    - name: save the docker image since everything worked
+      if: github.event_name == 'push'
+      run: docker save lidar_prod_im:${BRANCH_NAME} -o /var/data/cicd/CICD_github_assets/CICD_docker_images/lidar_prod_im_${BRANCH_NAME}.tar
 
+    # get the version number, to tag the image pushed to nexus
     - name: get version number
       if: github.event_name == 'push'
       id: version
       run: echo "::set-output name=version::$(docker run lidar_prod_im grep '__version__' package_metadata.yaml| cut -d\" -f2)"
 
+    # show the version number, for debugging purpose
     - name: Print the version
       if: github.event_name == 'push'
       run: echo "${{steps.version.outputs.version}}"
 
     - name: push docker on nexus
-      if: github.event_name == 'push'
+      if: ${{ (github.event.review.state == 'approved') && ( BRANCH_NAME == 'main') }} # we push on nexus only if a pull request on the main branch has been accepted
       run: |
         docker tag lidar_prod_im 10.128.81.69:8082/lidar_hd/lidar_prod_im:${{steps.version.outputs.version}}
         docker login 10.128.81.69:8082 --username svc_lidarhd --password ${{ secrets.PASSWORD_SVC_LIDARHD }}
