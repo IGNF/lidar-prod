@@ -107,7 +107,7 @@ jobs:
       run: echo "${{steps.version.outputs.version}}"
 
     - name: push docker on nexus
-      if: ((github.event.review.state == 'approved') && (${BRANCH_NAME} == 'main'))  # we push on nexus only if a pull request on the main branch has been accepted
+      if: ${((github.event.review.state == 'approved') && (BRANCH_NAME == 'main'))}  # we push on nexus only if a pull request on the main branch has been accepted
       run: |
         docker tag lidar_prod_im 10.128.81.69:8082/lidar_hd/lidar_prod_im:${{steps.version.outputs.version}}
         docker login 10.128.81.69:8082 --username svc_lidarhd --password ${{ secrets.PASSWORD_SVC_LIDARHD }}
