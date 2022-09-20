@@ -36,7 +36,7 @@ jobs:
         python -m
         pytest -rA -v -m "not slow" --ignore=actions-runner
 
-    # - name: Run slow tests last (evaluation on large file)
+    - name: Run slow tests last (evaluation on large file)
       run: >
         docker run
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
