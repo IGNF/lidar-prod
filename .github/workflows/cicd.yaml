@@ -38,13 +38,13 @@ jobs:
         python -m
         pytest -rA -v -m "not slow" --ignore=actions-runner
 
-    - name: Run slow tests last (evaluation on large file)
-      run: >
-        docker run
-        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
-        lidar_prod_im
-        python -m
-        pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
+    # - name: Run slow tests last (evaluation on large file)
+    #   run: >
+    #     docker run
+    #     -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
+    #     lidar_prod_im
+    #     python -m
+    #     pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
 
     - name: Test detection of building.
       run: >
@@ -81,7 +81,6 @@ jobs:
 
     # get version number and date, to tag the image pushed to nexus
     - name: get version number
-      if: github.event_name == 'push'
       id: tag
       run: |
         echo "::set-output name=version::$(docker run myria3d grep '__version__' package_metadata.yaml| cut -d\" -f2)"
@@ -89,10 +88,10 @@ jobs:
 
     # show possible tags, for debugging purpose
     - name: Print tag
-      if: github.event_name == 'push'
       run: |
         echo "${{steps.tag.outputs.version}}"
         echo "${{steps.tag.outputs.date}}"
+        echo "${{github.event_name}}"
 
     - name: push docker on nexus, if a pull request on main has been accepted  
       if: ((github.ref_name == 'main') && (github.event.pull_request.merged == true)) # we push on nexus only if a pull request on the main branch has been accepted 
