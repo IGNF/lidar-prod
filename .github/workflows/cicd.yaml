@@ -92,6 +92,7 @@ jobs:
         echo "${{steps.tag.outputs.version}}"
         echo "${{steps.tag.outputs.date}}"
         echo "${{github.event_name}}"
+        echo "${{github.ref_name}}"
 
     - name: push docker on nexus, if a pull request on main has been accepted  
       if: ((github.ref_name == 'main') && (github.event.pull_request.merged == true)) # we push on nexus only if a pull request on the main branch has been accepted 
