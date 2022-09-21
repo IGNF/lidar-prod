@@ -72,30 +72,12 @@ jobs:
         paths.src_las=/inputs/888000_6614000.subset.las
         paths.output_dir=/outputs/
 
-    # Everything ran so we tag the valid docker image to keep it
-    # This happens for push events, which are in particular 
-    # triggered when a pull request is merged.
-    - name: Get the branch name into an environment variable.
-      if: github.event_name == 'push'
-      uses: nelonoel/branch-name@v1.0.1
-
-    # show the branch name, for debugging purpose
-    - name: Print the branch name
-      if: github.event_name == 'push'
-      run: echo ${BRANCH_NAME}
-
     - name: Tag the docker image with branch name
       if: github.event_name == 'push'
-      run: docker tag lidar_prod_im:latest lidar_prod_im:${BRANCH_NAME}
-
-    - name: Dry run image so that is it not prunned
-      if: github.event_name == 'push'
-      run: docker run lidar_prod_im:${BRANCH_NAME} bash
-
-    # This needs writing rights to the mounted path
-    - name: save the docker image since everything worked
-      if: github.event_name == 'push'
-      run: docker save lidar_prod_im:${BRANCH_NAME} -o /var/data/cicd/CICD_github_assets/CICD_docker_images/lidar_prod_im_${BRANCH_NAME}.tar
+      run: |
+        docker tag lidar_prod_im:latest lidar_prod_im:${{github.ref_name}} 
+        docker run lidar_prod_im:${{github.ref_name}}  bash  # Dry run image so that is it not prunned
+        # docker save lidar_prod_im:${{github.ref_name}}  -o /var/data/cicd/CICD_github_assets/CICD_docker_images/lidar_prod_im_${{github.ref_name}}.tar # This needs writing rights to the mounted path
 
     # get version number and date, to tag the image pushed to nexus
     - name: get version number
