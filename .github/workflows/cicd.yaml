@@ -80,7 +80,7 @@ jobs:
         # docker save lidar_prod_im:${{github.ref_name}}  -o /var/data/cicd/CICD_github_assets/CICD_docker_images/lidar_prod_im_${{github.ref_name}}.tar # This needs writing rights to the mounted path
 
     # get version number and date, to tag the image pushed to nexus
-    - name: get version number
+    - name: Get version number
       id: tag
       run: |
         echo "::set-output name=version::$(docker run myria3d grep '__version__' package_metadata.yaml| cut -d\" -f2)"
@@ -92,14 +92,14 @@ jobs:
         echo "${{steps.tag.outputs.version}}"
         echo "${{steps.tag.outputs.date}}"
 
-    - name: push docker on nexus, if a pull request on main has been accepted  
+    - name: Push docker image on Nexus repository if a pull request on main has been accepted.  
       if: ((github.ref_name == 'main') && (github.event.pull_request.merged == true)) # we push on nexus only if a pull request on the main branch has been accepted 
       run: |
         docker tag lidar_prod_im $nexus_server/lidar_hd/lidar_prod_im:${{steps.tag.outputs.date}}
         docker login $nexus_server --username svc_lidarhd --password ${{ secrets.PASSWORD_SVC_LIDARHD }}
         docker push $nexus_server/lidar_hd/lidar_prod_im:${{steps.tag.outputs.date}}
 
-    - name: push docker on nexus, from a simple branch 
+    - name: Push docker image on nexus repository, when pushing to any other branch.
       if: ((github.event_name != 'pull_request') && (github.ref_name != 'main'))
       run: |
         docker tag lidar_prod_im $nexus_server/lidar_hd/lidar_prod_im:${{github.ref_name}}
