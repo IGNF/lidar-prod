@@ -95,14 +95,13 @@ jobs:
     - name: push main docker on nexus (tagged with a date)
       # we push on nexus an image from the main branch when it has been updated (push or accepted pull request)
       if: ((github.ref_name == 'main') && ((github.event.pull_request.merged == true) || (github.event_name == 'push'))) 
-
       run: |
         docker tag lidar_prod $nexus_server/lidar_hd/lidar_prod:${{steps.tag.outputs.date}}
         docker login $nexus_server --username svc_lidarhd --password ${{ secrets.PASSWORD_SVC_LIDARHD }}
         docker push $nexus_server/lidar_hd/lidar_prod:${{steps.tag.outputs.date}}
 
     - name: push branch docker on nexus (tagged with the branch name)
-
+      # we push on nexus an image from a branch when it's pushed
       if: ((github.event_name == 'push') && (github.ref_name != 'main'))
       run: |
         docker tag lidar_prod $nexus_server/lidar_hd/lidar_prod:${{github.ref_name}}
