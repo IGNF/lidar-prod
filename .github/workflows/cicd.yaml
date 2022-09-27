@@ -13,6 +13,8 @@ on:
       - dev
       - prod
       - main
+env:
+  nexus_server: 10.128.81.69:8082
 
 jobs:
   build_test_deploy:
@@ -24,15 +26,15 @@ jobs:
       uses: actions/checkout@v2
 
     - name: build docker image       
-      run: docker build -t lidar_prod_im .
+      run: docker build -t lidar_prod .
 
     - name: Check code neatness (linter)
-      run: docker run lidar_prod_im flake8
+      run: docker run lidar_prod flake8
 
     - name: Run tests & get coverage - fast ones go first.
       run: >
         docker run
-        lidar_prod_im
+        lidar_prod
         python -m
         pytest -rA -v -m "not slow" --ignore=actions-runner
 
@@ -40,7 +42,7 @@ jobs:
       run: >
         docker run
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
-        lidar_prod_im
+        lidar_prod
         python -m
         pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
 
@@ -49,7 +51,7 @@ jobs:
         docker run 
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
         -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/
-        lidar_prod_im
+        lidar_prod
         python 
         lidar_prod/run.py
         data_format=legacy.yaml
@@ -62,7 +64,7 @@ jobs:
         docker run 
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
         -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/
-        lidar_prod_im
+        lidar_prod
         python 
         lidar_prod/run.py
         +task=identify_vegetation_unclassified
@@ -70,33 +72,42 @@ jobs:
         paths.src_las=/inputs/888000_6614000.subset.las
         paths.output_dir=/outputs/
 
-    # Everything ran so we tag the valid docker image to keep it
-    # This happens for push events, which are in particular 
-    # triggered when a pull request is merged.
-    - name: Get the branch name into an environment variable.
-      if: github.event_name == 'push'
-      uses: nelonoel/branch-name@v1.0.1
-
-    - name: Print the branch name
-      if: github.event_name == 'push'
-      run: echo ${BRANCH_NAME}
-
     - name: Tag the docker image with branch name
       if: github.event_name == 'push'
-      run: docker tag lidar_prod_im:latest lidar_prod_im:${BRANCH_NAME}
+      run: |
+        docker tag lidar_prod:latest lidar_prod:${{github.ref_name}} 
+        docker run lidar_prod:${{github.ref_name}}  bash  # Dry run image so that is it not prunned
+        # docker save lidar_prod:${{github.ref_name}}  -o /var/data/cicd/CICD_github_assets/CICD_docker_images/lidar_prod_${{github.ref_name}}.tar # This needs writing rights to the mounted path
 
-    - name: Dry run image so that is it not prunned
-      if: github.event_name == 'push'
-      run: docker run lidar_prod_im:${BRANCH_NAME} bash
+    # get version number and date, to tag the image pushed to nexus
+    - name: Get version number
+      id: tag
+      run: |
+        echo "::set-output name=version::$(docker run myria3d grep '__version__' package_metadata.yaml| cut -d\" -f2)"
+        echo "::set-output name=date::$(date '+%Y.%m.%d')"
 
-    # This needs writing rights to the mounted path
-    - name: save the docker image because everything worked
-      if: github.event_name == 'push'
-      run: docker save lidar_prod_im:${BRANCH_NAME} -o /var/data/cicd/CICD_github_assets/CICD_docker_images/lidar_prod_im_${BRANCH_NAME}.tar
+    # show possible tags, for debugging purpose
+    - name: Print tag
+      run: |
+        echo "${{steps.tag.outputs.version}}"
+        echo "${{steps.tag.outputs.date}}"
+
+    - name: push main docker on nexus (tagged with a date)
+      # we push on nexus an image from the main branch when it has been updated (push or accepted pull request)
+      if: ((github.ref_name == 'main') && (github.event_name == 'push')) 
+      run: |
+        docker tag lidar_prod $nexus_server/lidar_hd/lidar_prod:${{steps.tag.outputs.date}}
+        docker login $nexus_server --username svc_lidarhd --password ${{ secrets.PASSWORD_SVC_LIDARHD }}
+        docker push $nexus_server/lidar_hd/lidar_prod:${{steps.tag.outputs.version}}-${{steps.tag.outputs.date}}
+
+    - name: push branch docker on nexus (tagged with the branch name)
+      # we push on nexus an image from a branch when it's pushed
+      if: ((github.event_name == 'push') && (github.ref_name != 'main'))
+      run: |
+        docker tag lidar_prod $nexus_server/lidar_hd/lidar_prod:${{github.ref_name}}
+        docker login $nexus_server --username svc_lidarhd --password ${{ secrets.PASSWORD_SVC_LIDARHD }}
+        docker push $nexus_server/lidar_hd/lidar_prod:${{steps.tag.outputs.version}}-${{github.ref_name}}
 
     - name: Clean dangling docker images
       if: always()  # always do it, even if something failed
       run: docker system prune --force # remove dangling docker images, without asking user for confirmation
-
-
-      
