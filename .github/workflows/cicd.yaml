@@ -104,7 +104,7 @@ jobs:
       # we push on nexus an image from a branch when it's pushed
       if: ((github.event_name == 'push') && (github.ref_name != 'main'))
       run: |
-        docker tag lidar_prod $nexus_server/lidar_hd/lidar_prod:${{github.ref_name}}
+        docker tag lidar_prod $nexus_server/lidar_hd/lidar_prod:${{steps.tag.outputs.version}}-${{github.ref_name}}
         docker login $nexus_server --username svc_lidarhd --password ${{ secrets.PASSWORD_SVC_LIDARHD }}
         docker push $nexus_server/lidar_hd/lidar_prod:${{steps.tag.outputs.version}}-${{github.ref_name}}
 
