@@ -33,8 +33,6 @@ def main(config: DictConfig):  # pragma: no cover
 
     extras(config)
 
-    assert os.path.exists(config.paths.src_las)
-
     if config.get("task") == POSSIBLE_TASK.OPT_VEGETATION.value:
         optimize_vegetation(config)
 
