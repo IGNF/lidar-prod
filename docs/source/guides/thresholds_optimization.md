@@ -43,7 +43,6 @@ Once an optimal solution was found, you may want to evaluate the decision proces
 conda activate lidar_prod
 
 python lidar_prod/run.py \
-+task=optimize \
 building_validation.optimization.todo='prepare+evaluate+update' \
 building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] \
 building_validation.optimization.paths.results_output_dir=[path/to/save/results] \

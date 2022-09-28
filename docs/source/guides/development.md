@@ -25,7 +25,7 @@ CI tests are run for pull request to merge on either `dev` or `main` branches, a
 
 ## Continuous Delivery (CD)
 
-When the event is a push and not a merge request, this means that there was either a direct push to `dev`|`main`|`prod` or that a merge request was accepted. In this case, if the CI workflow passes, the docker image is tagged with the branch name, resulting in e.g. a `lidar_prod_im:prod` image that is up to date with the branch content. See [../tutorials/use.md] for how to leverage such image to run the app.
+When the event is a push and not a merge request, this means that there was either a direct push to `dev`|`main`|`prod` or that a merge request was accepted. In this case, if the CI workflow passes, the docker image is tagged with the branch name, resulting in e.g. a `lidar_prod:prod` image that is up to date with the branch content. See [../tutorials/use.md] for how to leverage such image to run the app.
 
 Additionnaly, pushes on the `main` branch build this library documentation, which is hosted on Github pages.
 
