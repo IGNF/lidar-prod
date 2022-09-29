@@ -29,7 +29,7 @@ Run the full optimization module with
 conda activate lidar_prod
 
 python lidar_prod/run.py \
-+task=optimize building_validation.optimization.todo='prepare+optimize+evaluate+update' \
+building_validation.optimization.todo='prepare+optimize+evaluate+update' \
 building_validation.optimization.paths.input_las_dir=[path/to/labelled/val/dataset/] \
 building_validation.optimization.paths.results_output_dir=[path/to/save/results] 
 ```
