@@ -11,7 +11,7 @@ These thresholds define how much we automate decisions, but also the quantity of
 ## Strategy
 
 We approach the choice of decisions thresholds as a constrained multi-objectives hyperparameters optimization.
-We use the [NSGA-II](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.samplers.NSGAIISampler.html#optuna.samplers.NSGAIISampler) algorithm from the optuna optimization library.
+We use the [NSGA-II](https://doi.org/10.1109/4235.996017) algorithm from the optuna optimization library.
 
 The constraints are defined empirically: recall>=98% and precision>=98%. The genetic algorithms search two maximize the three objectives, but focuses the search to solutions that meet these criteria.
 
