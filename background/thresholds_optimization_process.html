@@ -144,7 +144,7 @@
 <section id="strategy">
 <h2>Strategy<a class="headerlink" href="#strategy" title="Permalink to this headline"></a></h2>
 <p>We approach the choice of decisions thresholds as a constrained multi-objectives hyperparameters optimization.
-We use the <a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/generated/optuna.samplers.NSGAIISampler.html#optuna.samplers.NSGAIISampler">NSGA-II</a> algorithm from the optuna optimization library.</p>
+We use the <a class="reference external" href="https://doi.org/10.1109/4235.996017">NSGA-II</a> algorithm from the optuna optimization library.</p>
 <p>The constraints are defined empirically: recall&gt;=98% and precision&gt;=98%. The genetic algorithms search two maximize the three objectives, but focuses the search to solutions that meet these criteria.</p>
 <p>After a chosen number of generations, the genetic algorithms outputs the <a class="reference external" href="https://en.wikipedia.org/wiki/Pareto_front">Pareto front</a> i.e. the set of Pareto efficient solutions for which no objective criterion could be increased without another one being reduced. Among Pareto-efficient solutions compliant with the constraint, the final solution is the set of thresholds that maximizes the production of precision, recall, and automation.</p>
 </section>

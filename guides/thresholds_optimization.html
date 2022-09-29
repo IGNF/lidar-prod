@@ -158,7 +158,8 @@ A <code class="docutils literal notranslate"><span class="pre">todo</span></code
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate lidar_prod
 
 python lidar_prod/run.py <span class="se">\</span>
-+task<span class="o">=</span>optimize building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+optimize+evaluate+update&#39;</span> <span class="se">\</span>
+++task<span class="o">=</span>optimize_building <span class="se">\</span>
+building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+optimize+evaluate+update&#39;</span> <span class="se">\</span>
 building_validation.optimization.paths.input_las_dir<span class="o">=[</span>path/to/labelled/val/dataset/<span class="o">]</span> <span class="se">\</span>
 building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span> 
 </pre></div>
@@ -170,7 +171,7 @@ building_validation.optimization.paths.results_output_dir<span class="o">=[</spa
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate lidar_prod
 
 python lidar_prod/run.py <span class="se">\</span>
-+task<span class="o">=</span>optimize <span class="se">\</span>
+++task<span class="o">=</span>optimize_building <span class="se">\</span>
 building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+evaluate+update&#39;</span> <span class="se">\</span>
 building_validation.optimization.paths.input_las_dir<span class="o">=[</span>path/to/labelled/test/dataset/<span class="o">]</span> <span class="se">\</span>
 building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span> <span class="se">\</span>

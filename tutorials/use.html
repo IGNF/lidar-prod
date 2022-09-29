@@ -137,12 +137,12 @@
 <h1>Using the app<a class="headerlink" href="#using-the-app" title="Permalink to this headline"></a></h1>
 <section id="run-within-a-docker-container">
 <h2>Run within a docker container<a class="headerlink" href="#run-within-a-docker-container" title="Permalink to this headline"></a></h2>
-<p>Up to date docker images (named <code class="docutils literal notranslate"><span class="pre">lidar_prod_im</span></code>) are created via Github integration actions (see <a class="reference internal" href="../guides/development.html"><span class="doc std std-doc">Developer’s guide</span></a>).</p>
+<p>Up to date docker images (named <code class="docutils literal notranslate"><span class="pre">lidar_prod</span></code>) are created via Github integration actions (see <a class="reference internal" href="../guides/development.html"><span class="doc std std-doc">Developer’s guide</span></a>).</p>
 <p>To run the app, use</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker run <span class="se">\</span>
 -v <span class="o">{</span>local_src_las_dir<span class="o">}</span>:/inputs/ <span class="se">\</span>
 -v <span class="o">{</span>local_output_dir<span class="o">}</span>:/outputs/
-lidar_prod_im <span class="se">\</span>
+lidar_prod <span class="se">\</span>
 python lidar_prod/run.py <span class="se">\</span>
 paths.src_las<span class="o">=</span>/inputs/<span class="o">{</span>src_las_basename<span class="o">}</span>.las
 paths.output_dir<span class="o">=</span>/outputs/
