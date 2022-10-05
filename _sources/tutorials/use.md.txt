@@ -49,6 +49,7 @@ Different tasks can be runned from the application. Currently, they are:
 - `optimize_building` to evaluate the best parameters for building detection
 - `optimize_veg_id` to evaluate the best parameters for vegetation detection
 - `optimize_unc_id` to evaluate the best parameters for unclassified detection
+- `get_shapefile` to create a shapefile from the BD UNI corresponding to a las file
 - `cleaning` to prepare las file with the correct dimension (mostly useful in development)
 
 To use on of those tasks, simply add "+task=[task_name]" to the options list, like this:

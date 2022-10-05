@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks &mdash; lidar_prod 1.7.2 documentation</title>
+  <title>lidar_prod.tasks &mdash; lidar_prod 1.7.3 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -212,15 +212,6 @@ and saves it to <cite>target_las_path</cite></p>
 <dd><p>Updates point cloud classification channel.</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="lidar_prod.tasks.building_validation.request_bd_uni_for_building_shapefile">
-<span class="sig-prename descclassname"><span class="pre">lidar_prod.tasks.building_validation.</span></span><span class="sig-name descname"><span class="pre">request_bd_uni_for_building_shapefile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bd_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lidar_prod.tasks.utils.BDUniConnectionParams" title="lidar_prod.tasks.utils.BDUniConnectionParams"><span class="pre">lidar_prod.tasks.utils.BDUniConnectionParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapefile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.10)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/building_validation.html#request_bd_uni_for_building_shapefile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.building_validation.request_bd_uni_for_building_shapefile" title="Permalink to this definition"></a></dt>
-<dd><p>BD Uni request.</p>
-<p>Create a shapefile with non destructed building on the area of interest
-and saves it.
-Also add a “PRESENCE” column filled with 1 for later use by pdal.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -651,8 +642,9 @@ of information from previous VuildingValidation clustering.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lidar_prod.tasks.utils.get_pipeline">
-<span class="sig-prename descclassname"><span class="pre">lidar_prod.tasks.utils.</span></span><span class="sig-name descname"><span class="pre">get_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.10)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><span class="pre">pdal.pipeline.Pipeline</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/utils.html#get_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.utils.get_pipeline" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.tasks.utils.</span></span><span class="sig-name descname"><span class="pre">get_pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.10)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><span class="pre">pdal.pipeline.Pipeline</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/utils.html#get_pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.utils.get_pipeline" title="Permalink to this definition"></a></dt>
+<dd><p>If the input value is a pipeline, returns it, if it’s a las path return the corresponding pipeline</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lidar_prod.tasks.utils.pdal_read_las_array">
@@ -669,6 +661,15 @@ of information from previous VuildingValidation clustering.</p>
 <dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lidar_prod.tasks.utils.request_bd_uni_for_building_shapefile">
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.tasks.utils.</span></span><span class="sig-name descname"><span class="pre">request_bd_uni_for_building_shapefile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bd_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lidar_prod.tasks.utils.BDUniConnectionParams" title="lidar_prod.tasks.utils.BDUniConnectionParams"><span class="pre">lidar_prod.tasks.utils.BDUniConnectionParams</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapefile_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.10)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/tasks/utils.html#request_bd_uni_for_building_shapefile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.tasks.utils.request_bd_uni_for_building_shapefile" title="Permalink to this definition"></a></dt>
+<dd><p>BD Uni request.</p>
+<p>Create a shapefile with non destructed building on the area of interest
+and saves it.
+Also add a “PRESENCE” column filled with 1 for later use by pdal.</p>
 </dd></dl>
 
 <dl class="py function">

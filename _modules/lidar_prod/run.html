@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.run &mdash; lidar_prod 1.7.2 documentation</title>
+  <title>lidar_prod.run &mdash; lidar_prod 1.7.3 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -145,7 +145,8 @@
     <span class="n">OPT_VEGETATION</span> <span class="o">=</span> <span class="s2">&quot;optimize_veg_id&quot;</span>
     <span class="n">OPT_UNCLASSIFIED</span> <span class="o">=</span> <span class="s2">&quot;optimize_unc_id&quot;</span>
     <span class="n">APPLY_BUILDING</span> <span class="o">=</span> <span class="s2">&quot;apply_on_building&quot;</span>
-    <span class="n">OPT_BUIlDING</span> <span class="o">=</span> <span class="s2">&quot;optimize_building&quot;</span></div>
+    <span class="n">OPT_BUIlDING</span> <span class="o">=</span> <span class="s2">&quot;optimize_building&quot;</span>
+    <span class="n">GET_SHAPEFILE</span> <span class="o">=</span> <span class="s2">&quot;get_shapefile&quot;</span></div>
 
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../apidoc/lidar_prod.html#lidar_prod.run.main">[docs]</a><span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../configs/&quot;</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
@@ -159,7 +160,7 @@
     <span class="c1"># Imports should be nested inside @hydra.main to optimize tab completion</span>
     <span class="c1"># Read more here: https://github.com/facebookresearch/hydra/issues/934</span>
     <span class="kn">from</span> <span class="nn">lidar_prod.commons.commons</span> <span class="kn">import</span> <span class="n">extras</span>
-    <span class="kn">from</span> <span class="nn">lidar_prod.application</span> <span class="kn">import</span> <span class="n">apply</span><span class="p">,</span> <span class="n">identify_vegetation_unclassified</span><span class="p">,</span> <span class="n">just_clean</span><span class="p">,</span> <span class="n">apply_building_module</span>
+    <span class="kn">from</span> <span class="nn">lidar_prod.application</span> <span class="kn">import</span> <span class="n">apply</span><span class="p">,</span> <span class="n">identify_vegetation_unclassified</span><span class="p">,</span> <span class="n">just_clean</span><span class="p">,</span> <span class="n">apply_building_module</span><span class="p">,</span> <span class="n">get_shapefile</span>
     <span class="kn">from</span> <span class="nn">lidar_prod.optimization</span> <span class="kn">import</span> <span class="n">optimize_building</span><span class="p">,</span> <span class="n">optimize_vegetation</span><span class="p">,</span> <span class="n">optimize_unclassified</span>
 
     <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -183,6 +184,9 @@
 
     <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">POSSIBLE_TASK</span><span class="o">.</span><span class="n">OPT_BUIlDING</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
         <span class="n">optimize_building</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">POSSIBLE_TASK</span><span class="o">.</span><span class="n">GET_SHAPEFILE</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="n">apply</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">get_shapefile</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting applying the default process&quot;</span><span class="p">)</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod 1.7.2 documentation</title>
+  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod 1.7.3 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -136,8 +136,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pdal</span>
 <span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
@@ -146,12 +145,12 @@
 <span class="kn">import</span> <span class="nn">geopandas</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">lidar_prod.tasks.utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BDUniConnectionParams</span><span class="p">,</span>
     <span class="n">get_integer_bbox</span><span class="p">,</span>
     <span class="n">get_pdal_reader</span><span class="p">,</span>
     <span class="n">get_pdal_writer</span><span class="p">,</span>
     <span class="n">split_idx_by_dim</span><span class="p">,</span>
-    <span class="n">get_pipeline</span>
+    <span class="n">get_pipeline</span><span class="p">,</span>
+    <span class="n">request_bd_uni_for_building_shapefile</span>
 <span class="p">)</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -307,7 +306,7 @@
             <span class="n">temp_dirpath</span> <span class="o">=</span> <span class="kc">None</span>     <span class="c1"># no need for a temporay directory to add the shapefile in it, we already have the shapefile</span>
             <span class="n">_shp_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shp_path</span>
             <span class="n">gdf</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">_shp_p</span><span class="p">)</span>
-            <span class="n">buildings_in_bd_topo</span> <span class="o">=</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>    <span class="c1"># check if there arebuildings in the shp</span>
+            <span class="n">buildings_in_bd_topo</span> <span class="o">=</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>    <span class="c1"># check if there are buildings in the shp</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="n">temp_dirpath</span> <span class="o">=</span> <span class="n">mkdtemp</span><span class="p">()</span>
@@ -481,70 +480,6 @@
         <span class="k">if</span> <span class="n">uni_overlayed</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">detailed</span><span class="o">.</span><span class="n">db_overlayed_only</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">detailed</span><span class="o">.</span><span class="n">both_unsure</span></div>
-
-
-<div class="viewcode-block" id="request_bd_uni_for_building_shapefile"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.request_bd_uni_for_building_shapefile">[docs]</a><span class="k">def</span> <span class="nf">request_bd_uni_for_building_shapefile</span><span class="p">(</span>
-    <span class="n">bd_params</span><span class="p">:</span> <span class="n">BDUniConnectionParams</span><span class="p">,</span>
-    <span class="n">shapefile_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">bbox</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
-<span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;BD Uni request.</span>
-
-<span class="sd">    Create a shapefile with non destructed building on the area of interest</span>
-<span class="sd">    and saves it.</span>
-<span class="sd">    Also add a &quot;PRESENCE&quot; column filled with 1 for later use by pdal.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">Lambert_93_SRID</span> <span class="o">=</span> <span class="mi">2154</span>
-    <span class="n">sql_request</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;SELECT </span><span class="se">\</span>
-<span class="s1">        st_setsrid(batiment.geometrie,</span><span class="si">{</span><span class="n">Lambert_93_SRID</span><span class="si">}</span><span class="s1">) AS geometry, </span><span class="se">\</span>
-<span class="s1">        1 as presence </span><span class="se">\</span>
-<span class="s1">        FROM batiment </span><span class="se">\</span>
-<span class="s1">        WHERE batiment.geometrie </span><span class="se">\</span>
-<span class="s1">            &amp;&amp; </span><span class="se">\</span>
-<span class="s1">        ST_MakeEnvelope(</span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;x_min&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;y_min&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;x_max&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;y_max&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">Lambert_93_SRID</span><span class="si">}</span><span class="s1">) </span><span class="se">\</span>
-<span class="s1">        and </span><span class="se">\</span>
-<span class="s1">        not gcms_detruit&#39;</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;pgsql2shp&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;-f&quot;</span><span class="p">,</span>
-        <span class="n">shapefile_path</span><span class="p">,</span>
-        <span class="s2">&quot;-h&quot;</span><span class="p">,</span>
-        <span class="n">bd_params</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
-        <span class="s2">&quot;-u&quot;</span><span class="p">,</span>
-        <span class="n">bd_params</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
-        <span class="s2">&quot;-P&quot;</span><span class="p">,</span>
-        <span class="n">bd_params</span><span class="o">.</span><span class="n">pwd</span><span class="p">,</span>
-        <span class="n">bd_params</span><span class="o">.</span><span class="n">bd_name</span><span class="p">,</span>
-        <span class="n">sql_request</span><span class="p">,</span>
-    <span class="p">]</span>
-    <span class="c1"># This call may yield</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
-    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="c1"># In empty zones, pgsql2shp does not create a shapefile</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">e</span><span class="o">.</span><span class="n">output</span>
-            <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;Initializing... </span><span class="se">\n</span><span class="s2">ERROR: Could not determine table metadata (empty table)</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="p">):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="c1"># Error can be due to something else entirely, like</span>
-        <span class="c1"># an inability to translate host name to an address.</span>
-        <span class="c1"># e.g. &quot;could not translate host name &quot;serveurbdudiff.ign.fr&quot; to address: System error&quot;</span>
-        <span class="k">raise</span> <span class="n">e</span>
-    <span class="k">except</span> <span class="ne">ConnectionRefusedError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-            <span class="s2">&quot;ConnectionRefusedError when requesting BDUni.  </span><span class="se">\</span>
-<span class="s2">            This means that the Database cannot be accessed (e.g. due to vpn/proxy reasons, </span><span class="se">\</span>
-<span class="s2">            or bad credentials)&quot;</span>
-        <span class="p">)</span>
-        <span class="k">raise</span> <span class="n">e</span>
-
-    <span class="c1"># read &amp; write to avoid unnacepted 3D shapefile format.</span>
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">shapefile_path</span><span class="p">)</span>
-    <span class="n">gdf</span><span class="p">[[</span><span class="s2">&quot;PRESENCE&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">shapefile_path</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="kc">True</span></div>
 
 
 <div class="viewcode-block" id="thresholds"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.thresholds">[docs]</a><span class="nd">@dataclass</span>
