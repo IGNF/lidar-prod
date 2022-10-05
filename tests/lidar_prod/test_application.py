@@ -5,7 +5,7 @@ import numpy as np
 import os
 
 from omegaconf import open_dict
-from lidar_prod.application import just_clean, identify_vegetation_unclassified, apply, apply_building_module
+from lidar_prod.application import just_clean, identify_vegetation_unclassified, apply, apply_building_module, get_shapefile
 from lidar_prod.tasks.utils import get_a_las_to_las_pdal_pipeline, get_las_metadata, get_las_data_from_las
 from tests.conftest import (
     check_las_contains_dims,
@@ -139,3 +139,13 @@ def test_applying(vegetation_unclassifed_hydra_cfg, path, expected):
     with open_dict(vegetation_unclassifed_hydra_cfg):   # needed to open the config dict and add elements
         vegetation_unclassifed_hydra_cfg.expected = expected
     apply(vegetation_unclassifed_hydra_cfg, dummy_method)
+
+
+def test_get_shapefile(legacy_hydra_cfg):
+    destination_path = tempfile.NamedTemporaryFile().name
+    get_shapefile(legacy_hydra_cfg, LAS_SUBSET_FILE_BUILDING, destination_path)
+    created_shapefile_path = os.path.join(
+        os.path.dirname(destination_path),
+        os.path.splitext(os.path.basename(LAS_SUBSET_FILE_BUILDING))[0] + ".shp"
+    )
+    assert os.path.exists(created_shapefile_path)

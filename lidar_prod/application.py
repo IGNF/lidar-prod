@@ -13,7 +13,7 @@ from lidar_prod.tasks.building_identification import BuildingIdentifier
 from lidar_prod.tasks.basic_identification import BasicIdentifier
 
 from lidar_prod.tasks.utils import get_las_data_from_las, save_las_data_to_las
-
+from lidar_prod.tasks.utils import get_integer_bbox, get_pipeline, request_bd_uni_for_building_shapefile
 log = logging.getLogger(__name__)
 
 
@@ -130,3 +130,18 @@ def apply_building_module(config: DictConfig, src_las_path: str, dest_las_path: 
         cl.run(tmp_las_path, dest_las_path)
 
     return dest_las_path
+
+
+@commons.eval_time
+def get_shapefile(config: DictConfig, src_las_path: str, dest_las_path: str):
+    """save a shapefile for the las in the destination path
+    Args:
+        src_las_path: the path of the source las
+        dest_las_path: the path to save the shapefile
+    """
+    log.info(f"get shapefile for {src_las_path}")
+    request_bd_uni_for_building_shapefile(
+        hydra.utils.instantiate(config.building_validation.application.bd_uni_connection_params),  # BDUniConnectionParams
+        os.path.join(os.path.dirname(dest_las_path), os.path.splitext(os.path.basename(src_las_path))[0] + ".shp"),  # new shapefile path
+        get_integer_bbox(get_pipeline(src_las_path), buffer=config.building_validation.application.bd_uni_request.buffer)  # bbox
+    )
