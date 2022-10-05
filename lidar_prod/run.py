@@ -13,6 +13,7 @@ class POSSIBLE_TASK(Enum):
     OPT_UNCLASSIFIED = "optimize_unc_id"
     APPLY_BUILDING = "apply_on_building"
     OPT_BUIlDING = "optimize_building"
+    GET_SHAPEFILE = "get_shapefile"
 
 
 @hydra.main(config_path="../configs/", config_name="config.yaml")
@@ -26,7 +27,7 @@ def main(config: DictConfig):  # pragma: no cover
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934
     from lidar_prod.commons.commons import extras
-    from lidar_prod.application import apply, identify_vegetation_unclassified, just_clean, apply_building_module
+    from lidar_prod.application import apply, identify_vegetation_unclassified, just_clean, apply_building_module, get_shapefile
     from lidar_prod.optimization import optimize_building, optimize_vegetation, optimize_unclassified
 
     log = logging.getLogger(__name__)
@@ -50,6 +51,9 @@ def main(config: DictConfig):  # pragma: no cover
 
     elif config.get("task") == POSSIBLE_TASK.OPT_BUIlDING.value:
         optimize_building(config)
+
+    elif config.get("task") == POSSIBLE_TASK.GET_SHAPEFILE.value:
+        apply(config, get_shapefile)
 
     else:
         log.info("Starting applying the default process")

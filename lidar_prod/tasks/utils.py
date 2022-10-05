@@ -2,11 +2,16 @@ from dataclasses import dataclass
 from typing import Union
 import json
 import math
+import logging
 from numbers import Number
 from typing import Any, Dict, Iterable
 import numpy as np
 import pdal
 import laspy
+import subprocess
+import geopandas
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -30,12 +35,13 @@ def split_idx_by_dim(dim_array):
     return group_idx
 
 
-def get_pipeline(entry_value: Union[pdal.pipeline.Pipeline, str]):
-    if type(entry_value) == str:
-        pipeline = pdal.Pipeline() | get_pdal_reader(entry_value)
+def get_pipeline(input_value: Union[pdal.pipeline.Pipeline, str]):
+    """If the input value is a pipeline, returns it, if it's a las path return the corresponding pipeline"""
+    if type(input_value) == str:
+        pipeline = pdal.Pipeline() | get_pdal_reader(input_value)
         pipeline.execute()
     else:
-        pipeline = entry_value
+        pipeline = input_value
     return pipeline
 
 
@@ -135,3 +141,67 @@ def pdal_read_las_array(las_path: str):
     p1 = pdal.Pipeline() | get_pdal_reader(las_path)
     p1.execute()
     return p1.arrays[0]
+
+
+def request_bd_uni_for_building_shapefile(
+    bd_params: BDUniConnectionParams,
+    shapefile_path: str,
+    bbox: Dict[str, int],
+):
+    """BD Uni request.
+
+    Create a shapefile with non destructed building on the area of interest
+    and saves it.
+    Also add a "PRESENCE" column filled with 1 for later use by pdal.
+
+    """
+    Lambert_93_SRID = 2154
+    sql_request = f'SELECT \
+        st_setsrid(batiment.geometrie,{Lambert_93_SRID}) AS geometry, \
+        1 as presence \
+        FROM batiment \
+        WHERE batiment.geometrie \
+            && \
+        ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
+        and \
+        not gcms_detruit'
+    cmd = [
+        "pgsql2shp",
+        "-f",
+        shapefile_path,
+        "-h",
+        bd_params.host,
+        "-u",
+        bd_params.user,
+        "-P",
+        bd_params.pwd,
+        bd_params.bd_name,
+        sql_request,
+    ]
+    # This call may yield
+    try:
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        # In empty zones, pgsql2shp does not create a shapefile
+        if (
+            e.output
+            == b"Initializing... \nERROR: Could not determine table metadata (empty table)\n"
+        ):
+            return False
+        # Error can be due to something else entirely, like
+        # an inability to translate host name to an address.
+        # e.g. "could not translate host name "serveurbdudiff.ign.fr" to address: System error"
+        raise e
+    except ConnectionRefusedError as e:
+        log.error(
+            "ConnectionRefusedError when requesting BDUni.  \
+            This means that the Database cannot be accessed (e.g. due to vpn/proxy reasons, \
+            or bad credentials)"
+        )
+        raise e
+
+    # read & write to avoid unnacepted 3D shapefile format.
+    gdf = geopandas.read_file(shapefile_path)
+    gdf[["PRESENCE", "geometry"]].to_file(shapefile_path)
+
+    return True
