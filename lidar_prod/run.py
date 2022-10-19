@@ -56,7 +56,7 @@ def main(config: DictConfig):  # pragma: no cover
         apply(config, get_shapefile)
 
     else:
-        log.info("Starting applying the default process")
+        log.info("WARNING! Starting applying the default process")
         apply(config, apply_building_module)
 
 
