@@ -19,13 +19,13 @@ cluster:
 bd_uni_request:
   buffer: 50
 
-# TODO: update min_frac_confirmation_factor_if_bd_uni_overlay and others after optimization...
+# Associated Version(s) : M9.0-proto151_V1.0_epoch_40_Myria3DV3.0.1-proto151optimization
 thresholds:
-  min_confidence_confirmation: 0.37574976186264664  # min proba to validate a point
-  min_frac_confirmation: 0.6661410185371994  # min fractin of confirmed points per group for confirmation
-  min_frac_confirmation_factor_if_bd_uni_overlay: 0.8820746597006655  # relaxation factor to min proba when point is under BDUni vector
-  min_uni_db_overlay_frac: 0.5041941489707767  # min fraction of points  under BDUni vector per group for confirmation
-  min_confidence_refutation: 0.5212204710813311 # min proba to refute a point
-  min_frac_refutation: 0.9613067360728214   # min fractin of refuted points per group for confirmation
-  min_entropy_uncertainty: 0.6286345539969987   # min entropy to flag a point as uncertain
-  min_frac_entropy_uncertain: 0.9057081151270139   # min fractin of uncertain points (based on entropy) per group to flag as uncertain
+  min_confidence_confirmation: 0.04775821567428573  # min proba to validate a point
+  min_frac_confirmation: 0.9089751574841473  # min fractin of confirmed points per group for confirmation
+  min_frac_confirmation_factor_if_bd_uni_overlay: 0.743295128504609  # relaxation factor to min proba when point is under BDUni vector
+  min_uni_db_overlay_frac: 0.8754024590987084  # min fraction of points  under BDUni vector per group for confirmation
+  min_confidence_refutation: 0.78937871811036 # min proba to refute a point
+  min_frac_refutation: 0.8410149824316226   # min fractin of refuted points per group for confirmation
+  min_entropy_uncertainty: 0.9156671575122429   # min entropy to flag a point as uncertain
+  min_frac_entropy_uncertain: 0.8531327415229186   # min fractin of uncertain points (based on entropy) per group to flag as uncertain
