@@ -38,13 +38,13 @@ jobs:
     #     python -m
     #     pytest -rA -v -m "not slow" --ignore=actions-runner
 
-    - name: Run slow tests last (evaluation on large file)
-      run: >
-        docker run
-        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
-        lidar_prod
-        python -m
-        pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
+    # - name: Run slow tests last (evaluation on large file)
+    #   run: >
+    #     docker run
+    #     -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
+    #     lidar_prod
+    #     python -m
+    #     pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
 
     - name: Test detection of building.
       run: >
