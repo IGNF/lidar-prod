@@ -31,12 +31,12 @@ jobs:
     - name: Check code neatness (linter)
       run: docker run lidar_prod flake8
 
-    - name: Run tests & get coverage - fast ones go first.
-      run: >
-        docker run
-        lidar_prod
-        python -m
-        pytest -rA -v -m "not slow" --ignore=actions-runner
+    # - name: Run tests & get coverage - fast ones go first.
+    #   run: >
+    #     docker run
+    #     lidar_prod
+    #     python -m
+    #     pytest -rA -v -m "not slow" --ignore=actions-runner
 
     - name: Run slow tests last (evaluation on large file)
       run: >
