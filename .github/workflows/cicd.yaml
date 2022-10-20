@@ -83,7 +83,7 @@ jobs:
     - name: Get version number
       id: tag
       run: |
-        echo "::set-output name=version::$(docker run myria3d grep '__version__' package_metadata.yaml| cut -d\" -f2)"
+        echo "::set-output name=version::$(docker run lidar_prod grep '__version__' package_metadata.yaml| cut -d\" -f2)"
         echo "::set-output name=date::$(date '+%Y.%m.%d')"
 
     # show possible tags, for debugging purpose
