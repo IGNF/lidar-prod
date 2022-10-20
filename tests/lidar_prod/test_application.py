@@ -47,13 +47,16 @@ def test_application_data_invariance_and_data_format(legacy_hydra_cfg, las_mutat
         _fc.unsure,
     }
     # Run application on the data subset
+    print("CHECKPOINT 0!!!")
     with tempfile.TemporaryDirectory() as legacy_hydra_cfg.paths.output_dir:
         # Copy the data and apply the "mutation"
         mutated_copy: str = tempfile.NamedTemporaryFile().name
+        print("CHECKPOINT 1!!!")
         pipeline = get_a_las_to_las_pdal_pipeline(
             LAS_SUBSET_FILE_BUILDING, mutated_copy, las_mutation
         )
         pipeline.execute()
+        print("CHECKPOINT 2!!!")
         legacy_hydra_cfg.paths.src_las = mutated_copy
         if not query_db_Uni:    # we don't request db_uni, we use a shapefile instead
             legacy_hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
