@@ -39,4 +39,4 @@ Right now, the class `building` is the only one that is addressed. The extension
 ## Version
 
 Decision thresholds for building validation should be optimized for the trained deep learning model which will produce the probabilities.
-Current model version: proto151_V0.0_epoch_056_Myria3DV2.3.0.ckpt (accessible at this [Myria3D Production Release](https://github.com/IGNF/myria3d/releases/tag/prod-release-tag) - if up to date).
+Current model version:proto151_V1.0_epoch_40_Myria3DV3.0.1.ckpt (accessible at this [Myria3D Production Release](https://github.com/IGNF/myria3d/releases/tag/prod-release-tag) - if up to date).
