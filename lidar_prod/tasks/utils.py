@@ -199,10 +199,7 @@ def request_bd_uni_for_building_shapefile(
             or bad credentials)"
         )
         raise e
-    except TimeoutError as e:
-        log.error(
-            "TimeoutError when requesting BDUni"
-        )
+    except e:
         raise e
 
     # read & write to avoid unnacepted 3D shapefile format.
