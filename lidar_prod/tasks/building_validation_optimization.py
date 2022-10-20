@@ -94,8 +94,9 @@ class BuildingValidationOptimizer:
         codes to adapt to those of the optimization dataset.
 
         """
-        self.las_filepaths = glob(osp.join(self.paths.input_las_dir, "*.las"))
-        self.las_filepaths = sorted(self.las_filepaths)
+        las_paths = glob(osp.join(self.paths.input_las_dir, "*.las"))
+        laz_paths = glob(osp.join(self.paths.input_las_dir, "*.laz"))
+        self.las_filepaths = sorted(las_paths + laz_paths)
         if self.debug:
             self.las_filepaths = self.las_filepaths[:1]
         os.makedirs(self.paths.prepared_las_dir, exist_ok=True)
@@ -115,7 +116,9 @@ class BuildingValidationOptimizer:
             + self.buildings_correction_labels.codes.false_positives
         )
         # We also specify if, when updating corrected data (for inspection) we want final codes or detailed ones.
-        self.bv.use_final_classification_codes = self.use_final_classification_codes
+        self.bv.use_final_classification_codes = (
+            self.use_final_classification_codes
+        )
         self.design.confusion_matrix_order = [
             self.bv.codes.final.unsure,
             self.bv.codes.final.not_building,
@@ -178,7 +181,9 @@ class BuildingValidationOptimizer:
         """
         clusters = self._load_clusters()
         self._set_thresholds_from_pickle_if_available()
-        decisions = np.array([self.bv._make_group_decision(c) for c in clusters])
+        decisions = np.array(
+            [self.bv._make_group_decision(c) for c in clusters]
+        )
         mts_gt = np.array([c.target for c in clusters])
         metrics_dict = self.evaluate_decisions(mts_gt, decisions)
         log.info(f"\n Results:\n{self._get_results_logs_str(metrics_dict)}")
@@ -186,7 +191,9 @@ class BuildingValidationOptimizer:
 
     def _set_thresholds_from_pickle_if_available(self):
         try:
-            with open(self.paths.building_validation_thresholds_pickle, "rb") as f:
+            with open(
+                self.paths.building_validation_thresholds_pickle, "rb"
+            ) as f:
                 self.bv.thresholds = pickle.load(f)
         except FileNotFoundError:
             warnings.warn(
@@ -204,7 +211,9 @@ class BuildingValidationOptimizer:
         based on those threshods and saves the result.
 
         """
-        log.info(f"Updated las will be saved in {self.paths.results_output_dir}")
+        log.info(
+            f"Updated las will be saved in {self.paths.results_output_dir}"
+        )
         self._set_thresholds_from_pickle_if_available()
         for prepared_las_path, target_las_path in tqdm(
             zip(self.prepared_las_filepaths, self.out_las_filepaths),
@@ -235,7 +244,9 @@ class BuildingValidationOptimizer:
         dim_cluster_id = las[
             self.bv.data_format.las_dimensions.ClusterID_candidate_building
         ]
-        dim_classification = las[self.bv.data_format.las_dimensions.classification]
+        dim_classification = las[
+            self.bv.data_format.las_dimensions.classification
+        ]
 
         split_idx = split_idx_by_dim(dim_cluster_id)
         # removes the group of unclustered points, which has ClusterID = 0
@@ -245,8 +256,8 @@ class BuildingValidationOptimizer:
         for pts_idx in tqdm(
             split_idx, desc="Extract cluster info from LAS", unit="clusters"
         ):
-            infos: BuildingValidationClusterInfo = self.bv._extract_cluster_info_by_idx(
-                las, pts_idx
+            infos: BuildingValidationClusterInfo = (
+                self.bv._extract_cluster_info_by_idx(las, pts_idx)
             )
             infos.target = self._define_MTS_ground_truth_flag(
                 dim_classification[pts_idx]
@@ -264,7 +275,9 @@ class BuildingValidationOptimizer:
         )
         if tp_frac >= self.buildings_correction_labels.min_frac.true_positives:
             return self.bv.codes.final.building
-        elif tp_frac < self.buildings_correction_labels.min_frac.false_positives:
+        elif (
+            tp_frac < self.buildings_correction_labels.min_frac.false_positives
+        ):
             return self.bv.codes.final.not_building
         return self.bv.codes.final.unsure
 
@@ -272,14 +285,18 @@ class BuildingValidationOptimizer:
         """Positive float indicative a solution violates the constraint of minimal auto/precision/metrics"""
         penalty = 0
         if precision < self.design.constraints.min_precision_constraint:
-            penalty += self.design.constraints.min_precision_constraint - precision
+            penalty += (
+                self.design.constraints.min_precision_constraint - precision
+            )
         if recall < self.design.constraints.min_recall_constraint:
             penalty += self.design.constraints.min_recall_constraint - recall
         if auto < self.design.constraints.min_automation_constraint:
             penalty += self.design.constraints.min_automation_constraint - auto
         return [penalty]
 
-    def _objective(self, trial, clusters: List[BuildingValidationClusterInfo] = None):
+    def _objective(
+        self, trial, clusters: List[BuildingValidationClusterInfo] = None
+    ):
         """Objective function for optuna optimization.
         Use prepared list to access group-level probas and targets.
 
@@ -301,7 +318,9 @@ class BuildingValidationOptimizer:
             "min_confidence_refutation": trial.suggest_float(
                 "min_confidence_refutation", 0.0, 1.0
             ),
-            "min_frac_refutation": trial.suggest_float("min_frac_refutation", 0.0, 1.0),
+            "min_frac_refutation": trial.suggest_float(
+                "min_frac_refutation", 0.0, 1.0
+            ),
             "min_uni_db_overlay_frac": trial.suggest_float(
                 "min_uni_db_overlay_frac", 0.5, 1.0
             ),
@@ -316,13 +335,17 @@ class BuildingValidationOptimizer:
             ),
         }
         self.bv.thresholds = thresholds(**params)
-        decisions = np.array([self.bv._make_group_decision(c) for c in clusters])
+        decisions = np.array(
+            [self.bv._make_group_decision(c) for c in clusters]
+        )
         mts_gt = np.array([c.target for c in clusters])
         metrics_dict = self.evaluate_decisions(mts_gt, decisions)
 
         # WARNING: order should always be automation, precision, recall
         values = (
-            metrics_dict[self.design.metrics.proportion_of_automated_decisions],
+            metrics_dict[
+                self.design.metrics.proportion_of_automated_decisions
+            ],
             metrics_dict[self.design.metrics.precision],
             metrics_dict[self.design.metrics.recall],
         )
@@ -338,7 +361,9 @@ class BuildingValidationOptimizer:
 
     def _select_best_rules(self, study):
         """Find the trial that meet constraints and that maximizes automation."""
-        trials = sorted(study.best_trials, key=lambda x: x.values[0], reverse=True)
+        trials = sorted(
+            study.best_trials, key=lambda x: x.values[0], reverse=True
+        )
         TRIALS_BELOW_ZERO_ARE_VALID = 0
         respect_constraints = [
             s
@@ -352,7 +377,9 @@ class BuildingValidationOptimizer:
                 "No trial respecting constraints - returning best metrics-products."
             )
             trials = sorted(
-                study.best_trials, key=lambda x: np.product(x.values), reverse=True
+                study.best_trials,
+                key=lambda x: np.product(x.values),
+                reverse=True,
             )
             best = trials[0]
         best_rules = thresholds(**best.params)
@@ -376,7 +403,9 @@ class BuildingValidationOptimizer:
         """Deserializes the list of cluster-level information objects."""
         with open(self.paths.group_info_pickle_path, "rb") as f:
             clusters = pickle.load(f)
-            log.info(f"Loading pickled groups from {self.paths.group_info_pickle_path}")
+            log.info(
+                f"Loading pickled groups from {self.paths.group_info_pickle_path}"
+            )
         return clusters
 
     def evaluate_decisions(self, mts_gt, ia_decision) -> Dict[str, Any]:
@@ -430,7 +459,9 @@ class BuildingValidationOptimizer:
             labels=self.design.confusion_matrix_order,
             normalize=None,
         )
-        metrics_dict.update({self.design.metrics.confusion_matrix_no_norm: cm.copy()})
+        metrics_dict.update(
+            {self.design.metrics.confusion_matrix_no_norm: cm.copy()}
+        )
 
         # CRITERIA
         cm = confusion_matrix(
@@ -481,7 +512,9 @@ class BuildingValidationOptimizer:
             labels=self.design.confusion_matrix_order,
             normalize="true",
         )
-        metrics_dict.update({self.design.metrics.confusion_matrix_norm: cm.copy()})
+        metrics_dict.update(
+            {self.design.metrics.confusion_matrix_norm: cm.copy()}
+        )
 
         # QUALITY
         non_ambiguous_idx = mts_gt != self.bv.codes.final.unsure
@@ -528,8 +561,16 @@ class BuildingValidationOptimizer:
         results_logs = (
             results_logs
             + "\nConfusion Matrix\n"
-            + str(metrics_dict[self.design.metrics.confusion_matrix_no_norm].round(3))
+            + str(
+                metrics_dict[
+                    self.design.metrics.confusion_matrix_no_norm
+                ].round(3)
+            )
             + "\nConfusion Matrix (normalized)\n"
-            + str(metrics_dict[self.design.metrics.confusion_matrix_norm].round(3))
+            + str(
+                metrics_dict[self.design.metrics.confusion_matrix_norm].round(
+                    3
+                )
+            )
         )
         return results_logs

@@ -8,7 +8,7 @@ use_final_classification_codes: false
 building_validator: ${building_validation.application}
 
 paths:
-  input_las_dir:  "/path/to/folder/"  # contains .las files
+  input_las_dir:  "/path/to/folder/"  # contains .las/.laz files
   results_output_dir: "/path/to/folder/"  # will contain best optimization trial and (optionnaly) updated las
   group_info_pickle_path: ${.results_output_dir}/group_info.pickle
   prepared_las_dir: ${.results_output_dir}/prepared/
