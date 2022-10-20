@@ -199,7 +199,7 @@ def request_bd_uni_for_building_shapefile(
             or bad credentials)"
         )
         raise e
-    except e:
+    except Exception as e:
         raise e
 
     # read & write to avoid unnacepted 3D shapefile format.
