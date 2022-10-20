@@ -17,7 +17,7 @@ A large validation dataset might help having a better sense of the app performan
 
 > Refer to the [installation tutorial](../tutorials/install.md) to set up your python environment.
 
-Your corrected data must live in a single `input_las_dir` directory as a set of LAS files. 
+Your corrected data must live in a single `input_las_dir` directory as a set of LAS/LAZ files. 
 Prepared and updated files will be saved in subfolder of a `results_output_dir` directory (`./prepared` and `./updated/`, respectively).
 They will keep the same basename as the original files.
 Be sure that the `data_format` configurations match your data, and in particular the (clasification) `codes` and `las_dimensions` configuration groups.
