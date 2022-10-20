@@ -97,6 +97,11 @@ class BuildingValidationOptimizer:
         las_paths = glob(osp.join(self.paths.input_las_dir, "*.las"))
         laz_paths = glob(osp.join(self.paths.input_las_dir, "*.laz"))
         self.las_filepaths = sorted(las_paths + laz_paths)
+        if not self.las_filepaths:
+            raise ValueError(
+                "No LAS/LAZ found in {self.paths.input_las_dir} (i.e. input_las_dir) while"
+                "globbing *las and *laz extensions (lowercase)."
+            )
         if self.debug:
             self.las_filepaths = self.las_filepaths[:1]
         os.makedirs(self.paths.prepared_las_dir, exist_ok=True)
