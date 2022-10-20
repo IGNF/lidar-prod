@@ -180,7 +180,7 @@ def request_bd_uni_for_building_shapefile(
     ]
     # This call may yield
     try:
-        subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=120)
     except subprocess.CalledProcessError as e:
         # In empty zones, pgsql2shp does not create a shapefile
         if (
@@ -199,7 +199,10 @@ def request_bd_uni_for_building_shapefile(
             or bad credentials)"
         )
         raise e
-    except Exception as e:
+    except subprocess.TimeoutExpired as e:
+        log.error(
+            "Time out when requesting BDUni."
+        )
         raise e
 
     # read & write to avoid unnacepted 3D shapefile format.
