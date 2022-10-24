@@ -11,6 +11,7 @@ import optuna
 from tqdm import tqdm
 import os.path as osp
 import pdal
+import math
 
 from lidar_prod.tasks.building_validation import (
     BuildingValidator,
@@ -332,8 +333,11 @@ class BuildingValidationOptimizer:
             "min_frac_confirmation_factor_if_bd_uni_overlay": trial.suggest_float(
                 "min_frac_confirmation_factor_if_bd_uni_overlay", 0.5, 1.0
             ),
+            # Max entropy for 7 classes. When looking at prediction's entropy,
+            # the observed maximal value is aqual to the Shannon entropy divided by two,
+            # so this is what we consider as the max for the min entropy for uncertainty.
             "min_entropy_uncertainty": trial.suggest_float(
-                "min_entropy_uncertainty", 0.5, 1.0
+                "min_entropy_uncertainty", 0.0, -math.log2(1 / 7) / 2.0
             ),
             "min_frac_entropy_uncertain": trial.suggest_float(
                 "min_frac_entropy_uncertain", 0.33, 1.0
