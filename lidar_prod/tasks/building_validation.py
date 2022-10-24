@@ -17,7 +17,7 @@ from lidar_prod.tasks.utils import (
     get_pdal_writer,
     split_idx_by_dim,
     get_pipeline,
-    request_bd_uni_for_building_shapefile
+    request_bd_uni_for_building_shapefile,
 )
 
 log = logging.getLogger(__name__)
@@ -99,7 +99,9 @@ class BuildingValidator:
                 "Preparation : Clustering of candidates buildings & Requesting BDUni"
             )
             if type(input_values) == str:
-                log.info(f"Applying Building Validation to file \n{input_values}")
+                log.info(
+                    f"Applying Building Validation to file \n{input_values}"
+                )
                 temp_f = osp.join(td, osp.basename(input_values))
             else:
                 temp_f = ""
@@ -108,7 +110,12 @@ class BuildingValidator:
             self.update()
         return target_las_path
 
-    def prepare(self, input_values: Union[str, pdal.pipeline.Pipeline], prepared_las_path: str, save_result: bool = False) -> None:
+    def prepare(
+        self,
+        input_values: Union[str, pdal.pipeline.Pipeline],
+        prepared_las_path: str,
+        save_result: bool = False,
+    ) -> None:
         f"""
         Prepare las for later decision process. .
         1. Cluster candidates points, in a new `{self.data_format.las_dimensions.ClusterID_candidate_building}`
@@ -130,7 +137,9 @@ class BuildingValidator:
 
         """
 
-        dim_candidate_flag = self.data_format.las_dimensions.candidate_buildings_flag
+        dim_candidate_flag = (
+            self.data_format.las_dimensions.candidate_buildings_flag
+        )
         dim_cluster_id_pdal = self.data_format.las_dimensions.cluster_id
         dim_cluster_id_candidates = (
             self.data_format.las_dimensions.ClusterID_candidate_building
@@ -139,7 +148,9 @@ class BuildingValidator:
 
         self.pipeline = get_pipeline(input_values)
         # Identify candidates buildings points with a boolean flag
-        self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_candidate_flag}")
+        self.pipeline |= pdal.Filter.ferry(
+            dimensions=f"=>{dim_candidate_flag}"
+        )
         _is_candidate_building = (
             "("
             + " || ".join(
@@ -165,15 +176,19 @@ class BuildingValidator:
         )
         self.pipeline |= pdal.Filter.assign(value=f"{dim_cluster_id_pdal} = 0")
         self.pipeline.execute()
-        bbox = get_integer_bbox(self.pipeline, buffer=self.bd_uni_request.buffer)
+        bbox = get_integer_bbox(
+            self.pipeline, buffer=self.bd_uni_request.buffer
+        )
 
         self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_overlay}")
 
         if self.shp_path:
-            temp_dirpath = None     # no need for a temporay directory to add the shapefile in it, we already have the shapefile
+            temp_dirpath = None  # no need for a temporay directory to add the shapefile in it, we already have the shapefile
             _shp_p = self.shp_path
             gdf = geopandas.read_file(_shp_p)
-            buildings_in_bd_topo = not len(gdf) == 0    # check if there are buildings in the shp
+            buildings_in_bd_topo = (
+                not len(gdf) == 0
+            )  # check if there are buildings in the shp
 
         else:
             temp_dirpath = mkdtemp()
@@ -201,7 +216,9 @@ class BuildingValidator:
         if temp_dirpath:
             shutil.rmtree(temp_dirpath)
 
-    def update(self, src_las_path: str = None, target_las_path: str = None) -> None:
+    def update(
+        self, src_las_path: str = None, target_las_path: str = None
+    ) -> None:
         """Updates point cloud classification channel."""
         if src_las_path:
             self.pipeline = pdal.Pipeline()
@@ -316,7 +333,8 @@ class BuildingValidator:
         p_heq_relaxed_threshold = infos.probabilities >= relaxed_threshold
 
         ia_confirmed_flag = np.logical_or(
-            p_heq_threshold, np.logical_and(infos.overlays, p_heq_relaxed_threshold)
+            p_heq_threshold,
+            np.logical_and(infos.overlays, p_heq_relaxed_threshold),
         )
 
         ia_confirmed = (
@@ -326,26 +344,32 @@ class BuildingValidator:
         # REFUTATION
         ia_refuted = (
             np.mean(
-                (1 - infos.probabilities) >= self.thresholds.min_confidence_refutation
+                (1 - infos.probabilities)
+                >= self.thresholds.min_confidence_refutation
             )
             >= self.thresholds.min_frac_refutation
         )
         uni_overlayed = (
             np.mean(infos.overlays) >= self.thresholds.min_uni_db_overlay_frac
         )
-
-        if high_entropy:
-            return self.codes.detailed.unsure_by_entropy
-        if ia_refuted:
-            if uni_overlayed:
-                return self.codes.detailed.ia_refuted_but_under_db_uni
-            return self.codes.detailed.ia_refuted
-        if ia_confirmed:
-            if uni_overlayed:
-                return self.codes.detailed.both_confirmed
-            return self.codes.detailed.ia_confirmed_only
+        # If low entropy, we may trust AI to confirm/refute
+        if not high_entropy:
+            if ia_refuted:
+                if uni_overlayed:
+                    return self.codes.detailed.ia_refuted_but_under_db_uni
+                return self.codes.detailed.ia_refuted
+            if ia_confirmed:
+                if uni_overlayed:
+                    return self.codes.detailed.both_confirmed
+                return self.codes.detailed.ia_confirmed_only
+        # Else, we may still use BDUni information
         if uni_overlayed:
             return self.codes.detailed.db_overlayed_only
+
+        # Else: we are uncertain, and we specify why we can specify if entropy was
+        # involved to conclude to uncertainty.
+        if high_entropy:
+            return self.codes.detailed.unsure_by_entropy
         return self.codes.detailed.both_unsure
 
 
