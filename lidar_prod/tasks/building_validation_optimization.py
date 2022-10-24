@@ -327,10 +327,10 @@ class BuildingValidationOptimizer:
                 "min_frac_refutation", 0.0, 1.0
             ),
             "min_uni_db_overlay_frac": trial.suggest_float(
-                "min_uni_db_overlay_frac", 0.5, 1.0
+                "min_uni_db_overlay_frac", 2.0, 2.0
             ),
             "min_frac_confirmation_factor_if_bd_uni_overlay": trial.suggest_float(
-                "min_frac_confirmation_factor_if_bd_uni_overlay", 0.5, 1.0
+                "min_frac_confirmation_factor_if_bd_uni_overlay", 1.0, 1.0
             ),
             "min_entropy_uncertainty": trial.suggest_float(
                 "min_entropy_uncertainty", 0.5, 1.0
