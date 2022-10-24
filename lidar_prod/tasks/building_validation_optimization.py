@@ -315,28 +315,28 @@ class BuildingValidationOptimizer:
         """
         params = {
             "min_confidence_confirmation": trial.suggest_float(
-                "min_confidence_confirmation", 0.0, 1.0
+                "min_confidence_confirmation", 1.0, 1.0
             ),
             "min_frac_confirmation": trial.suggest_float(
-                "min_frac_confirmation", 0.0, 1.0
+                "min_frac_confirmation", 1.0, 1.0
             ),
             "min_confidence_refutation": trial.suggest_float(
-                "min_confidence_refutation", 0.0, 1.0
+                "min_confidence_refutation", 1.0, 1.0
             ),
             "min_frac_refutation": trial.suggest_float(
-                "min_frac_refutation", 0.0, 1.0
+                "min_frac_refutation", 1.0, 1.0
             ),
             "min_uni_db_overlay_frac": trial.suggest_float(
-                "min_uni_db_overlay_frac", 0.5, 1.0
+                "min_uni_db_overlay_frac", 0.0, 1.0
             ),
             "min_frac_confirmation_factor_if_bd_uni_overlay": trial.suggest_float(
-                "min_frac_confirmation_factor_if_bd_uni_overlay", 0.5, 1.0
+                "min_frac_confirmation_factor_if_bd_uni_overlay", 1.0, 1.0
             ),
             "min_entropy_uncertainty": trial.suggest_float(
-                "min_entropy_uncertainty", 0.5, 1.0
+                "min_entropy_uncertainty", 1000, 1000
             ),
             "min_frac_entropy_uncertain": trial.suggest_float(
-                "min_frac_entropy_uncertain", 0.33, 1.0
+                "min_frac_entropy_uncertain", 1.0, 1.0
             ),
         }
         self.bv.thresholds = thresholds(**params)
