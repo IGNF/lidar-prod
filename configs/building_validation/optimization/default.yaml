@@ -48,7 +48,7 @@ study:
         - "${get_method:lidar_prod.tasks.building_validation_optimization.constraints_func}"
 
 design:
-  n_trials: 300
+  n_trials: 400
   constraints:
     min_precision_constraint: 0.98
     min_recall_constraint: 0.98
