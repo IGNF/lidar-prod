@@ -95,26 +95,27 @@ class BuildingValidationOptimizer:
         codes to adapt to those of the optimization dataset.
 
         """
-        las_paths = glob(osp.join(self.paths.input_las_dir, "*.las"))
-        laz_paths = glob(osp.join(self.paths.input_las_dir, "*.laz"))
-        self.las_filepaths = sorted(las_paths + laz_paths)
-        if not self.las_filepaths:
-            raise ValueError(
-                "No LAS/LAZ found in {self.paths.input_las_dir} (i.e. input_las_dir) while"
-                "globbing *las and *laz extensions (lowercase)."
-            )
-        if self.debug:
-            self.las_filepaths = self.las_filepaths[:1]
-        os.makedirs(self.paths.prepared_las_dir, exist_ok=True)
-        self.prepared_las_filepaths = [
-            osp.join(self.paths.prepared_las_dir, osp.basename(f))
-            for f in self.las_filepaths
-        ]
-        os.makedirs(self.paths.updated_las_dir, exist_ok=True)
-        self.out_las_filepaths = [
-            osp.join(self.paths.updated_las_dir, osp.basename(f))
-            for f in self.las_filepaths
-        ]
+        if "prepare" in self.todo or "update" in self.todo:
+            las_paths = glob(osp.join(self.paths.input_las_dir, "*.las"))
+            laz_paths = glob(osp.join(self.paths.input_las_dir, "*.laz"))
+            self.las_filepaths = sorted(las_paths + laz_paths)
+            if not self.las_filepaths:
+                raise ValueError(
+                    "No LAS/LAZ found in {self.paths.input_las_dir} (i.e. input_las_dir) while"
+                    "globbing *las and *laz extensions (lowercase)."
+                )
+            if self.debug:
+                self.las_filepaths = self.las_filepaths[:1]
+            os.makedirs(self.paths.prepared_las_dir, exist_ok=True)
+            self.prepared_las_filepaths = [
+                osp.join(self.paths.prepared_las_dir, osp.basename(f))
+                for f in self.las_filepaths
+            ]
+            os.makedirs(self.paths.updated_las_dir, exist_ok=True)
+            self.out_las_filepaths = [
+                osp.join(self.paths.updated_las_dir, osp.basename(f))
+                for f in self.las_filepaths
+            ]
 
         # We must adapt BuildingValidator to corrected data by specifying the codes to use as candidates
         self.bv.candidate_buildings_codes = (
