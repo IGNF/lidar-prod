@@ -33,14 +33,14 @@ jobs:
 
     - name: Run tests & get coverage - fast ones go first.
       run: >
-        docker run
+        docker run --network host
         lidar_prod
         python -m
         pytest -rA -v -m "not slow" --ignore=actions-runner
 
     - name: Run slow tests last (evaluation on large file)
       run: >
-        docker run
+        docker run --network host
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
         lidar_prod
         python -m
@@ -48,7 +48,7 @@ jobs:
 
     - name: Test detection of building.
       run: >
-        docker run 
+        docker run --network host
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
         -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/
         lidar_prod
@@ -61,7 +61,7 @@ jobs:
 
     - name: Test vegetation/unclassified detection from CLI on a LAS subset.
       run: >
-        docker run 
+        docker run
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
         -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/
         lidar_prod
