@@ -313,7 +313,7 @@
     <span class="p">]</span>
     <span class="c1"># This call may yield</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="c1"># In empty zones, pgsql2shp does not create a shapefile</span>
         <span class="k">if</span> <span class="p">(</span>
@@ -330,6 +330,11 @@
             <span class="s2">&quot;ConnectionRefusedError when requesting BDUni.  </span><span class="se">\</span>
 <span class="s2">            This means that the Database cannot be accessed (e.g. due to vpn/proxy reasons, </span><span class="se">\</span>
 <span class="s2">            or bad credentials)&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">e</span>
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;Time out when requesting BDUni.&quot;</span>
         <span class="p">)</span>
         <span class="k">raise</span> <span class="n">e</span>
 

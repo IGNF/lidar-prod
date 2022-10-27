@@ -150,6 +150,7 @@ paths.output_dir<span class="o">=</span>/outputs/
 </pre></div>
 </div>
 <p>A docker image encapsulating the virtual environment and application sources can also be built using the provided Dockerfile. This Dockerfile is not standalone and should be part of the repository (whose content is copied into the image), on the github reference you want to build from.</p>
+<p><em>Note: during our tests, we needed to add the docker option <code class="docutils literal notranslate"><span class="pre">--network</span> <span class="pre">host</span></code> to manage the connexion with the bduni_france_consultation database.</em></p>
 </section>
 <section id="run-as-a-python-module">
 <h2>Run as a python module<a class="headerlink" href="#run-as-a-python-module" title="Permalink to this headline"></a></h2>
