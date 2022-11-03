@@ -22,7 +22,6 @@ dependencies:
   - rich==11.2.*  # rich text formatting
   - pytest==6.2.*  # tests
   - pytest-cov==3.0.*
-  - pytest-timeout==2.1.*
   # --------- torch --------- #
   - pip:
       - -r requirements.txt

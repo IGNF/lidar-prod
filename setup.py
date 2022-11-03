@@ -12,6 +12,6 @@ setup(
     author=pm["__author__"],
     install_requires=[
         # assume an environment as described in ./bash/setup_env.sh
-    ], 
+    ],
     packages=find_packages(),
 )

@@ -18,11 +18,7 @@ from lidar_prod.tasks.utils import (
     get_las_data_from_las,
     get_las_metadata,
 )
-from tests.conftest import (
-    check_las_contains_dims,
-    check_las_invariance,
-    pdal_read_las_array,
-)
+from tests.conftest import check_las_contains_dims, check_las_invariance, pdal_read_las_array
 
 LAS_SUBSET_FILE_BUILDING = "tests/files/870000_6618000.subset.postIA.las"
 SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
@@ -50,9 +46,7 @@ DUMMY_FILE_PATH = "tests/files/dummy_folder/dummy_file1.las"
         ),  # only candidate buildings
     ],  # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
 )
-def test_application_data_invariance_and_data_format(
-    legacy_hydra_cfg, las_mutation, query_db_Uni
-):
+def test_application_data_invariance_and_data_format(legacy_hydra_cfg, las_mutation, query_db_Uni):
     """We test the application against a LAS subset (~2500m²).
 
     Data contains a few buildings, a few classification mistakes, and necessary fields (building probability, entropy)
@@ -74,9 +68,7 @@ def test_application_data_invariance_and_data_format(
     with tempfile.TemporaryDirectory() as legacy_hydra_cfg.paths.output_dir:
         # Copy the data and apply the "mutation"
         mutated_copy: str = tempfile.NamedTemporaryFile().name
-        pipeline = get_a_las_to_las_pdal_pipeline(
-            LAS_SUBSET_FILE_BUILDING, mutated_copy, las_mutation
-        )
+        pipeline = get_a_las_to_las_pdal_pipeline(LAS_SUBSET_FILE_BUILDING, mutated_copy, las_mutation)
         pipeline.execute()
         legacy_hydra_cfg.paths.src_las = mutated_copy
         if not query_db_Uni:  # we don't request db_uni, we use a shapefile instead
@@ -96,9 +88,7 @@ def check_format_of_application_output_las(output_las_path: str, expected_codes:
 
     """
     # Check that we contain extra_dims that production needs
-    check_las_contains_dims(
-        output_las_path, dims_to_check=["Group", "building", "entropy"]
-    )
+    check_las_contains_dims(output_las_path, dims_to_check=["Group", "building", "entropy"])
 
     # Ensure that the format versions are as expected
     check_las_format_versions_and_srs(output_las_path)
@@ -141,14 +131,8 @@ def test_detect_vegetation_unclassified(vegetation_unclassifed_hydra_cfg):
         destination_path,
     )
     las_data = get_las_data_from_las(destination_path)
-    vegetation_count = np.count_nonzero(
-        las_data.points.classification
-        == vegetation_unclassifed_hydra_cfg.data_format.codes.vegetation
-    )
-    unclassified_count = np.count_nonzero(
-        las_data.points.classification
-        == vegetation_unclassifed_hydra_cfg.data_format.codes.unclassified
-    )
+    vegetation_count = np.count_nonzero(las_data.points.classification == vegetation_unclassifed_hydra_cfg.data_format.codes.vegetation)
+    unclassified_count = np.count_nonzero(las_data.points.classification == vegetation_unclassifed_hydra_cfg.data_format.codes.unclassified)
     assert vegetation_count == 17
     assert unclassified_count == 23222
 
@@ -168,9 +152,7 @@ def test_applying(vegetation_unclassifed_hydra_cfg, path, expected):
     vegetation_unclassifed_hydra_cfg.paths.src_las = path
     with tempfile.TemporaryDirectory() as td:
         vegetation_unclassifed_hydra_cfg.paths.output_dir = td
-    with open_dict(
-        vegetation_unclassifed_hydra_cfg
-    ):  # needed to open the config dict and add elements
+    with open_dict(vegetation_unclassifed_hydra_cfg):  # needed to open the config dict and add elements
         vegetation_unclassifed_hydra_cfg.expected = expected
     apply(vegetation_unclassifed_hydra_cfg, dummy_method)
 
