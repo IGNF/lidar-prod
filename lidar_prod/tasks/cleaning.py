@@ -23,20 +23,14 @@ class Cleaner:
 
         """
         # turn a listconfig into a 'normal' list
-        self.extra_dims = (
-            [extra_dims]
-            if isinstance(extra_dims, str)
-            else [dimension for dimension in extra_dims]
-        )
+        self.extra_dims = [extra_dims] if isinstance(extra_dims, str) else [dimension for dimension in extra_dims]
 
         # creating a dict where key = dimension's name and value = diemnsion's type
         #  if no "=type" in extra_dims then value = None
         self.extra_dims_as_dict = dict()
         for extra_dim in self.extra_dims:
             if len(extra_dim.split("=")) == 2:
-                self.extra_dims_as_dict[extra_dim.split("=")[0]] = extra_dim.split("=")[
-                    1
-                ]
+                self.extra_dims_as_dict[extra_dim.split("=")[0]] = extra_dim.split("=")[1]
             else:
                 self.extra_dims_as_dict[extra_dim] = None
 
@@ -54,11 +48,9 @@ class Cleaner:
         """
         pipeline = pdal.Pipeline()
         pipeline |= get_pdal_reader(src_las_path)
-        pipeline |= get_pdal_writer(
-            target_las_path, extra_dims=self.get_extra_dims_as_str()
-        )
-        pipeline.execute()
+        pipeline |= get_pdal_writer(target_las_path, extra_dims=self.get_extra_dims_as_str())
         os.makedirs(osp.dirname(target_las_path), exist_ok=True)
+        pipeline.execute()
         log.info(f"Saved to {target_las_path}")
 
     def remove_dimensions(self, las_data: laspy.lasdata.LasData):
@@ -91,9 +83,7 @@ class Cleaner:
         dimensions_to_add = []
         for dimension, type in self.extra_dims_as_dict.items():
             if not type:  # we only add the dimensions we know the type of
-                log.warning(
-                    f"{dimension} has no type and thus is not added as a column."
-                )
+                log.warning(f"{dimension} has no type and thus is not added as a column.")
                 continue
 
             if dimension not in las_data.point_format.extra_dimension_names:
@@ -117,9 +107,5 @@ class Cleaner:
         # case: 2+ dimensions to add
         extra_bytes_list = []
         for dimension in dimensions_to_add:
-            extra_bytes_list.append(
-                laspy.ExtraBytesParams(
-                    dimension, type=self.extra_dims_as_dict[dimension]
-                )
-            )
+            extra_bytes_list.append(laspy.ExtraBytesParams(dimension, type=self.extra_dims_as_dict[dimension]))
         las_data.add_extra_dims(extra_bytes_list)
