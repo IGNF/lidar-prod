@@ -46,7 +46,7 @@ jobs:
         python -m
         pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
 
-    - name: Test detection of building.
+    - name: Test building module from CLI on a LAS subset.
       run: >
         docker run 
         -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
