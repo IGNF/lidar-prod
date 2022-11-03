@@ -11,6 +11,7 @@ import optuna
 from tqdm import tqdm
 import os.path as osp
 import pdal
+import math
 
 from lidar_prod.tasks.building_validation import (
     BuildingValidator,
@@ -94,26 +95,27 @@ class BuildingValidationOptimizer:
         codes to adapt to those of the optimization dataset.
 
         """
-        las_paths = glob(osp.join(self.paths.input_las_dir, "*.las"))
-        laz_paths = glob(osp.join(self.paths.input_las_dir, "*.laz"))
-        self.las_filepaths = sorted(las_paths + laz_paths)
-        if not self.las_filepaths:
-            raise ValueError(
-                "No LAS/LAZ found in {self.paths.input_las_dir} (i.e. input_las_dir) while"
-                "globbing *las and *laz extensions (lowercase)."
-            )
-        if self.debug:
-            self.las_filepaths = self.las_filepaths[:1]
-        os.makedirs(self.paths.prepared_las_dir, exist_ok=True)
-        self.prepared_las_filepaths = [
-            osp.join(self.paths.prepared_las_dir, osp.basename(f))
-            for f in self.las_filepaths
-        ]
-        os.makedirs(self.paths.updated_las_dir, exist_ok=True)
-        self.out_las_filepaths = [
-            osp.join(self.paths.updated_las_dir, osp.basename(f))
-            for f in self.las_filepaths
-        ]
+        if "prepare" in self.todo or "update" in self.todo:
+            las_paths = glob(osp.join(self.paths.input_las_dir, "*.las"))
+            laz_paths = glob(osp.join(self.paths.input_las_dir, "*.laz"))
+            self.las_filepaths = sorted(las_paths + laz_paths)
+            if not self.las_filepaths:
+                raise ValueError(
+                    "No LAS/LAZ found in {self.paths.input_las_dir} (i.e. input_las_dir) while"
+                    "globbing *las and *laz extensions (lowercase)."
+                )
+            if self.debug:
+                self.las_filepaths = self.las_filepaths[:1]
+            os.makedirs(self.paths.prepared_las_dir, exist_ok=True)
+            self.prepared_las_filepaths = [
+                osp.join(self.paths.prepared_las_dir, osp.basename(f))
+                for f in self.las_filepaths
+            ]
+            os.makedirs(self.paths.updated_las_dir, exist_ok=True)
+            self.out_las_filepaths = [
+                osp.join(self.paths.updated_las_dir, osp.basename(f))
+                for f in self.las_filepaths
+            ]
 
         # We must adapt BuildingValidator to corrected data by specifying the codes to use as candidates
         self.bv.candidate_buildings_codes = (
@@ -332,8 +334,11 @@ class BuildingValidationOptimizer:
             "min_frac_confirmation_factor_if_bd_uni_overlay": trial.suggest_float(
                 "min_frac_confirmation_factor_if_bd_uni_overlay", 0.5, 1.0
             ),
+            # Max entropy for 7 classes. When looking at prediction's entropy,
+            # the observed maximal value is aqual to the Shannon entropy divided by two,
+            # so this is what we consider as the max for the min entropy for uncertainty.
             "min_entropy_uncertainty": trial.suggest_float(
-                "min_entropy_uncertainty", 0.5, 1.0
+                "min_entropy_uncertainty", 0.0, -math.log2(1 / 7) / 2.0
             ),
             "min_frac_entropy_uncertain": trial.suggest_float(
                 "min_frac_entropy_uncertain", 0.33, 1.0
