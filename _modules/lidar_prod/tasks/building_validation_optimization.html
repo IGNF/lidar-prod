@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_validation_optimization &mdash; lidar_prod 1.7.4 documentation</title>
+  <title>lidar_prod.tasks.building_validation_optimization &mdash; lidar_prod 1.8.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -144,6 +144,7 @@
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
 <span class="kn">import</span> <span class="nn">pdal</span>
+<span class="kn">import</span> <span class="nn">math</span>
 
 <span class="kn">from</span> <span class="nn">lidar_prod.tasks.building_validation</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BuildingValidator</span><span class="p">,</span>
@@ -227,26 +228,27 @@
 <span class="sd">        codes to adapt to those of the optimization dataset.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">las_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">input_las_dir</span><span class="p">,</span> <span class="s2">&quot;*.las&quot;</span><span class="p">))</span>
-        <span class="n">laz_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">input_las_dir</span><span class="p">,</span> <span class="s2">&quot;*.laz&quot;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">las_paths</span> <span class="o">+</span> <span class="n">laz_paths</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;No LAS/LAZ found in </span><span class="si">{self.paths.input_las_dir}</span><span class="s2"> (i.e. input_las_dir) while&quot;</span>
-                <span class="s2">&quot;globbing *las and *laz extensions (lowercase).&quot;</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prepared_las_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prepared_las_filepaths</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prepared_las_dir</span><span class="p">,</span> <span class="n">osp</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span>
-        <span class="p">]</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">updated_las_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">out_las_filepaths</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">updated_las_dir</span><span class="p">,</span> <span class="n">osp</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span>
-        <span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;prepare&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">todo</span> <span class="ow">or</span> <span class="s2">&quot;update&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">todo</span><span class="p">:</span>
+            <span class="n">las_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">input_las_dir</span><span class="p">,</span> <span class="s2">&quot;*.las&quot;</span><span class="p">))</span>
+            <span class="n">laz_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">input_las_dir</span><span class="p">,</span> <span class="s2">&quot;*.laz&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">las_paths</span> <span class="o">+</span> <span class="n">laz_paths</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;No LAS/LAZ found in </span><span class="si">{self.paths.input_las_dir}</span><span class="s2"> (i.e. input_las_dir) while&quot;</span>
+                    <span class="s2">&quot;globbing *las and *laz extensions (lowercase).&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prepared_las_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prepared_las_filepaths</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prepared_las_dir</span><span class="p">,</span> <span class="n">osp</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span>
+            <span class="p">]</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">updated_las_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_las_filepaths</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">updated_las_dir</span><span class="p">,</span> <span class="n">osp</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">las_filepaths</span>
+            <span class="p">]</span>
 
         <span class="c1"># We must adapt BuildingValidator to corrected data by specifying the codes to use as candidates</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">candidate_buildings_codes</span> <span class="o">=</span> <span class="p">(</span>
@@ -465,8 +467,11 @@
             <span class="s2">&quot;min_frac_confirmation_factor_if_bd_uni_overlay&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
                 <span class="s2">&quot;min_frac_confirmation_factor_if_bd_uni_overlay&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span>
             <span class="p">),</span>
+            <span class="c1"># Max entropy for 7 classes. When looking at prediction&#39;s entropy,</span>
+            <span class="c1"># the observed maximal value is aqual to the Shannon entropy divided by two,</span>
+            <span class="c1"># so this is what we consider as the max for the min entropy for uncertainty.</span>
             <span class="s2">&quot;min_entropy_uncertainty&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
-                <span class="s2">&quot;min_entropy_uncertainty&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span>
+                <span class="s2">&quot;min_entropy_uncertainty&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">7</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
             <span class="p">),</span>
             <span class="s2">&quot;min_frac_entropy_uncertain&quot;</span><span class="p">:</span> <span class="n">trial</span><span class="o">.</span><span class="n">suggest_float</span><span class="p">(</span>
                 <span class="s2">&quot;min_frac_entropy_uncertain&quot;</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">,</span> <span class="mf">1.0</span>
