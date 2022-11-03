@@ -20,6 +20,8 @@ paths.output_dir=/outputs/
 
 A docker image encapsulating the virtual environment and application sources can also be built using the provided Dockerfile. This Dockerfile is not standalone and should be part of the repository (whose content is copied into the image), on the github reference you want to build from.
 
+*Note: during our tests, we needed to add the docker option `--network host` to manage the connexion with the bduni_france_consultation database.*
+
 ## Run as a python module
 To run the module as a module, you will need a source cloud point in LAS format with an additional channel containing predicted building probabilities (`ai_building_proba`) and another one containing predictions entropy (`entropy`). The names of thes channel can be specified via hydra config `config.data_format.las_dimensions`.
 
