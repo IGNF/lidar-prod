@@ -2,8 +2,9 @@ import logging
 import os
 import os.path as osp
 from typing import Iterable, Optional, Union
-import pdal
+
 import laspy
+import pdal
 
 from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer
 
@@ -22,19 +23,25 @@ class Cleaner:
 
         """
         # turn a listconfig into a 'normal' list
-        self.extra_dims = [extra_dims] if isinstance(extra_dims, str) else [dimension for dimension in extra_dims]
+        self.extra_dims = (
+            [extra_dims]
+            if isinstance(extra_dims, str)
+            else [dimension for dimension in extra_dims]
+        )
 
         # creating a dict where key = dimension's name and value = diemnsion's type
         #  if no "=type" in extra_dims then value = None
         self.extra_dims_as_dict = dict()
         for extra_dim in self.extra_dims:
-            if len(extra_dim.split('=')) == 2:
-                self.extra_dims_as_dict[extra_dim.split('=')[0]] = extra_dim.split('=')[1]
-            else :
+            if len(extra_dim.split("=")) == 2:
+                self.extra_dims_as_dict[extra_dim.split("=")[0]] = extra_dim.split("=")[
+                    1
+                ]
+            else:
                 self.extra_dims_as_dict[extra_dim] = None
 
     def get_extra_dims_as_str(self):
-        """ 'stringify' the extra_dims list and return it, or an empty list if there is no extra dims"""
+        """'stringify' the extra_dims list and return it, or an empty list if there is no extra dims"""
         return_str = ",".join(self.extra_dims)
         return return_str if return_str else []
 
@@ -47,7 +54,9 @@ class Cleaner:
         """
         pipeline = pdal.Pipeline()
         pipeline |= get_pdal_reader(src_las_path)
-        pipeline |= get_pdal_writer(target_las_path, extra_dims=self.get_extra_dims_as_str())
+        pipeline |= get_pdal_writer(
+            target_las_path, extra_dims=self.get_extra_dims_as_str()
+        )
         pipeline.execute()
         os.makedirs(osp.dirname(target_las_path), exist_ok=True)
         log.info(f"Saved to {target_las_path}")
@@ -55,7 +64,7 @@ class Cleaner:
     def remove_dimensions(self, las_data: laspy.lasdata.LasData):
         """remove dimension from (laspy) data"""
         # if we want to keep all dimension, we do nothing
-        if self.extra_dims == ['all']:
+        if self.extra_dims == ["all"]:
             return
 
         # selecting dimensions to remove
@@ -81,7 +90,7 @@ class Cleaner:
         # selecting dimensions to add
         dimensions_to_add = []
         for dimension, type in self.extra_dims_as_dict.items():
-            if not type:    # we only add the dimensions we know the type of
+            if not type:  # we only add the dimensions we know the type of
                 log.warning(
                     f"{dimension} has no type and thus is not added as a column."
                 )
@@ -97,11 +106,20 @@ class Cleaner:
 
         # case: 1 dimension to add
         if len(dimensions_to_add) == 1:
-            las_data.add_extra_dim(laspy.ExtraBytesParams(dimensions_to_add[0], type=self.extra_dims_as_dict[dimensions_to_add[0]]))
+            las_data.add_extra_dim(
+                laspy.ExtraBytesParams(
+                    dimensions_to_add[0],
+                    type=self.extra_dims_as_dict[dimensions_to_add[0]],
+                )
+            )
             return
 
         # case: 2+ dimensions to add
         extra_bytes_list = []
         for dimension in dimensions_to_add:
-            extra_bytes_list.append(laspy.ExtraBytesParams(dimension, type=self.extra_dims_as_dict[dimension]))
+            extra_bytes_list.append(
+                laspy.ExtraBytesParams(
+                    dimension, type=self.extra_dims_as_dict[dimension]
+                )
+            )
         las_data.add_extra_dims(extra_bytes_list)

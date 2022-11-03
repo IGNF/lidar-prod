@@ -1,8 +1,9 @@
 import logging
 import os
 import os.path as osp
-import pdal
 from typing import Union
+
+import pdal
 
 from lidar_prod.tasks.utils import get_pdal_writer, get_pipeline
 
@@ -36,7 +37,11 @@ class BuildingIdentifier:
         )
         self.pipeline: pdal.pipeline.Pipeline = None
 
-    def run(self, input_values: Union[str, pdal.pipeline.Pipeline], target_las_path: str = None) -> str:
+    def run(
+        self,
+        input_values: Union[str, pdal.pipeline.Pipeline],
+        target_las_path: str = None,
+    ) -> str:
         """Application.
 
         Transform cloud at `src_las_path` following identification logic, and save it to
@@ -54,7 +59,11 @@ class BuildingIdentifier:
         self.prepare(input_values, target_las_path)
         return target_las_path
 
-    def prepare(self, input_values: Union[str, pdal.pipeline.Pipeline], target_las_path: str = None) -> None:
+    def prepare(
+        self,
+        input_values: Union[str, pdal.pipeline.Pipeline],
+        target_las_path: str = None,
+    ) -> None:
         """Identify potential buildings in a new channel, excluding former candidates from
         search based on their group ID. ClusterID needs to be reset to avoid unwanted merge
         of information from previous VuildingValidation clustering.

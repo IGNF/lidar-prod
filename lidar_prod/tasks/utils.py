@@ -1,15 +1,15 @@
-from dataclasses import dataclass
-from typing import Union
 import json
-import math
 import logging
+import math
+import subprocess
+from dataclasses import dataclass
 from numbers import Number
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, Union
+
+import geopandas
+import laspy
 import numpy as np
 import pdal
-import laspy
-import subprocess
-import geopandas
 
 log = logging.getLogger(__name__)
 
@@ -81,7 +81,7 @@ def get_pdal_reader(las_path: str) -> pdal.Reader.las:
 
 
 def get_las_data_from_las(las_path: str) -> laspy.lasdata.LasData:
-    """ Load las data from a las file """
+    """Load las data from a las file"""
     return laspy.read(las_path)
 
 
@@ -106,13 +106,11 @@ def get_pdal_writer(target_las_path: str, extra_dims: str = "all") -> pdal.Write
 
 
 def save_las_data_to_las(las_path: str, las_data: laspy.lasdata.LasData):
-    """ save las data to a las file"""
+    """save las data to a las file"""
     las_data.write(las_path)
 
 
-def get_a_las_to_las_pdal_pipeline(
-    src_las_path: str, target_las_path: str, ops: Iterable[Any]
-):
+def get_a_las_to_las_pdal_pipeline(src_las_path: str, target_las_path: str, ops: Iterable[Any]):
     """Create a pdal pipeline, preserving format, forwarding every dimension.
 
     Args:
@@ -148,10 +146,11 @@ def request_bd_uni_for_building_shapefile(
     shapefile_path: str,
     bbox: Dict[str, int],
 ):
-    """BD Uni request.
+    """Rrequest BD Uni for its buildings.
 
     Create a shapefile with non destructed building on the area of interest
     and saves it.
+
     Also add a "PRESENCE" column filled with 1 for later use by pdal.
 
     """
@@ -183,10 +182,7 @@ def request_bd_uni_for_building_shapefile(
         subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=120)
     except subprocess.CalledProcessError as e:
         # In empty zones, pgsql2shp does not create a shapefile
-        if (
-            e.output
-            == b"Initializing... \nERROR: Could not determine table metadata (empty table)\n"
-        ):
+        if e.output == b"Initializing... \nERROR: Could not determine table metadata (empty table)\n":
             return False
         # Error can be due to something else entirely, like
         # an inability to translate host name to an address.
@@ -200,13 +196,12 @@ def request_bd_uni_for_building_shapefile(
         )
         raise e
     except subprocess.TimeoutExpired as e:
-        log.error(
-            "Time out when requesting BDUni."
-        )
+        log.error("Time out when requesting BDUni.")
         raise e
 
     # read & write to avoid unnacepted 3D shapefile format.
+    # Dissolve to avoid invalid shapefile that would make pdal hang in overlay filter.
     gdf = geopandas.read_file(shapefile_path)
-    gdf[["PRESENCE", "geometry"]].to_file(shapefile_path)
+    gdf[["PRESENCE", "geometry"]].dissolve().to_file(shapefile_path)
 
     return True

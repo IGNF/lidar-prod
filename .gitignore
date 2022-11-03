@@ -5,6 +5,7 @@ outputs/
 
 # large file for tests
 tests/files/large/V0.5_792000_6272000.las
+tests/files/large/842_6521_invalid_band.las
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

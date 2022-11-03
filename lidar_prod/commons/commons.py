@@ -1,7 +1,7 @@
 import logging
-from typing import Callable
-import warnings
 import time
+import warnings
+from typing import Callable
 
 import rich.syntax
 import rich.tree

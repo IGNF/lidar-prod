@@ -1,9 +1,10 @@
 import logging
-import pdal
-from tqdm import tqdm
 from typing import Union
 
-from lidar_prod.tasks.utils import split_idx_by_dim, get_pipeline
+import pdal
+from tqdm import tqdm
+
+from lidar_prod.tasks.utils import get_pipeline, split_idx_by_dim
 
 log = logging.getLogger(__name__)
 
@@ -56,9 +57,7 @@ class BuildingCompletor:
         self.prepare_for_building_completion(pipeline)
         self.update_classification()
 
-    def prepare_for_building_completion(
-        self, pipeline: pdal.pipeline.Pipeline
-    ) -> None:
+    def prepare_for_building_completion(self, pipeline: pdal.pipeline.Pipeline) -> None:
         f"""Prepare for building completion.
 
         Identify candidates that were not clustered together by the BuildingValidator, but that
@@ -111,11 +110,8 @@ class BuildingCompletor:
         )
         self.pipeline.execute()
 
-    def update_classification(
-        self
-    ) -> None:
-        """Updates Classification dimension by completing buildings with high probability points.
-        """
+    def update_classification(self) -> None:
+        """Updates Classification dimension by completing buildings with high probability points."""
 
         las = self.pipeline.arrays[0]
 

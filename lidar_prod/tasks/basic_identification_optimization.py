@@ -1,26 +1,26 @@
+import logging
 from typing import Union
 
-import logging
 import optuna
 from omegaconf import DictConfig
-from lidar_prod.tasks.basic_identification import BasicIdentifier, IoU
 
-from lidar_prod.tasks.utils import get_las_data_from_las
 from lidar_prod.application import get_list_las_path_from_src
+from lidar_prod.tasks.basic_identification import BasicIdentifier, IoU
+from lidar_prod.tasks.utils import get_las_data_from_las
 
 log = logging.getLogger(__name__)
 
 
 class BasicIdentifierOptimizer:
     def __init__(
-            self,
-            config: DictConfig,
-            proba_column: str,
-            result_column: str,
-            result_code: int,
-            target_column: str,
-            n_trials: int,
-            target_result_code: Union[int, list] = None
+        self,
+        config: DictConfig,
+        proba_column: str,
+        result_column: str,
+        result_code: int,
+        target_column: str,
+        n_trials: int,
+        target_result_code: Union[int, list] = None,
     ) -> None:
         """
         Search the best threshold for BasicIdentifier
@@ -37,20 +37,22 @@ class BasicIdentifierOptimizer:
                                 is not provided then result_code is used instead.
         """
 
-        self.study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler())
+        self.study = optuna.create_study(
+            direction="maximize", sampler=optuna.samplers.TPESampler()
+        )
         self.config = config
         self.proba_column = proba_column
         self.result_column = result_column
         self.result_code = result_code
         self.truth_column = target_column
         self.n_trials = n_trials
-        self.truth_result_code = target_result_code if target_result_code else result_code
+        self.truth_result_code = (
+            target_result_code if target_result_code else result_code
+        )
 
     def optimize(self) -> None:
         """Search the best threshold."""
-        self.study.optimize(
-            self._optuna_objective_func, self.n_trials
-        )
+        self.study.optimize(self._optuna_objective_func, self.n_trials)
         for key, value in self.study.best_trial.params.items():
             print(f"    {key}: {value}")
 
@@ -68,7 +70,8 @@ class BasicIdentifierOptimizer:
                 self.result_code,
                 True,
                 self.truth_column,
-                self.truth_result_code)
+                self.truth_result_code,
+            )
             basic_identifier.identify(las_data)
             iou_list.append(basic_identifier.iou)
-        return IoU.combine_iou(iou_list).iou    # return the combined IoU of all the .las
+        return IoU.combine_iou(iou_list).iou  # return the combined IoU of all the .las
