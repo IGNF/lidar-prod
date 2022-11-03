@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.utils &mdash; lidar_prod 1.8.0 documentation</title>
+  <title>lidar_prod.tasks.utils &mdash; lidar_prod 1.8.1 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -131,18 +131,18 @@
            <div itemprop="articleBody">
              
   <h1>Source code for lidar_prod.tasks.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">math</span>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">geopandas</span>
+<span class="kn">import</span> <span class="nn">laspy</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pdal</span>
-<span class="kn">import</span> <span class="nn">laspy</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">geopandas</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -214,7 +214,7 @@
 
 
 <div class="viewcode-block" id="get_las_data_from_las"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_las_data_from_las">[docs]</a><span class="k">def</span> <span class="nf">get_las_data_from_las</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Load las data from a las file &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Load las data from a las file&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">laspy</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">las_path</span><span class="p">)</span></div>
 
 
@@ -239,13 +239,11 @@
 
 
 <div class="viewcode-block" id="save_las_data_to_las"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.save_las_data_to_las">[docs]</a><span class="k">def</span> <span class="nf">save_las_data_to_las</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">las_data</span><span class="p">:</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; save las data to a las file&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;save las data to a las file&quot;&quot;&quot;</span>
     <span class="n">las_data</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">las_path</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_a_las_to_las_pdal_pipeline"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_a_las_to_las_pdal_pipeline">[docs]</a><span class="k">def</span> <span class="nf">get_a_las_to_las_pdal_pipeline</span><span class="p">(</span>
-    <span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ops</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
-<span class="p">):</span>
+<div class="viewcode-block" id="get_a_las_to_las_pdal_pipeline"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_a_las_to_las_pdal_pipeline">[docs]</a><span class="k">def</span> <span class="nf">get_a_las_to_las_pdal_pipeline</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ops</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
     <span class="sd">&quot;&quot;&quot;Create a pdal pipeline, preserving format, forwarding every dimension.</span>
 
 <span class="sd">    Args:</span>
@@ -281,10 +279,11 @@
     <span class="n">shapefile_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">bbox</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;BD Uni request.</span>
+    <span class="sd">&quot;&quot;&quot;Rrequest BD Uni for its buildings.</span>
 
 <span class="sd">    Create a shapefile with non destructed building on the area of interest</span>
 <span class="sd">    and saves it.</span>
+
 <span class="sd">    Also add a &quot;PRESENCE&quot; column filled with 1 for later use by pdal.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -316,10 +315,7 @@
         <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="c1"># In empty zones, pgsql2shp does not create a shapefile</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">e</span><span class="o">.</span><span class="n">output</span>
-            <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;Initializing... </span><span class="se">\n</span><span class="s2">ERROR: Could not determine table metadata (empty table)</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="p">):</span>
+        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">output</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;Initializing... </span><span class="se">\n</span><span class="s2">ERROR: Could not determine table metadata (empty table)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="c1"># Error can be due to something else entirely, like</span>
         <span class="c1"># an inability to translate host name to an address.</span>
@@ -333,14 +329,13 @@
         <span class="p">)</span>
         <span class="k">raise</span> <span class="n">e</span>
     <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-            <span class="s2">&quot;Time out when requesting BDUni.&quot;</span>
-        <span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Time out when requesting BDUni.&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">e</span>
 
     <span class="c1"># read &amp; write to avoid unnacepted 3D shapefile format.</span>
+    <span class="c1"># Dissolve to avoid invalid shapefile that would make pdal hang in overlay filter.</span>
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">shapefile_path</span><span class="p">)</span>
-    <span class="n">gdf</span><span class="p">[[</span><span class="s2">&quot;PRESENCE&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">shapefile_path</span><span class="p">)</span>
+    <span class="n">gdf</span><span class="p">[[</span><span class="s2">&quot;PRESENCE&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">dissolve</span><span class="p">()</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">shapefile_path</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">True</span></div>
 </pre></div>

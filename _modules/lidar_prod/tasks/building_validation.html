@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod 1.8.0 documentation</title>
+  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod 1.8.1 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -131,26 +131,26 @@
            <div itemprop="articleBody">
              
   <h1>Source code for lidar_prod.tasks.building_validation</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span><span class="p">,</span> <span class="n">mkdtemp</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">geopandas</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pdal</span>
-<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span>
-<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">mkdtemp</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">geopandas</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
 <span class="kn">from</span> <span class="nn">lidar_prod.tasks.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_integer_bbox</span><span class="p">,</span>
     <span class="n">get_pdal_reader</span><span class="p">,</span>
     <span class="n">get_pdal_writer</span><span class="p">,</span>
-    <span class="n">split_idx_by_dim</span><span class="p">,</span>
     <span class="n">get_pipeline</span><span class="p">,</span>
     <span class="n">request_bd_uni_for_building_shapefile</span><span class="p">,</span>
+    <span class="n">split_idx_by_dim</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -232,9 +232,7 @@
                 <span class="s2">&quot;Preparation : Clustering of candidates buildings &amp; Requesting BDUni&quot;</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">input_values</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Applying Building Validation to file </span><span class="se">\n</span><span class="si">{</span><span class="n">input_values</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applying Building Validation to file </span><span class="se">\n</span><span class="si">{</span><span class="n">input_values</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">temp_f</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">td</span><span class="p">,</span> <span class="n">osp</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">input_values</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">temp_f</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -270,9 +268,7 @@
 
 <span class="s2">        &quot;&quot;&quot;</span>
 
-        <span class="n">dim_candidate_flag</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">candidate_buildings_flag</span>
-        <span class="p">)</span>
+        <span class="n">dim_candidate_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">candidate_buildings_flag</span>
         <span class="n">dim_cluster_id_pdal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span>
         <span class="n">dim_cluster_id_candidates</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_candidate_building</span>
@@ -281,9 +277,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">input_values</span><span class="p">)</span>
         <span class="c1"># Identify candidates buildings points with a boolean flag</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span>
-            <span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;=&gt;</span><span class="si">{</span><span class="n">dim_candidate_flag</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;=&gt;</span><span class="si">{</span><span class="n">dim_candidate_flag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">_is_candidate_building</span> <span class="o">=</span> <span class="p">(</span>
             <span class="s2">&quot;(&quot;</span>
             <span class="o">+</span> <span class="s2">&quot; || &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
@@ -309,9 +303,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim_cluster_id_pdal</span><span class="si">}</span><span class="s2"> = 0&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
-        <span class="n">bbox</span> <span class="o">=</span> <span class="n">get_integer_bbox</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bd_uni_request</span><span class="o">.</span><span class="n">buffer</span>
-        <span class="p">)</span>
+        <span class="n">bbox</span> <span class="o">=</span> <span class="n">get_integer_bbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bd_uni_request</span><span class="o">.</span><span class="n">buffer</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;=&gt;</span><span class="si">{</span><span class="n">dim_overlay</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -349,9 +341,7 @@
         <span class="k">if</span> <span class="n">temp_dirpath</span><span class="p">:</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">temp_dirpath</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BuildingValidator.update"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidator.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="BuildingValidator.update"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidator.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Updates point cloud classification channel.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">src_las_path</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">()</span>
@@ -477,8 +467,7 @@
         <span class="c1"># REFUTATION</span>
         <span class="n">ia_refuted</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
-                <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">infos</span><span class="o">.</span><span class="n">probabilities</span><span class="p">)</span>
-                <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">min_confidence_refutation</span>
+                <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">infos</span><span class="o">.</span><span class="n">probabilities</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">min_confidence_refutation</span>
             <span class="p">)</span>
             <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">min_frac_refutation</span>
         <span class="p">)</span>

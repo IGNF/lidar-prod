@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.cleaning &mdash; lidar_prod 1.8.0 documentation</title>
+  <title>lidar_prod.tasks.cleaning &mdash; lidar_prod 1.8.1 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -135,8 +135,9 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">import</span> <span class="nn">pdal</span>
+
 <span class="kn">import</span> <span class="nn">laspy</span>
+<span class="kn">import</span> <span class="nn">pdal</span>
 
 <span class="kn">from</span> <span class="nn">lidar_prod.tasks.utils</span> <span class="kn">import</span> <span class="n">get_pdal_reader</span><span class="p">,</span> <span class="n">get_pdal_writer</span>
 
@@ -155,19 +156,25 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># turn a listconfig into a &#39;normal&#39; list</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">extra_dims</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">extra_dims</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">dimension</span> <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">extra_dims</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="n">extra_dims</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">extra_dims</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">[</span><span class="n">dimension</span> <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">extra_dims</span><span class="p">]</span>
+        <span class="p">)</span>
 
         <span class="c1"># creating a dict where key = dimension&#39;s name and value = diemnsion&#39;s type</span>
         <span class="c1">#  if no &quot;=type&quot; in extra_dims then value = None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">extra_dim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_dim</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="p">[</span><span class="n">extra_dim</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">extra_dim</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">extra_dim</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="p">[</span><span class="n">extra_dim</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">extra_dim</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)[</span>
+                    <span class="mi">1</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="p">[</span><span class="n">extra_dim</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Cleaner.get_extra_dims_as_str"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.get_extra_dims_as_str">[docs]</a>    <span class="k">def</span> <span class="nf">get_extra_dims_as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; &#39;stringify&#39; the extra_dims list and return it, or an empty list if there is no extra dims&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;&#39;stringify&#39; the extra_dims list and return it, or an empty list if there is no extra dims&quot;&quot;&quot;</span>
         <span class="n">return_str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_dims</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">return_str</span> <span class="k">if</span> <span class="n">return_str</span> <span class="k">else</span> <span class="p">[]</span></div>
 
@@ -180,7 +187,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">()</span>
         <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">get_pdal_reader</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">)</span>
-        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">get_pdal_writer</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">,</span> <span class="n">extra_dims</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_extra_dims_as_str</span><span class="p">())</span>
+        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">get_pdal_writer</span><span class="p">(</span>
+            <span class="n">target_las_path</span><span class="p">,</span> <span class="n">extra_dims</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_extra_dims_as_str</span><span class="p">()</span>
+        <span class="p">)</span>
         <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved to </span><span class="si">{</span><span class="n">target_las_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
@@ -188,7 +197,7 @@
 <div class="viewcode-block" id="Cleaner.remove_dimensions"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.remove_dimensions">[docs]</a>    <span class="k">def</span> <span class="nf">remove_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">las_data</span><span class="p">:</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;remove dimension from (laspy) data&quot;&quot;&quot;</span>
         <span class="c1"># if we want to keep all dimension, we do nothing</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">]:</span>
             <span class="k">return</span>
 
         <span class="c1"># selecting dimensions to remove</span>
@@ -214,7 +223,7 @@
         <span class="c1"># selecting dimensions to add</span>
         <span class="n">dimensions_to_add</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">dimension</span><span class="p">,</span> <span class="nb">type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">:</span>    <span class="c1"># we only add the dimensions we know the type of</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">:</span>  <span class="c1"># we only add the dimensions we know the type of</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dimension</span><span class="si">}</span><span class="s2"> has no type and thus is not added as a column.&quot;</span>
                 <span class="p">)</span>
@@ -230,13 +239,22 @@
 
         <span class="c1"># case: 1 dimension to add</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dimensions_to_add</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">las_data</span><span class="o">.</span><span class="n">add_extra_dim</span><span class="p">(</span><span class="n">laspy</span><span class="o">.</span><span class="n">ExtraBytesParams</span><span class="p">(</span><span class="n">dimensions_to_add</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="p">[</span><span class="n">dimensions_to_add</span><span class="p">[</span><span class="mi">0</span><span class="p">]]))</span>
+            <span class="n">las_data</span><span class="o">.</span><span class="n">add_extra_dim</span><span class="p">(</span>
+                <span class="n">laspy</span><span class="o">.</span><span class="n">ExtraBytesParams</span><span class="p">(</span>
+                    <span class="n">dimensions_to_add</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="p">[</span><span class="n">dimensions_to_add</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
             <span class="k">return</span>
 
         <span class="c1"># case: 2+ dimensions to add</span>
         <span class="n">extra_bytes_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">dimensions_to_add</span><span class="p">:</span>
-            <span class="n">extra_bytes_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">laspy</span><span class="o">.</span><span class="n">ExtraBytesParams</span><span class="p">(</span><span class="n">dimension</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="p">[</span><span class="n">dimension</span><span class="p">]))</span>
+            <span class="n">extra_bytes_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">laspy</span><span class="o">.</span><span class="n">ExtraBytesParams</span><span class="p">(</span>
+                    <span class="n">dimension</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
         <span class="n">las_data</span><span class="o">.</span><span class="n">add_extra_dims</span><span class="p">(</span><span class="n">extra_bytes_list</span><span class="p">)</span></div></div>
 </pre></div>
 
