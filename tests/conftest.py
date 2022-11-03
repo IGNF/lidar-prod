@@ -13,7 +13,9 @@ def vegetation_unclassifed_hydra_cfg():
             overrides=[
                 "data_format=vegetation_unclassified.yaml",
                 "basic_identification=for_testing.yaml",
-                "paths.src_las=tests/files/436000_6478000.subset.postIA.las"])
+                "paths.src_las=tests/files/436000_6478000.subset.postIA.las",
+            ],
+        )
 
 
 @pytest.fixture

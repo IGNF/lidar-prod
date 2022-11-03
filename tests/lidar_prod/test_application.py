@@ -1,23 +1,29 @@
+import os
+import tempfile
+
+import numpy as np
 import pdal
 import pytest
-import tempfile
-import numpy as np
-import os
-
 from omegaconf import open_dict
-from lidar_prod.application import just_clean, identify_vegetation_unclassified, apply, apply_building_module, get_shapefile
-from lidar_prod.tasks.utils import get_a_las_to_las_pdal_pipeline, get_las_metadata, get_las_data_from_las
+
+from lidar_prod.application import (
+    apply,
+    apply_building_module,
+    get_shapefile,
+    identify_vegetation_unclassified,
+    just_clean,
+)
+from lidar_prod.tasks.utils import (
+    get_a_las_to_las_pdal_pipeline,
+    get_las_data_from_las,
+    get_las_metadata,
+)
 from tests.conftest import (
     check_las_contains_dims,
     check_las_invariance,
     pdal_read_las_array,
 )
 
-"""We test the application against a LAS subset (~2500m²) with a few buildings and a few
-classification mistakes. The data contains the necessary fields (building probability, entropy)
-for validation.
-We apply different "mutations" to the data in order to test for multiple scenarii.
-"""
 LAS_SUBSET_FILE_BUILDING = "tests/files/870000_6618000.subset.postIA.las"
 SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
 LAS_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.las"
@@ -30,14 +36,32 @@ DUMMY_FILE_PATH = "tests/files/dummy_folder/dummy_file1.las"
     "las_mutation, query_db_Uni",
     [
         ([], True),  # identity
-        ([pdal.Filter.assign(value="building = 0.0")], True),  # low proba everywhere
-        ([pdal.Filter.assign(value="Classification = 1")], False),  # no candidate buildings
-        ([pdal.Filter.assign(value="Classification = 202")], False),  # only candidate buildings
+        (
+            [pdal.Filter.assign(value="building = 0.0")],
+            True,
+        ),  # low proba everywhere
+        (
+            [pdal.Filter.assign(value="Classification = 1")],
+            False,
+        ),  # no candidate buildings
+        (
+            [pdal.Filter.assign(value="Classification = 202")],
+            False,
+        ),  # only candidate buildings
     ],  # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
 )
-def test_application_data_invariance_and_data_format(legacy_hydra_cfg, las_mutation, query_db_Uni):
-    # Expected classification codes after application run are either default=0, unclassified=1, or
-    # one of the decision codes.
+def test_application_data_invariance_and_data_format(
+    legacy_hydra_cfg, las_mutation, query_db_Uni
+):
+    """We test the application against a LAS subset (~2500m²).
+
+    Data contains a few buildings, a few classification mistakes, and necessary fields (building probability, entropy)
+    for validation.
+    We apply different "mutations" to the data in order to test for multiple scenarii.
+
+    Expected classification codes after application run are either default=0, unclassified=1, or
+    one of the decision codes.
+    """
     _fc = legacy_hydra_cfg.data_format.codes.building.final
     expected_codes = {
         1,
@@ -55,7 +79,7 @@ def test_application_data_invariance_and_data_format(legacy_hydra_cfg, las_mutat
         )
         pipeline.execute()
         legacy_hydra_cfg.paths.src_las = mutated_copy
-        if not query_db_Uni:    # we don't request db_uni, we use a shapefile instead
+        if not query_db_Uni:  # we don't request db_uni, we use a shapefile instead
             legacy_hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
         updated_las_path_list = apply(legacy_hydra_cfg, apply_building_module)
         # Check output
@@ -96,16 +120,17 @@ def check_las_format_versions_and_srs(pipeline: pdal.pipeline.Pipeline):
 
 @pytest.mark.parametrize(
     "las_file",
-    [
-        LAS_SUBSET_FILE_VEGETATION,
-        LAZ_SUBSET_FILE_VEGETATION
-    ],
+    [LAS_SUBSET_FILE_VEGETATION, LAZ_SUBSET_FILE_VEGETATION],
 )
 def test_just_clean(vegetation_unclassifed_hydra_cfg, las_file):
     destination_path = tempfile.NamedTemporaryFile().name
     just_clean(vegetation_unclassifed_hydra_cfg, las_file, destination_path)
     las_data = get_las_data_from_las(destination_path)
-    assert [dim for dim in las_data.point_format.extra_dimension_names] == ['entropy', 'vegetation', 'unclassified']
+    assert [dim for dim in las_data.point_format.extra_dimension_names] == [
+        "entropy",
+        "vegetation",
+        "unclassified",
+    ]
 
 
 def test_detect_vegetation_unclassified(vegetation_unclassifed_hydra_cfg):
@@ -113,10 +138,17 @@ def test_detect_vegetation_unclassified(vegetation_unclassifed_hydra_cfg):
     identify_vegetation_unclassified(
         vegetation_unclassifed_hydra_cfg,
         LAS_SUBSET_FILE_VEGETATION,
-        destination_path)
+        destination_path,
+    )
     las_data = get_las_data_from_las(destination_path)
-    vegetation_count = np.count_nonzero(las_data.points.classification == vegetation_unclassifed_hydra_cfg.data_format.codes.vegetation)
-    unclassified_count = np.count_nonzero(las_data.points.classification == vegetation_unclassifed_hydra_cfg.data_format.codes.unclassified)
+    vegetation_count = np.count_nonzero(
+        las_data.points.classification
+        == vegetation_unclassifed_hydra_cfg.data_format.codes.vegetation
+    )
+    unclassified_count = np.count_nonzero(
+        las_data.points.classification
+        == vegetation_unclassifed_hydra_cfg.data_format.codes.unclassified
+    )
     assert vegetation_count == 17
     assert unclassified_count == 23222
 
@@ -136,7 +168,9 @@ def test_applying(vegetation_unclassifed_hydra_cfg, path, expected):
     vegetation_unclassifed_hydra_cfg.paths.src_las = path
     with tempfile.TemporaryDirectory() as td:
         vegetation_unclassifed_hydra_cfg.paths.output_dir = td
-    with open_dict(vegetation_unclassifed_hydra_cfg):   # needed to open the config dict and add elements
+    with open_dict(
+        vegetation_unclassifed_hydra_cfg
+    ):  # needed to open the config dict and add elements
         vegetation_unclassifed_hydra_cfg.expected = expected
     apply(vegetation_unclassifed_hydra_cfg, dummy_method)
 
@@ -146,6 +180,6 @@ def test_get_shapefile(legacy_hydra_cfg):
     get_shapefile(legacy_hydra_cfg, LAS_SUBSET_FILE_BUILDING, destination_path)
     created_shapefile_path = os.path.join(
         os.path.dirname(destination_path),
-        os.path.splitext(os.path.basename(LAS_SUBSET_FILE_BUILDING))[0] + ".shp"
+        os.path.splitext(os.path.basename(LAS_SUBSET_FILE_BUILDING))[0] + ".shp",
     )
     assert os.path.exists(created_shapefile_path)

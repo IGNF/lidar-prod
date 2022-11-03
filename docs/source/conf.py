@@ -12,12 +12,12 @@
 
 import os
 import sys
+
 import yaml
-
-# from unittest import mock
-
 from hydra.experimental import compose, initialize
 from omegaconf import OmegaConf
+
+# from unittest import mock
 
 
 rel_root_path = "./../../"
@@ -65,7 +65,7 @@ extensions = [
     "myst_parser",  # supports markdown syntax for doc pages, and link to markdown pages
     "sphinx_paramlinks",  # allow to reference params, which is done in pytorch_lightning
     "sphinxnotes.mock",  # ignore third-parties directive suche as "testcode" - see "mock_directive" args below
-    'sphinxcontrib.mermaid',  # enable mermaid schema
+    "sphinxcontrib.mermaid",  # enable mermaid schema
 ]
 
 # See https://myst-parser.readthedocs.io/en/latest/syntax/optional.html

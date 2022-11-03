@@ -1,11 +1,11 @@
-import shutil
-import pytest
 import os
 import os.path as osp
+import shutil
 import tempfile
+
 import hydra
 import numpy as np
-
+import pytest
 
 from lidar_prod.tasks.building_validation_optimization import (
     BuildingValidationOptimizer,

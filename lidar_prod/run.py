@@ -1,9 +1,10 @@
-import sys
-import os
 import logging
+import os
+import sys
+from enum import Enum
+
 import hydra
 from omegaconf import DictConfig
-from enum import Enum
 
 
 class POSSIBLE_TASK(Enum):
@@ -26,9 +27,19 @@ def main(config: DictConfig):  # pragma: no cover
 
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934
+    from lidar_prod.application import (
+        apply,
+        apply_building_module,
+        get_shapefile,
+        identify_vegetation_unclassified,
+        just_clean,
+    )
     from lidar_prod.commons.commons import extras
-    from lidar_prod.application import apply, identify_vegetation_unclassified, just_clean, apply_building_module, get_shapefile
-    from lidar_prod.optimization import optimize_building, optimize_vegetation, optimize_unclassified
+    from lidar_prod.optimization import (
+        optimize_building,
+        optimize_unclassified,
+        optimize_vegetation,
+    )
 
     log = logging.getLogger(__name__)
 

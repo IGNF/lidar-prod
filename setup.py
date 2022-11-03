@@ -1,5 +1,5 @@
-from setuptools import find_packages, setup
 import yaml
+from setuptools import find_packages, setup
 
 with open("package_metadata.yaml", "r") as f:
     pm = yaml.safe_load(f)
@@ -12,6 +12,6 @@ setup(
     author=pm["__author__"],
     install_requires=[
         # assume an environment as described in ./bash/setup_env.sh
-    ],
+    ], 
     packages=find_packages(),
 )

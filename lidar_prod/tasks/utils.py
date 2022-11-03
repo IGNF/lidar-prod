@@ -1,15 +1,15 @@
-from dataclasses import dataclass
-from typing import Union
 import json
-import math
 import logging
+import math
+import subprocess
+from dataclasses import dataclass
 from numbers import Number
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, Union
+
+import geopandas
+import laspy
 import numpy as np
 import pdal
-import laspy
-import subprocess
-import geopandas
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +50,9 @@ def get_las_metadata(entry_value: Union[pdal.pipeline.Pipeline, str]):
     return json.loads(pipeline.metadata)["metadata"]["readers.las"]
 
 
-def get_integer_bbox(entry_value: Union[pdal.pipeline.Pipeline, str], buffer: Number = 0) -> Dict[str, int]:
+def get_integer_bbox(
+    entry_value: Union[pdal.pipeline.Pipeline, str], buffer: Number = 0
+) -> Dict[str, int]:
     pipeline = get_pipeline(entry_value)
     """Get XY bounding box of a cloud, cast x/y min/max to integers."""
     metadata = get_las_metadata(pipeline)
@@ -81,7 +83,7 @@ def get_pdal_reader(las_path: str) -> pdal.Reader.las:
 
 
 def get_las_data_from_las(las_path: str) -> laspy.lasdata.LasData:
-    """ Load las data from a las file """
+    """Load las data from a las file"""
     return laspy.read(las_path)
 
 
@@ -106,7 +108,7 @@ def get_pdal_writer(target_las_path: str, extra_dims: str = "all") -> pdal.Write
 
 
 def save_las_data_to_las(las_path: str, las_data: laspy.lasdata.LasData):
-    """ save las data to a las file"""
+    """save las data to a las file"""
     las_data.write(las_path)
 
 
@@ -200,13 +202,12 @@ def request_bd_uni_for_building_shapefile(
         )
         raise e
     except subprocess.TimeoutExpired as e:
-        log.error(
-            "Time out when requesting BDUni."
-        )
+        log.error("Time out when requesting BDUni.")
         raise e
 
     # read & write to avoid unnacepted 3D shapefile format.
     gdf = geopandas.read_file(shapefile_path)
+    # TODO: dissolve coul happen here!
     gdf[["PRESENCE", "geometry"]].to_file(shapefile_path)
 
     return True
