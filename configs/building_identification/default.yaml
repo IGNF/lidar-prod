@@ -3,7 +3,6 @@ _target_: lidar_prod.tasks.building_identification.BuildingIdentifier
 data_format: ${data_format}
 
 min_building_proba: 0.5
-min_building_proba_relaxation_if_bd_uni_overlay: 1.0  # No effect if = 1.0
 
 cluster:
   min_points: 200  # Large so that small isolated artefacts are ignored

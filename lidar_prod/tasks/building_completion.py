@@ -30,13 +30,11 @@ class BuildingCompletor:
     def __init__(
         self,
         min_building_proba: float = 0.5,
-        min_building_proba_relaxation_if_bd_uni_overlay: float = 1.0,
         cluster=None,
         data_format=None,
     ):
         self.cluster = cluster
         self.min_building_proba = min_building_proba
-        self.min_building_proba_relaxation_if_bd_uni_overlay = min_building_proba_relaxation_if_bd_uni_overlay
         self.data_format = data_format
         self.pipeline: pdal.pipeline.Pipeline = None
 
@@ -74,20 +72,10 @@ class BuildingCompletor:
 
         """
 
-        # P above threshold
-        p_heq_threshold = f"(building>={self.min_building_proba})"
-
-        # P above relaxed threshold when under BDUni
-        under_bd_uni = f"({self.data_format.las_dimensions.uni_db_overlay} > 0)"
-        p_heq_relaxed_threshold = f"(building>={self.min_building_proba * self.min_building_proba_relaxation_if_bd_uni_overlay})"
-        p_heq_threshold_under_bd_uni = f"({p_heq_relaxed_threshold} && {under_bd_uni})"
-
-        # Candidates that where clustered by BuildingValidator but have high enough probability.
-        # not_clustered_but_with_high_p = f"{candidates} && {where_not_clustered} && ({p_heq_threshold} || {p_heq_threshold_under_bd_uni})"
-        high_proba = f"({p_heq_threshold} || {p_heq_threshold_under_bd_uni})"
+        # Candidates that where already confirmed by BuildingValidator.
         confirmed_buildings = f"Classification == {self.data_format.codes.building.final.building}"
-
-        where = f"{high_proba} || {confirmed_buildings}"
+        p_heq_threshold = f"(building>={self.min_building_proba})"
+        where = f"{p_heq_threshold} || {confirmed_buildings}"
         pipeline |= pdal.Filter.cluster(
             min_points=self.cluster.min_points,
             tolerance=self.cluster.tolerance,

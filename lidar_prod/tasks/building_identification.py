@@ -16,23 +16,18 @@ class BuildingIdentifier:
     Points that were not found by rule-based algorithms but which have a high-enough probability of
     being a building are clustered into candidate groups of buildings.
 
-    High enough probability means :
-    - p>=min_building_proba
-    OR, IF point fall in a building vector from the BDUni:
-    - p>=(min_building_proba*min_building_proba_relaxation_if_bd_uni_overlay).
+    High enough probability means p>=min_building_proba
     """
 
     def __init__(
         self,
         min_building_proba: float = 0.5,
-        min_building_proba_relaxation_if_bd_uni_overlay: float = 1.0,
         cluster=None,
         data_format=None,
     ):
         self.cluster = cluster
         self.data_format = data_format
         self.min_building_proba = min_building_proba
-        self.min_building_proba_relaxation_if_bd_uni_overlay = min_building_proba_relaxation_if_bd_uni_overlay
         self.pipeline: pdal.pipeline.Pipeline = None
 
     def run(
@@ -75,12 +70,8 @@ class BuildingIdentifier:
         # Considered for identification:
         non_candidates = f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
         not_already_confirmed = f"{self.data_format.las_dimensions.classification} != {self.data_format.codes.building.final.building}"
-
         p_heq_threshold = f"(building>={self.min_building_proba})"
-        A = f"(building>={self.min_building_proba * self.min_building_proba_relaxation_if_bd_uni_overlay})"
-        B = f"({self.data_format.las_dimensions.uni_db_overlay} > 0)"
-        p_heq_modified_threshold_under_bd_uni = f"({A} && {B})"
-        where = f"({non_candidates} && {not_already_confirmed}) && ({p_heq_threshold} || {p_heq_modified_threshold_under_bd_uni})"
+        where = f"({non_candidates} && {not_already_confirmed} && {p_heq_threshold})"
         self.pipeline |= pdal.Filter.cluster(
             min_points=self.cluster.min_points,
             tolerance=self.cluster.tolerance,
