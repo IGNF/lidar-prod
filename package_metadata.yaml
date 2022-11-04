@@ -1,4 +1,4 @@
-__version__: "M11V1.8.2"
+__version__: "M11V1.9.0"
 __name__: "lidar_prod"
 __url__: "https://github.com/IGNF/lidar-prod-quality-control"
 __description__: "A 3D semantic segmentation production tool to augment rules-based Lidar classification with AI and databases."
