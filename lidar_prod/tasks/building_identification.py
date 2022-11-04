@@ -35,28 +35,6 @@ class BuildingIdentifier:
         input_values: Union[str, pdal.pipeline.Pipeline],
         target_las_path: str = None,
     ) -> str:
-        """Application.
-
-        Transform cloud at `src_las_path` following identification logic, and save it to
-        `target_las_path`
-
-        Args:
-            input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with a building probability channel
-            target_las_path (str): path for saving updated LAS file.
-
-        Returns:
-            str:  `target_las_path`
-
-        """
-        log.info("Clustering of points with high building proba.")
-        self.run(input_values, target_las_path)
-        return target_las_path
-
-    def run(
-        self,
-        input_values: Union[str, pdal.pipeline.Pipeline],
-        target_las_path: str = None,
-    ) -> None:
         """Identify potential buildings in a new channel, excluding former candidates as well as already
         confirmed building (confirmed by either Validation or Completion).
 
@@ -65,6 +43,8 @@ class BuildingIdentifier:
             target_las_path (str): output LAS
 
         """
+
+        log.info("Clustering of points with high building proba.")
         self.pipeline = get_pipeline(input_values)
 
         # Considered for identification:
@@ -87,3 +67,5 @@ class BuildingIdentifier:
             self.pipeline |= get_pdal_writer(target_las_path)
             os.makedirs(osp.dirname(target_las_path), exist_ok=True)
         self.pipeline.execute()
+
+        return target_las_path
