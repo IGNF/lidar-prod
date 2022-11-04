@@ -35,33 +35,27 @@ Exactly as with vegetation detection, the identification is done by comparing th
 4) Update of the point cloud classification
 
 Decision thresholds `E1`, `E2` , `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a [multi-objective hyperparameter optimization](/background/thresholds_optimization_process.md) that aims to maximize automation, precision, and recall of the decisions. 
-Current performances on a 15km² validation dataset, expressed as percentages of clusters, are:
-- Automation=91%
-- Precision=98.5%
-- Recall=98.1%.
+Current performances on a 15km² test dataset, expressed as percentages of clusters, are:
+- Automation=86.5%
+- Precision>=98%
+- Recall>=98%.
 
 ![](/img/LidarBati-BuildingValidationM7.1V2.0.png)
 
 ## B.2) Building Completion
 
-**Goal**: Confirm points that were too isolated to make up a group but have high-enough probability nevertheless (e.g. walls)
+**Goal**: Confirm points that have high-enough probability, but where not confirmed (because a) they were not candidate buildings points, or b) they were too scattered for clustering during validation).
 
-Among  _candidate buildings points_ that have not been clustered in previous step due, identify those which nevertheless meet the requirement to be `confirmed`.
-Cluster them together with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
-For each cluster, if some points were confirmed, the others are considered to belong to the same building, and are 
-therefore confirmed as well.
+Cluster high-proba points (p >= 0.5) with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
+For each cluster that includes already confirmed points, the rest (i.e. high probability points) are considered to belong to the same building, and are confirmed as well.
 
-![](/img/LidarBati-BuildingCompletion.png)
+![](/img/LidarBati-BuildingCompletion-M11.png)
 
 
 ## B.3) Building Identification
 
 **Goal**: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection. 
 
-Among points that were **not** _candidate buildings points_ identify those which meet the requirement to be `confirmed`, and cluster them.
+Among points that were **not** _candidate buildings points_ and not already confirmed, identify those with high enough probabiltity (p >= 0.5) and cluster.
 
-This clustering defines a LAS extra dimensions (`Group`) which indexes newly found cluster that may be some missed buildings.
-
-![](/img/LidarBati-BuildingIdentification.png)
-
-
+This clustering defines a LAS extra dimensions (`Group`) which indexes newly found cluster that may be buildings.

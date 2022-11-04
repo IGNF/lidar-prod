@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Production process used to transform point clouds classification &mdash; lidar_prod 1.8.2 documentation</title>
+  <title>Production process used to transform point clouds classification &mdash; lidar_prod M11V1.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -180,29 +180,26 @@
 <li><p>Update of the point cloud classification</p></li>
 </ol>
 <p>Decision thresholds <code class="docutils literal notranslate"><span class="pre">E1</span></code>, <code class="docutils literal notranslate"><span class="pre">E2</span></code> , <code class="docutils literal notranslate"><span class="pre">C1</span></code>, <code class="docutils literal notranslate"><span class="pre">C2</span></code>, <code class="docutils literal notranslate"><span class="pre">R1</span></code>, <code class="docutils literal notranslate"><span class="pre">R2</span></code>, <code class="docutils literal notranslate"><span class="pre">O1</span></code> are chosen via a <a class="reference internal" href="thresholds_optimization_process.html"><span class="doc std std-doc">multi-objective hyperparameter optimization</span></a> that aims to maximize automation, precision, and recall of the decisions.
-Current performances on a 15km² validation dataset, expressed as percentages of clusters, are:</p>
+Current performances on a 15km² test dataset, expressed as percentages of clusters, are:</p>
 <ul class="simple">
-<li><p>Automation=91%</p></li>
-<li><p>Precision=98.5%</p></li>
-<li><p>Recall=98.1%.</p></li>
+<li><p>Automation=86.5%</p></li>
+<li><p>Precision&gt;=98%</p></li>
+<li><p>Recall&gt;=98%.</p></li>
 </ul>
 <p><img alt="" src="../_images/LidarBati-BuildingValidationM7.1V2.0.png" /></p>
 </section>
 <section id="b-2-building-completion">
 <h2>B.2) Building Completion<a class="headerlink" href="#b-2-building-completion" title="Permalink to this headline"></a></h2>
-<p><strong>Goal</strong>: Confirm points that were too isolated to make up a group but have high-enough probability nevertheless (e.g. walls)</p>
-<p>Among  <em>candidate buildings points</em> that have not been clustered in previous step due, identify those which nevertheless meet the requirement to be <code class="docutils literal notranslate"><span class="pre">confirmed</span></code>.
-Cluster them together with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
-For each cluster, if some points were confirmed, the others are considered to belong to the same building, and are
-therefore confirmed as well.</p>
-<p><img alt="" src="../_images/LidarBati-BuildingCompletion.png" /></p>
+<p><strong>Goal</strong>: Confirm points that have high-enough probability, but where not confirmed (because a) they were not candidate buildings points, or b) they were too scattered for clustering during validation).</p>
+<p>Cluster high-proba points (p &gt;= 0.5) with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
+For each cluster that includes already confirmed points, the rest (i.e. high probability points) are considered to belong to the same building, and are confirmed as well.</p>
+<p><img alt="" src="../_images/LidarBati-BuildingCompletion-M11.png" /></p>
 </section>
 <section id="b-3-building-identification">
 <h2>B.3) Building Identification<a class="headerlink" href="#b-3-building-identification" title="Permalink to this headline"></a></h2>
 <p><strong>Goal</strong>: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection.</p>
-<p>Among points that were <strong>not</strong> <em>candidate buildings points</em> identify those which meet the requirement to be <code class="docutils literal notranslate"><span class="pre">confirmed</span></code>, and cluster them.</p>
-<p>This clustering defines a LAS extra dimensions (<code class="docutils literal notranslate"><span class="pre">Group</span></code>) which indexes newly found cluster that may be some missed buildings.</p>
-<p><img alt="" src="../_images/LidarBati-BuildingIdentification.png" /></p>
+<p>Among points that were <strong>not</strong> <em>candidate buildings points</em> and not already confirmed, identify those with high enough probabiltity (p &gt;= 0.5) and cluster.</p>
+<p>This clustering defines a LAS extra dimensions (<code class="docutils literal notranslate"><span class="pre">Group</span></code>) which indexes newly found cluster that may be buildings.</p>
 </section>
 </section>
 

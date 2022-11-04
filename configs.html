@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Default configuration &mdash; lidar_prod 1.8.2 documentation</title>
+  <title>Default configuration &mdash; lidar_prod M11V1.9.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/sphinx_paramlinks.css" type="text/css" />
@@ -309,17 +309,15 @@
 <span class="nt">building_identification</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar_prod.tasks.building_identification.BuildingIdentifier</span><span class="w"></span>
 <span class="w">  </span><span class="nt">data_format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format}</span><span class="w"></span>
-<span class="w">  </span><span class="nt">min_building_proba</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${building_validation.application.thresholds.min_confidence_confirmation}</span><span class="w"></span>
-<span class="w">  </span><span class="nt">min_frac_confirmation_factor_if_bd_uni_overlay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${building_validation.application.thresholds.min_frac_confirmation_factor_if_bd_uni_overlay}</span><span class="w"></span>
+<span class="w">  </span><span class="nt">min_building_proba</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span><span class="w"></span>
 <span class="w">  </span><span class="nt">cluster</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">min_points</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span><span class="w"></span>
-<span class="w">    </span><span class="nt">tolerance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+<span class="w">    </span><span class="nt">tolerance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.75</span><span class="w"></span>
 <span class="w">    </span><span class="nt">is3d</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
 <span class="nt">building_completion</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar_prod.tasks.building_completion.BuildingCompletor</span><span class="w"></span>
 <span class="w">  </span><span class="nt">data_format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format}</span><span class="w"></span>
 <span class="w">  </span><span class="nt">min_building_proba</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span><span class="w"></span>
-<span class="w">  </span><span class="nt">min_building_proba_relaxation_if_bd_uni_overlay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
 <span class="w">  </span><span class="nt">cluster</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">min_points</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w"></span>
 <span class="w">    </span><span class="nt">tolerance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
