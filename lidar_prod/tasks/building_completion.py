@@ -12,29 +12,33 @@ log = logging.getLogger(__name__)
 class BuildingCompletor:
     """Logic of building completion.
 
-    Some points were too isolated for BuildingValidator to consider them.
-    We will update their classification based on their probability as well as their surrounding:
-    - We select points that have p>=0.5
-    - We perform vertical (XY) clustering including these points as well as confirmed buildings.
-    - In the resulting groups, if there are some confirmed buildings, previously isolated points are
-    considered to be parts of the same building and their class is updated accordingly.
+    The BuildingValidator only considered points that were 1) candidate, and 2) formed clusers of sufficient size.
+
+    Some points were too isolated, or where not clustered, even though they might have a
+    high predicted building probabiliy.
+    We assume that we can trust AI probabilities (if high enough) in the neigborhood of large groups (clusters)
+    of candidate points already confirmed by the BuildingValidator.
+
+    We will update points classification based on their probability as well as their surrounding:
+    - We select points that have p>=0.5 (+ a BDUni factor when applicable)
+    - We perform vertical (XY) clustering of A) these points, together with B) confirmed buildings.
+    - If the resulting clusters contain confirmed buildings, points with high probability are
+    considered to be part of the confirmed building and their class is updated accordingly.
 
     """
 
     def __init__(
         self,
-        min_building_proba: float = 0.75,
+        min_building_proba: float = 0.5,
         min_building_proba_relaxation_if_bd_uni_overlay: float = 1.0,
         cluster=None,
         data_format=None,
     ):
         self.cluster = cluster
         self.min_building_proba = min_building_proba
-        self.min_building_proba_relaxation_if_bd_uni_overlay = (
-            min_building_proba_relaxation_if_bd_uni_overlay
-        )
+        self.min_building_proba_relaxation_if_bd_uni_overlay = min_building_proba_relaxation_if_bd_uni_overlay
         self.data_format = data_format
-        self.codes = data_format.codes.building  # easier access
+        self.codes = data_format.codes.building  # for easier access
         self.pipeline: pdal.pipeline.Pipeline = None
 
     def run(self, input_values: Union[str, pdal.pipeline.Pipeline]):
@@ -50,9 +54,7 @@ class BuildingCompletor:
             str: returns `target_las_path` for potential terminal piping.
 
         """
-        log.info(
-            "Completion of building with relatively distant points that have high enough probability"
-        )
+        log.info("Completion of building with relatively distant points that have high enough probability")
         pipeline = get_pipeline(input_values)
         self.prepare_for_building_completion(pipeline)
         self.update_classification()
@@ -70,15 +72,8 @@ class BuildingCompletor:
             src_las_path (pdal.pipeline.Pipeline): input LAS pipeline
             target_las_path (str): output, prepared LAS with a new `{self.data_format.las_dimensions.ClusterID_isolated_plus_confirmed}`
             dimension.
-        """
-        self.pipeline = pipeline
-        candidates = (
-            f"({self.data_format.las_dimensions.candidate_buildings_flag} == 1)"
-        )
 
-        where_not_clustered = (
-            f"{self.data_format.las_dimensions.ClusterID_candidate_building} == 0"
-        )
+        """
 
         # P above threshold
         p_heq_threshold = f"(building>={self.min_building_proba})"
@@ -89,26 +84,26 @@ class BuildingCompletor:
         p_heq_threshold_under_bd_uni = f"({p_heq_relaxed_threshold} && {under_bd_uni})"
 
         # Candidates that where clustered by BuildingValidator but have high enough probability.
-        not_clustered_but_with_high_p = f"{candidates} && {where_not_clustered} && ({p_heq_threshold} || {p_heq_threshold_under_bd_uni})"
-        confirmed_buildings = (
-            f"Classification == {self.data_format.codes.building.final.building}"
-        )
+        # not_clustered_but_with_high_p = f"{candidates} && {where_not_clustered} && ({p_heq_threshold} || {p_heq_threshold_under_bd_uni})"
+        high_proba = f"({p_heq_threshold} || {p_heq_threshold_under_bd_uni})"
+        confirmed_buildings = f"Classification == {self.data_format.codes.building.final.building}"
 
-        where = f"{not_clustered_but_with_high_p} || {confirmed_buildings}"
-        self.pipeline |= pdal.Filter.cluster(
+        where = f"{high_proba} || {confirmed_buildings}"
+        pipeline |= pdal.Filter.cluster(
             min_points=self.cluster.min_points,
             tolerance=self.cluster.tolerance,
             is3d=self.cluster.is3d,
             where=where,
         )
-        # Always move and reset ClusterID to avoid conflict with later tasks.
-        self.pipeline |= pdal.Filter.ferry(
+        # Always move, then reset ClusterID to avoid conflict with later tasks.
+        pipeline |= pdal.Filter.ferry(
             dimensions=f"{self.data_format.las_dimensions.cluster_id}=>{self.data_format.las_dimensions.ClusterID_isolated_plus_confirmed}"
         )
-        self.pipeline |= pdal.Filter.assign(
-            value=f"{self.data_format.las_dimensions.cluster_id} = 0"
-        )
-        self.pipeline.execute()
+        pipeline |= pdal.Filter.assign(value=f"{self.data_format.las_dimensions.cluster_id} = 0")
+        pipeline.execute()
+
+        # set pipeline for access in next operations/tasks.
+        self.pipeline = pipeline
 
     def update_classification(self) -> None:
         """Updates Classification dimension by completing buildings with high probability points."""
@@ -126,10 +121,8 @@ class BuildingCompletor:
         # For each group of isolated|confirmed points,
         # Assess if the group already contains confirmed points.
         # If it does, set all points to confirmed building class so that
-        # the isolated points they may contain are also confirmed.
-        for pts_idx in tqdm(
-            split_idx, desc="Complete buildings with isolated points", unit="grp"
-        ):
+        # the other points are confirmed as part of the same building.
+        for pts_idx in tqdm(split_idx, desc="Complete buildings with isolated points", unit="grp"):
             pts = las[pts_idx]
             if self.codes.final.building in pts[_clf]:
                 las[_clf][pts_idx] = self.codes.final.building
