@@ -38,7 +38,6 @@ class BuildingCompletor:
         self.min_building_proba = min_building_proba
         self.min_building_proba_relaxation_if_bd_uni_overlay = min_building_proba_relaxation_if_bd_uni_overlay
         self.data_format = data_format
-        self.codes = data_format.codes.building  # for easier access
         self.pipeline: pdal.pipeline.Pipeline = None
 
     def run(self, input_values: Union[str, pdal.pipeline.Pipeline]):
@@ -124,6 +123,6 @@ class BuildingCompletor:
         # the other points are confirmed as part of the same building.
         for pts_idx in tqdm(split_idx, desc="Complete buildings with isolated points", unit="grp"):
             pts = las[pts_idx]
-            if self.codes.final.building in pts[_clf]:
-                las[_clf][pts_idx] = self.codes.final.building
+            if self.data_format.codes.building.final.building in pts[_clf]:
+                las[_clf][pts_idx] = self.data_format.codes.building.final.building
         self.pipeline = pdal.Pipeline(arrays=[las])
