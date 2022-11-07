@@ -2,6 +2,8 @@
 las_dimensions:
   # input
   classification: Classification  # las format
+  terrascan_normal: Normal
+  terrascan_distance: Distance
 
   # Extra dims
   # ATTENTION: If extra dimensions are added, you may want to add them in cleaning.in parameter as well.
@@ -57,12 +59,14 @@ codes:
 
 
 cleaning:
-    # Extra dims that are kept when application starts. Others are removed to lighten the LAS.
+  # Extra dims that are kept when application starts. Others are removed to lighten the LAS.
   input_building:
     _target_: lidar_prod.tasks.cleaning.Cleaner
     extra_dims:
       - "${data_format.las_dimensions.ai_building_proba}=float"
       - "${data_format.las_dimensions.entropy}=float"
+      - "${data_format.las_dimensions.terrascan_normal}=uint"
+      - "${data_format.las_dimensions.terrascan_distance}=uint"
       # - "${data_format.las_dimensions.ai_vegetation_proba}=float"
       # - "${data_format.las_dimensions.ai_unclassified_proba}=float"
   output_building:
@@ -74,9 +78,11 @@ cleaning:
       # - "${data_format.las_dimensions.ai_vegetation_proba}=float"
       - "${data_format.las_dimensions.entropy}=float"
       - "${data_format.las_dimensions.ai_building_identified}=uint"
+      - "${data_format.las_dimensions.terrascan_normal}=uint"
+      - "${data_format.las_dimensions.terrascan_distance}=uint"
       # - "${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint"
   input_vegetation_unclassified:
-  # Extra dims added for storing the result of the vegetation/unclassified detection.
+    # Extra dims added for storing the result of the vegetation/unclassified detection.
     _target_: lidar_prod.tasks.cleaning.Cleaner
     extra_dims:
       - "${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint32"

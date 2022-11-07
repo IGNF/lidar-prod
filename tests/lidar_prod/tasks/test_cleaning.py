@@ -38,10 +38,11 @@ def test_cleaning_float_extra_dim():
         assert "building" not in las_dimensions
 
 
-def test_cleaning_two_float_extra_dims():
+def test_cleaning_two_float_extra_dims_and_one_fantasy_dim():
     d1 = "entropy"
     d2 = "building"
-    extra_dims = [f"{d1}=float", f"{d2}=float"]
+    d3 = "i_do_not_exist_but_no_error_incurs"
+    extra_dims = [f"{d1}=float", f"{d2}=float", f"{d3}=float"]
     cl = Cleaner(extra_dims=extra_dims)
     with tempfile.TemporaryDirectory() as td:
         clean_las_path = osp.join(td, "float_extra_dim.las")
@@ -50,10 +51,11 @@ def test_cleaning_two_float_extra_dims():
         out_a = pdal_read_las_array(clean_las_path)
         assert d1 in out_a.dtype.fields.keys()
         assert d2 in out_a.dtype.fields.keys()
+        assert d3 not in out_a.dtype.fields.keys()
 
 
 @pytest.mark.parametrize("extra_dims", ("", "entropy=float", "building=float"))
-def test_cleaning_format(extra_dims):
+def test_pdal_cleaning_format(extra_dims):
     cl = Cleaner(extra_dims=extra_dims)
     with tempfile.TemporaryDirectory() as td:
         clean_las_path = osp.join(td, "float_extra_dim.las")
@@ -69,7 +71,7 @@ def test_cleaning_format(extra_dims):
         (["entropy=float", "building=float"], "entropy=float,building=float"),
     ],
 )
-def test_cleaning_get_extra_dims_as_str(extra_dims, expected):
+def test_pdal_cleaning_get_extra_dims_as_str(extra_dims, expected):
     cleaner = Cleaner(extra_dims=extra_dims)
     assert cleaner.get_extra_dims_as_str() == expected
 
@@ -144,7 +146,7 @@ def test_cleaning_get_extra_dims_as_str(extra_dims, expected):
         ),
     ],
 )
-def test_cleaning_remove_dimensions(extra_dims, expected):
+def test_laspy_cleaning_remove_dimensions(extra_dims, expected):
     las_data = get_las_data_from_las(LAS_SUBSET_FILE_VEGETATION)
     cleaner = Cleaner(extra_dims=extra_dims)
     cleaner.remove_dimensions(las_data)
@@ -215,7 +217,7 @@ def test_cleaning_remove_dimensions(extra_dims, expected):
         ),
     ],
 )
-def test_cleaning_add_dimensions(extra_dims, expected):
+def test_laspy_cleaning_add_dimensions(extra_dims, expected):
     las_data = get_las_data_from_las(LAS_SUBSET_FILE_VEGETATION)
     cleaner = Cleaner(extra_dims=extra_dims)
     cleaner.add_dimensions(las_data)
