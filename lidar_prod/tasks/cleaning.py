@@ -6,7 +6,7 @@ from typing import Iterable, Optional, Union
 import laspy
 import pdal
 
-from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer, pdal_read_las_array
+from lidar_prod.tasks.utils import get_pdal_writer, pdal_read_las_array
 
 log = logging.getLogger(__name__)
 
