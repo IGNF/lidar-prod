@@ -4,7 +4,7 @@ las_dimensions:
   classification: Classification  # las format
   terrascan_normal: Normal
   terrascan_distance: Distance
-  terascan_deviation: Deviation
+  terrascan_deviation: Deviation
 
   # Extra dims
   # ATTENTION: If extra dimensions are added, you may want to add them in cleaning.in parameter as well.
