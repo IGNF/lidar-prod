@@ -36,7 +36,7 @@ DUMMY_FILE_PATH = "tests/files/dummy_folder/dummy_file1.las"
         ),  # only candidate buildings
     ],  # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
 )
-def test_application_data_invariance_and_data_format(legacy_hydra_cfg, las_mutation, query_db_Uni):
+def test_application_data_invariance_and_data_format(hydra_cfg, las_mutation, query_db_Uni):
     """We test the application against a LAS subset (~2500m²).
 
     Data contains a few buildings, a few classification mistakes, and necessary fields (building probability, entropy)
@@ -47,7 +47,7 @@ def test_application_data_invariance_and_data_format(legacy_hydra_cfg, las_mutat
     one of the decision codes.
 
     """
-    _fc = legacy_hydra_cfg.data_format.codes.building.final
+    _fc = hydra_cfg.data_format.codes.building.final
     expected_codes = {
         1,
         2,
@@ -56,15 +56,15 @@ def test_application_data_invariance_and_data_format(legacy_hydra_cfg, las_mutat
         _fc.unsure,
     }
     # Run application on the data subset
-    with tempfile.TemporaryDirectory() as legacy_hydra_cfg.paths.output_dir:
+    with tempfile.TemporaryDirectory() as hydra_cfg.paths.output_dir:
         # Copy the data and apply the "mutation"
         mutated_copy: str = tempfile.NamedTemporaryFile().name
         pipeline = get_a_las_to_las_pdal_pipeline(LAS_SUBSET_FILE_BUILDING, mutated_copy, las_mutation)
         pipeline.execute()
-        legacy_hydra_cfg.paths.src_las = mutated_copy
+        hydra_cfg.paths.src_las = mutated_copy
         if not query_db_Uni:  # we don't request db_uni, we use a shapefile instead
-            legacy_hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
-        updated_las_path_list = apply(legacy_hydra_cfg, apply_building_module)
+            hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
+        updated_las_path_list = apply(hydra_cfg, apply_building_module)
         # Check output
         check_las_invariance(mutated_copy, updated_las_path_list[0])
         check_format_of_application_output_las(updated_las_path_list[0], expected_codes)
@@ -148,9 +148,9 @@ def test_applying(vegetation_unclassifed_hydra_cfg, path, expected):
     apply(vegetation_unclassifed_hydra_cfg, dummy_method)
 
 
-def test_get_shapefile(legacy_hydra_cfg):
+def test_get_shapefile(hydra_cfg):
     destination_path = tempfile.NamedTemporaryFile().name
-    get_shapefile(legacy_hydra_cfg, LAS_SUBSET_FILE_BUILDING, destination_path)
+    get_shapefile(hydra_cfg, LAS_SUBSET_FILE_BUILDING, destination_path)
     created_shapefile_path = os.path.join(
         os.path.dirname(destination_path),
         os.path.splitext(os.path.basename(LAS_SUBSET_FILE_BUILDING))[0] + ".shp",

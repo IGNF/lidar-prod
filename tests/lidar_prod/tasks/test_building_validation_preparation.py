@@ -13,7 +13,7 @@ INVALID_OVERLAY_LAZ_PATH = "tests/files/invalid_overlay_data/842_6521-invalid_sh
 # Normal execution on subset of LAZ lasts ~ 3sec.
 # If a regression occurs, the pdal execution will hang and a timeout would make it more apparent.
 # However, pytest-timeout does not stop pdal for some reasons. For now this should be sufficient.
-def test_shapefile_overlay_in_building_module(legacy_hydra_cfg):
+def test_shapefile_overlay_in_building_module(hydra_cfg):
     """We test the application against a LAS subset for which the BDUni shapefile shows overlapping vectors.
 
     We only need points at the borders of the area in order to request the error-generating shapefile.
@@ -23,10 +23,10 @@ def test_shapefile_overlay_in_building_module(legacy_hydra_cfg):
 
     """
     # Run application on the data subset for which vector data is expected to be invalid.
-    with tempfile.TemporaryDirectory() as legacy_hydra_cfg.paths.output_dir:
+    with tempfile.TemporaryDirectory() as hydra_cfg.paths.output_dir:
         target_las_path = os.path.join(
-            legacy_hydra_cfg.paths.output_dir,
+            hydra_cfg.paths.output_dir,
             os.path.basename(INVALID_OVERLAY_LAZ_PATH),
         )
-        bv: BuildingValidator = hydra.utils.instantiate(legacy_hydra_cfg.building_validation.application)
+        bv: BuildingValidator = hydra.utils.instantiate(hydra_cfg.building_validation.application)
         bv.prepare(INVALID_OVERLAY_LAZ_PATH, target_las_path)
