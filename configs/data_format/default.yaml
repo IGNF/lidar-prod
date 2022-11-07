@@ -4,6 +4,7 @@ las_dimensions:
   classification: Classification  # las format
   terrascan_normal: Normal
   terrascan_distance: Distance
+  terascan_deviation: Deviation
 
   # Extra dims
   # ATTENTION: If extra dimensions are added, you may want to add them in cleaning.in parameter as well.
@@ -67,6 +68,7 @@ cleaning:
       - "${data_format.las_dimensions.entropy}=float"
       - "${data_format.las_dimensions.terrascan_normal}=uint"
       - "${data_format.las_dimensions.terrascan_distance}=uint"
+      - "${data_format.las_dimensions.terrascan_deviation}=uint"
       # - "${data_format.las_dimensions.ai_vegetation_proba}=float"
       # - "${data_format.las_dimensions.ai_unclassified_proba}=float"
   output_building:
@@ -80,6 +82,7 @@ cleaning:
       - "${data_format.las_dimensions.ai_building_identified}=uint"
       - "${data_format.las_dimensions.terrascan_normal}=uint"
       - "${data_format.las_dimensions.terrascan_distance}=uint"
+      - "${data_format.las_dimensions.terrascan_deviation}=uint"
       # - "${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint"
   input_vegetation_unclassified:
     # Extra dims added for storing the result of the vegetation/unclassified detection.
