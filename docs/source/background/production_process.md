@@ -44,10 +44,14 @@ Current performances on a 15km² test dataset, expressed as percentages of clust
 
 ## B.2) Building Completion
 
-**Goal**: Confirm points that have high-enough probability, but where not confirmed (because a) they were not candidate buildings points, or b) they were too scattered for clustering during validation).
+**Goal**: Confirm points that have high-enough probability, but where not confirmed because 
+- (a) they were too scattered for clustering during validation, or 
+- (b) they were not candidate buildings points.
 
-Cluster high-proba points (p >= 0.5) with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
-For each cluster that includes already confirmed points, the rest (i.e. high probability points) are considered to belong to the same building, and are confirmed as well.
+Cluster high-proba points (p >= 0.5) with previously confirmed building points in a vertical fashion (XY plan).
+For each cluster that includes already confirmed points, the rest (i.e. high probability points) are considered to belong to the same building. Then, it is one of two things:
+- If (a), then these candidate points are confirmed.
+- If (b), then these non-candidate points are added as a Group, for later human inspection/confirmation. This is to avoid a direct modification of the Classification dimension taking place outside of the scope of buildings detected in rules-based software.
 
 ![](/img/LidarBati-BuildingCompletion-M11.png)
 

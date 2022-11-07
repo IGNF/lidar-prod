@@ -16,7 +16,7 @@ las_dimensions:
   uni_db_overlay: BDTopoOverlay  # user-defined -> a 0/1 flag for presence of a BDUni vector
   candidate_buildings_flag: F_CandidateB # -> a 0/1 flag identifying candidate buildings found by rules-based classification  
   ClusterID_candidate_building: CID_CandidateB  # -> Cluster index from BuildingValidator, 0 if no cluster, 1-n otherwise
-  ClusterID_isolated_plus_confirmed: CID_IsolatedOrConfirmed  # -> Cluster index from BuildingCompletor, 0 if no cluster, 1-n otherwise
+  ClusterID_confirmed_or_high_proba: CID_IsolatedOrConfirmed  # -> Cluster index from BuildingCompletor, 0 if no cluster, 1-n otherwise
 
   # Additionnal output channel
   ai_building_identified: Group

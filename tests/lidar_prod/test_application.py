@@ -6,18 +6,8 @@ import pdal
 import pytest
 from omegaconf import open_dict
 
-from lidar_prod.application import (
-    apply,
-    apply_building_module,
-    get_shapefile,
-    identify_vegetation_unclassified,
-    just_clean,
-)
-from lidar_prod.tasks.utils import (
-    get_a_las_to_las_pdal_pipeline,
-    get_las_data_from_las,
-    get_las_metadata,
-)
+from lidar_prod.application import apply, apply_building_module, get_shapefile, identify_vegetation_unclassified, just_clean
+from lidar_prod.tasks.utils import get_a_las_to_las_pdal_pipeline, get_las_data_from_las, get_las_metadata
 from tests.conftest import check_las_contains_dims, check_las_invariance, pdal_read_las_array
 
 LAS_SUBSET_FILE_BUILDING = "tests/files/870000_6618000.subset.postIA.las"
@@ -55,6 +45,7 @@ def test_application_data_invariance_and_data_format(legacy_hydra_cfg, las_mutat
 
     Expected classification codes after application run are either default=0, unclassified=1, or
     one of the decision codes.
+
     """
     _fc = legacy_hydra_cfg.data_format.codes.building.final
     expected_codes = {
@@ -88,7 +79,7 @@ def check_format_of_application_output_las(output_las_path: str, expected_codes:
 
     """
     # Check that we contain extra_dims that production needs
-    check_las_contains_dims(output_las_path, dims_to_check=["Group", "building", "entropy"])
+    check_las_contains_dims(output_las_path, dims_to_check=["Group", "entropy"])
 
     # Ensure that the format versions are as expected
     check_las_format_versions_and_srs(output_las_path)

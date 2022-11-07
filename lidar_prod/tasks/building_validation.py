@@ -215,15 +215,15 @@ class BuildingValidator:
             self.pipeline |= get_pdal_reader(src_las_path)
             self.pipeline.execute()
 
-        las = self.pipeline.arrays[0]
+        points = self.pipeline.arrays[0]
 
         # 1) Map all points to a single "not_building" class
         # to be sure that they will all be modified.
 
         dim_clf = self.data_format.las_dimensions.classification
         dim_flag = self.data_format.las_dimensions.candidate_buildings_flag
-        candidates_mask = las[dim_flag] == 1
-        las[dim_clf][candidates_mask] = self.codes.final.not_building
+        candidates_mask = points[dim_flag] == 1
+        points[dim_clf][candidates_mask] = self.codes.final.not_building
 
         # 2) Decide at the group-level
         # TODO: check if this can be moved somewhere else. WARNING: use_final_classification_codes may be modified in
@@ -236,7 +236,7 @@ class BuildingValidator:
 
         # Get the index of points of each cluster
         # Remove unclustered group that have ClusterID = 0 (i.e. the first "group")
-        cluster_id_dim = las[
+        cluster_id_dim = points[
             self.data_format.las_dimensions.ClusterID_candidate_building
         ]
         split_idx = split_idx_by_dim(cluster_id_dim)
@@ -246,13 +246,13 @@ class BuildingValidator:
         for pts_idx in tqdm(
             split_idx, desc="Update cluster classification", unit="clusters"
         ):
-            infos = self._extract_cluster_info_by_idx(las, pts_idx)
-            las[dim_clf][pts_idx] = decision_func(infos)
+            infos = self._extract_cluster_info_by_idx(points, pts_idx)
+            points[dim_clf][pts_idx] = decision_func(infos)
 
-        self.pipeline = pdal.Pipeline(arrays=[las])
+        self.pipeline = pdal.Pipeline(arrays=[points])
 
         if target_las_path:
-            self.pipeline = get_pdal_writer(target_las_path).pipeline(las)
+            self.pipeline = get_pdal_writer(target_las_path).pipeline(points)
             os.makedirs(osp.dirname(target_las_path), exist_ok=True)
             self.pipeline.execute()
 

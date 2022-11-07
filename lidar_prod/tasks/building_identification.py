@@ -43,29 +43,36 @@ class BuildingIdentifier:
             target_las_path (str): output LAS
 
         """
+        # aliases
+        _cid = self.data_format.las_dimensions.cluster_id
+        _completion_flag = self.data_format.las_dimensions.completion_non_candidate_flag
 
         log.info("Clustering of points with high building proba.")
-        self.pipeline = get_pipeline(input_values)
+        pipeline = get_pipeline(input_values)
 
         # Considered for identification:
         non_candidates = f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
-        not_already_confirmed = f"{self.data_format.las_dimensions.classification} != {self.data_format.codes.building.final.building}"
+        not_already_confirmed = f"({self.data_format.las_dimensions.classification} != {self.data_format.codes.building.final.building})"
+        not_a_potential_completion = f"({_completion_flag} != 1)"
         p_heq_threshold = f"(building>={self.min_building_proba})"
-        where = f"({non_candidates} && {not_already_confirmed} && {p_heq_threshold})"
-        self.pipeline |= pdal.Filter.cluster(
+        where = f"({non_candidates} && {not_already_confirmed} && {not_a_potential_completion} && {p_heq_threshold})"
+        pipeline |= pdal.Filter.cluster(
             min_points=self.cluster.min_points,
             tolerance=self.cluster.tolerance,
             is3d=self.cluster.is3d,
             where=where,
         )
-        # Duplicate ClusterID to have an explicit name for it for inspection. 
+        # Increment ClusterID, so that points from building completion can become cluster 1
+        pipeline |= pdal.Filter.assign(value=f"{_cid} = {_cid} + 1", where=f"{_cid} != 0")
+        pipeline |= pdal.Filter.assign(value=f"{_cid} = 1", where=f"{_completion_flag} == 1")
+        # Duplicate ClusterID to have an explicit name for it for inspection.
         # Do not reset it to zero to have access to it at human inspection stage.
-        self.pipeline |= pdal.Filter.ferry(
-            dimensions=f"{self.data_format.las_dimensions.cluster_id}=>{self.data_format.las_dimensions.ai_building_identified}"
-        )
+        pipeline |= pdal.Filter.ferry(dimensions=f"{_cid}=>{self.data_format.las_dimensions.ai_building_identified}")
         if target_las_path:
-            self.pipeline |= get_pdal_writer(target_las_path)
+            pipeline |= get_pdal_writer(target_las_path)
             os.makedirs(osp.dirname(target_las_path), exist_ok=True)
-        self.pipeline.execute()
+        pipeline.execute()
+
+        self.pipeline = pipeline
 
         return target_las_path
