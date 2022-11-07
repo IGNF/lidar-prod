@@ -6,7 +6,7 @@ from typing import Iterable, Optional, Union
 import laspy
 import pdal
 
-from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer
+from lidar_prod.tasks.utils import get_pdal_reader, get_pdal_writer, pdal_read_las_array
 
 log = logging.getLogger(__name__)
 
@@ -27,6 +27,7 @@ class Cleaner:
 
         # creating a dict where key = dimension's name and value = diemnsion's type
         #  if no "=type" in extra_dims then value = None
+        # This is for easier manipulation
         self.extra_dims_as_dict = dict()
         for extra_dim in self.extra_dims:
             if len(extra_dim.split("=")) == 2:
@@ -36,7 +37,8 @@ class Cleaner:
 
     def get_extra_dims_as_str(self):
         """'stringify' the extra_dims list and return it, or an empty list if there is no extra dims"""
-        return_str = ",".join(self.extra_dims)
+        self.extra_dims_as_dict
+        return_str = ",".join([f"{k}={v}" for k, v in self.extra_dims_as_dict.items()])
         return return_str if return_str else []
 
     def run(self, src_las_path: str, target_las_path: str):
@@ -46,9 +48,12 @@ class Cleaner:
             src_las_path (str): input LAS path
             target_las_path (str): output LAS path, with specified extra dims.
         """
-        pipeline = pdal.Pipeline()
-        pipeline |= get_pdal_reader(src_las_path)
-        pipeline |= get_pdal_writer(target_las_path, extra_dims=self.get_extra_dims_as_str())
+        points = pdal_read_las_array(src_las_path)
+        # Check input dims to see what we can keep.
+        input_dims = points.dtype.fields.keys()
+        self.extra_dims_as_dict = {k: v for k, v in self.extra_dims_as_dict.items() if k in input_dims}
+
+        pipeline = pdal.Pipeline(arrays=[points]) | get_pdal_writer(target_las_path, extra_dims=self.get_extra_dims_as_str())
         os.makedirs(osp.dirname(target_las_path), exist_ok=True)
         pipeline.execute()
         log.info(f"Saved to {target_las_path}")
