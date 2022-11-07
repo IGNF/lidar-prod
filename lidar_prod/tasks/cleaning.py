@@ -32,8 +32,11 @@ class Cleaner:
         for extra_dim in self.extra_dims:
             if len(extra_dim.split("=")) == 2:
                 self.extra_dims_as_dict[extra_dim.split("=")[0]] = extra_dim.split("=")[1]
-            else:
+            elif extra_dim:
                 self.extra_dims_as_dict[extra_dim] = None
+            else:
+                # empty string
+                pass
 
     def get_extra_dims_as_str(self):
         """'stringify' the extra_dims list and return it, or an empty list if there is no extra dims"""
