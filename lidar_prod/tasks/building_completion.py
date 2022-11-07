@@ -57,7 +57,7 @@ class BuildingCompletor:
         self.update_classification()
 
     def prepare_for_building_completion(self, pipeline: pdal.pipeline.Pipeline) -> None:
-        f"""Prepare for building completion.
+        """Prepare for building completion.
 
         Identify candidates that have high enough probability. Then, cluster them together with previously confirmed buildings.
         Cluster parameters are relaxed (2D, with high tolerance).
