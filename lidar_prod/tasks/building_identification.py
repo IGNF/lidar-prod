@@ -58,11 +58,11 @@ class BuildingIdentifier:
             is3d=self.cluster.is3d,
             where=where,
         )
-        # Always move and reset ClusterID to avoid conflict with later tasks.
+        # Duplicate ClusterID to have an explicit name for it for inspection. 
+        # Do not reset it to zero to have access to it at human inspection stage.
         self.pipeline |= pdal.Filter.ferry(
             dimensions=f"{self.data_format.las_dimensions.cluster_id}=>{self.data_format.las_dimensions.ai_building_identified}"
         )
-        self.pipeline |= pdal.Filter.assign(value=f"{self.data_format.las_dimensions.cluster_id} = 0")
         if target_las_path:
             self.pipeline |= get_pdal_writer(target_las_path)
             os.makedirs(osp.dirname(target_las_path), exist_ok=True)
