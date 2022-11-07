@@ -7,9 +7,7 @@ import hydra
 import numpy as np
 import pytest
 
-from lidar_prod.tasks.building_validation_optimization import (
-    BuildingValidationOptimizer,
-)
+from lidar_prod.tasks.building_validation_optimization import BuildingValidationOptimizer
 from tests.conftest import pdal_read_las_array
 
 """We test the building validation optimizer against two LAS:
