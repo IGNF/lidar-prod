@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Production process used to transform point clouds classification &mdash; lidar_prod M11V1.9.0 documentation</title>
+  <title>Production process used to transform point clouds classification &mdash; lidar_prod M11.1V1.9.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -49,6 +49,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Production process used to transform point clouds classification</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#b-building-module">B) Building Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#b-1-building-validation">B.1) Building Validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#b-2-building-completion">B.2) Building Completion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#b-3-building-identification">B.3) Building Identification</a></li>
@@ -135,7 +136,7 @@
              
   <section id="production-process-used-to-transform-point-clouds-classification">
 <h1>Production process used to transform point clouds classification<a class="headerlink" href="#production-process-used-to-transform-point-clouds-classification" title="Permalink to this headline"></a></h1>
-<p>The end goal of the tool is to edit the input (rules-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for human inspection.</p>
+<p>The end goal of the tool is to edit the input (rule-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for human inspection.</p>
 <p><strong>Input</strong>: point cloud that went through a first geometric algorithm that identified <code class="docutils literal notranslate"><span class="pre">candidates</span> <span class="pre">building</span> <span class="pre">points</span></code> based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building, vegetation and/or unclassified, and calculate the associated entropy. The default name for those extra dimensions are <code class="docutils literal notranslate"><span class="pre">building</span></code>, <code class="docutils literal notranslate"><span class="pre">vegetation</span></code>, <code class="docutils literal notranslate"><span class="pre">unclassified</span></code> and <code class="docutils literal notranslate"><span class="pre">entropy</span></code> respectively. You can leverage this <a class="reference external" href="https://github.com/IGNF/lidar-deep-segmentation">package for aerial lidar deep learning segmentation</a>.</p>
 <section id="a-1-vegetation-detection">
 <h2>A.1) Vegetation detection<a class="headerlink" href="#a-1-vegetation-detection" title="Permalink to this headline"></a></h2>
@@ -146,6 +147,10 @@
 <h2>A.2) Unclassified detection<a class="headerlink" href="#a-2-unclassified-detection" title="Permalink to this headline"></a></h2>
 <p><strong>Goal</strong>: Confirm or refute points as unclassified.</p>
 <p>Exactly as with vegetation detection, the identification is done by comparing the unclassified probability of a point against a <code class="docutils literal notranslate"><span class="pre">threshold</span></code>. That threshold has been previously established as the best on a test set of las files.</p>
+</section>
+<section id="b-building-module">
+<h2>B) Building Module<a class="headerlink" href="#b-building-module" title="Permalink to this headline"></a></h2>
+<p><img alt="" src="../_images/lidar-prod-M11.1_BuildingModuleIllustration.png" /></p>
 </section>
 <section id="b-1-building-validation">
 <h2>B.1) Building Validation<a class="headerlink" href="#b-1-building-validation" title="Permalink to this headline"></a></h2>
@@ -186,14 +191,20 @@ Current performances on a 15km² test dataset, expressed as percentages of clust
 <li><p>Precision&gt;=98%</p></li>
 <li><p>Recall&gt;=98%.</p></li>
 </ul>
-<p><img alt="" src="../_images/LidarBati-BuildingValidationM7.1V2.0.png" /></p>
 </section>
 <section id="b-2-building-completion">
 <h2>B.2) Building Completion<a class="headerlink" href="#b-2-building-completion" title="Permalink to this headline"></a></h2>
-<p><strong>Goal</strong>: Confirm points that have high-enough probability, but where not confirmed (because a) they were not candidate buildings points, or b) they were too scattered for clustering during validation).</p>
-<p>Cluster high-proba points (p &gt;= 0.5) with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
-For each cluster that includes already confirmed points, the rest (i.e. high probability points) are considered to belong to the same building, and are confirmed as well.</p>
-<p><img alt="" src="../_images/LidarBati-BuildingCompletion-M11.png" /></p>
+<p><strong>Goal</strong>: Confirm points that have high-enough probability, but where not confirmed because</p>
+<ul class="simple">
+<li><p>(a) they were too scattered for clustering during validation, or</p></li>
+<li><p>(b) they were not candidate buildings points.</p></li>
+</ul>
+<p>Cluster high-proba points (p &gt;= 0.5) with previously confirmed building points in a vertical fashion (XY plan).
+For each cluster that includes already confirmed points, the rest (i.e. high probability points) are considered to belong to the same building. Then, it is one of two things:</p>
+<ul class="simple">
+<li><p>If (a), then these candidate points are confirmed.</p></li>
+<li><p>If (b), then these non-candidate points are added as a Group, for later human inspection/confirmation. This is to avoid a direct modification of the Classification dimension taking place outside of the scope of buildings detected in rule- based software.</p></li>
+</ul>
 </section>
 <section id="b-3-building-identification">
 <h2>B.3) Building Identification<a class="headerlink" href="#b-3-building-identification" title="Permalink to this headline"></a></h2>

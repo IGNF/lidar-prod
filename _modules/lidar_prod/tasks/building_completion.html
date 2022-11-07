@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_completion &mdash; lidar_prod M11V1.9.0 documentation</title>
+  <title>lidar_prod.tasks.building_completion &mdash; lidar_prod M11.1V1.9.1 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -46,6 +46,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../background/production_process.html">Production process used to transform point clouds classification</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-building-module">B) Building Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-1-building-validation">B.1) Building Validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-2-building-completion">B.2) Building Completion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-3-building-identification">B.3) Building Identification</a></li>
@@ -190,20 +191,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">update_classification</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="BuildingCompletor.prepare_for_building_completion"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_for_building_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Prepare for building completion.</span>
+        <span class="sd">&quot;&quot;&quot;Prepare for building completion.</span>
 
-<span class="s2">        Identify candidates that were not clustered together by the BuildingValidator, but that</span>
-<span class="s2">        have high enough probability. Then, cluster them together with previously confirmed buildings.</span>
-<span class="s2">        Cluster parameters are relaxed (2D, with high tolerance).</span>
-<span class="s2">        If a cluster contains some confirmed points, the others are considered to belong to the same building</span>
-<span class="s2">        and they will be confirmed as well.</span>
+<span class="sd">        Identify candidates that have high enough probability. Then, cluster them together with previously confirmed buildings.</span>
+<span class="sd">        Cluster parameters are relaxed (2D, with high tolerance).</span>
+<span class="sd">        If a cluster contains some confirmed points, the others are considered to belong to the same building</span>
+<span class="sd">        and they will be confirmed as well.</span>
 
-<span class="s2">        Args:</span>
-<span class="s2">            src_las_path (pdal.pipeline.Pipeline): input LAS pipeline</span>
-<span class="s2">            target_las_path (str): output, prepared LAS with a new `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_isolated_plus_confirmed</span><span class="si">}</span><span class="s2">`</span>
-<span class="s2">            dimension.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            src_las_path (pdal.pipeline.Pipeline): input LAS pipeline</span>
+<span class="sd">            target_las_path (str): output, prepared LAS.</span>
 
-<span class="s2">        &quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Reset Cluster dim out of safety</span>
+        <span class="n">dim_cluster_id_pdal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span>
+        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dim_cluster_id_pdal</span><span class="si">}</span><span class="s2"> = 0&quot;</span><span class="p">)</span>
 
         <span class="c1"># Candidates that where already confirmed by BuildingValidator.</span>
         <span class="n">confirmed_buildings</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Classification == </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">building</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -215,11 +218,14 @@
             <span class="n">is3d</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">is3d</span><span class="p">,</span>
             <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="c1"># Always move, then reset ClusterID to avoid conflict with later tasks.</span>
+        <span class="c1"># Always move then reset ClusterID to avoid conflict with later tasks.</span>
         <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span>
-            <span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2">=&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_isolated_plus_confirmed</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2">=&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_confirmed_or_high_proba</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
         <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2"> = 0&quot;</span><span class="p">)</span>
+        <span class="c1"># Create a placeholder dimension that will hold non-candidate points with high enough probas</span>
+        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;=&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">completion_non_candidate_flag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Run</span>
         <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 
         <span class="c1"># set pipeline for access in next operations/tasks.</span>
@@ -228,25 +234,31 @@
 <div class="viewcode-block" id="BuildingCompletor.update_classification"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.update_classification">[docs]</a>    <span class="k">def</span> <span class="nf">update_classification</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Updates Classification dimension by completing buildings with high probability points.&quot;&quot;&quot;</span>
 
-        <span class="n">las</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">arrays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">arrays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="c1"># las = laspy.read(prepared_las_path)</span>
         <span class="n">_clf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">classification</span>
-        <span class="n">_cid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_isolated_plus_confirmed</span>
+        <span class="n">_cid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_confirmed_or_high_proba</span>
+        <span class="n">_completion_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">completion_non_candidate_flag</span>
+        <span class="n">_candidate_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">candidate_buildings_flag</span>
 
         <span class="c1"># 2) Decide at the group-level</span>
-        <span class="n">split_idx</span> <span class="o">=</span> <span class="n">split_idx_by_dim</span><span class="p">(</span><span class="n">las</span><span class="p">[</span><span class="n">_cid</span><span class="p">])</span>
+        <span class="n">split_idx</span> <span class="o">=</span> <span class="n">split_idx_by_dim</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">_cid</span><span class="p">])</span>
         <span class="c1"># Isolated/confirmed groups have a cluster index &gt; 0</span>
         <span class="n">split_idx</span> <span class="o">=</span> <span class="n">split_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
         <span class="c1"># For each group of isolated|confirmed points,</span>
-        <span class="c1"># Assess if the group already contains confirmed points.</span>
-        <span class="c1"># If it does, set all points to confirmed building class so that</span>
-        <span class="c1"># the other points are confirmed as part of the same building.</span>
+        <span class="c1"># Assess if the group already contains confirmed points. If it does, points</span>
+        <span class="c1"># with high proba may belong to the same building.</span>
         <span class="k">for</span> <span class="n">pts_idx</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">split_idx</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Complete buildings with isolated points&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;grp&quot;</span><span class="p">):</span>
-            <span class="n">pts</span> <span class="o">=</span> <span class="n">las</span><span class="p">[</span><span class="n">pts_idx</span><span class="p">]</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">building</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span> <span class="ow">in</span> <span class="n">pts</span><span class="p">[</span><span class="n">_clf</span><span class="p">]:</span>
-                <span class="n">las</span><span class="p">[</span><span class="n">_clf</span><span class="p">][</span><span class="n">pts_idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">building</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">arrays</span><span class="o">=</span><span class="p">[</span><span class="n">las</span><span class="p">])</span></div></div>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">building</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span> <span class="ow">in</span> <span class="n">points</span><span class="p">[</span><span class="n">_clf</span><span class="p">][</span><span class="n">pts_idx</span><span class="p">]:</span>
+                <span class="n">candidates_mask</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">_candidate_flag</span><span class="p">][</span><span class="n">pts_idx</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="c1"># (a) If a point is a candidate building, Then confirm it.</span>
+                <span class="n">candidates_idx</span> <span class="o">=</span> <span class="n">pts_idx</span><span class="p">[</span><span class="n">candidates_mask</span><span class="p">]</span>
+                <span class="n">points</span><span class="p">[</span><span class="n">_clf</span><span class="p">][</span><span class="n">candidates_idx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">building</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span>
+                <span class="c1"># (b) If a point is not a candidate building, set a flag to</span>
+                <span class="c1"># identify it as a potential completion, for future human inspection.</span>
+                <span class="n">non_candidates_idx</span> <span class="o">=</span> <span class="n">pts_idx</span><span class="p">[</span><span class="o">~</span><span class="n">candidates_mask</span><span class="p">]</span>
+                <span class="n">points</span><span class="p">[</span><span class="n">_completion_flag</span><span class="p">][</span><span class="n">non_candidates_idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">arrays</span><span class="o">=</span><span class="p">[</span><span class="n">points</span><span class="p">])</span></div></div>
 </pre></div>
 
            </div>

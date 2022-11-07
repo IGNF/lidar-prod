@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod M11V1.9.0 documentation</title>
+  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod M11.1V1.9.1 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -46,6 +46,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../background/production_process.html">Production process used to transform point clouds classification</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-building-module">B) Building Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-1-building-validation">B.1) Building Validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-2-building-completion">B.2) Building Completion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../background/production_process.html#b-3-building-identification">B.3) Building Identification</a></li>
@@ -348,15 +349,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">|=</span> <span class="n">get_pdal_reader</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 
-        <span class="n">las</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">arrays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">arrays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># 1) Map all points to a single &quot;not_building&quot; class</span>
         <span class="c1"># to be sure that they will all be modified.</span>
 
         <span class="n">dim_clf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">classification</span>
         <span class="n">dim_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">candidate_buildings_flag</span>
-        <span class="n">candidates_mask</span> <span class="o">=</span> <span class="n">las</span><span class="p">[</span><span class="n">dim_flag</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
-        <span class="n">las</span><span class="p">[</span><span class="n">dim_clf</span><span class="p">][</span><span class="n">candidates_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">not_building</span>
+        <span class="n">candidates_mask</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">dim_flag</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">points</span><span class="p">[</span><span class="n">dim_clf</span><span class="p">][</span><span class="n">candidates_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">not_building</span>
 
         <span class="c1"># 2) Decide at the group-level</span>
         <span class="c1"># TODO: check if this can be moved somewhere else. WARNING: use_final_classification_codes may be modified in</span>
@@ -369,7 +370,7 @@
 
         <span class="c1"># Get the index of points of each cluster</span>
         <span class="c1"># Remove unclustered group that have ClusterID = 0 (i.e. the first &quot;group&quot;)</span>
-        <span class="n">cluster_id_dim</span> <span class="o">=</span> <span class="n">las</span><span class="p">[</span>
+        <span class="n">cluster_id_dim</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_candidate_building</span>
         <span class="p">]</span>
         <span class="n">split_idx</span> <span class="o">=</span> <span class="n">split_idx_by_dim</span><span class="p">(</span><span class="n">cluster_id_dim</span><span class="p">)</span>
@@ -379,13 +380,13 @@
         <span class="k">for</span> <span class="n">pts_idx</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
             <span class="n">split_idx</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Update cluster classification&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;clusters&quot;</span>
         <span class="p">):</span>
-            <span class="n">infos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_cluster_info_by_idx</span><span class="p">(</span><span class="n">las</span><span class="p">,</span> <span class="n">pts_idx</span><span class="p">)</span>
-            <span class="n">las</span><span class="p">[</span><span class="n">dim_clf</span><span class="p">][</span><span class="n">pts_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">decision_func</span><span class="p">(</span><span class="n">infos</span><span class="p">)</span>
+            <span class="n">infos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_cluster_info_by_idx</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">pts_idx</span><span class="p">)</span>
+            <span class="n">points</span><span class="p">[</span><span class="n">dim_clf</span><span class="p">][</span><span class="n">pts_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">decision_func</span><span class="p">(</span><span class="n">infos</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">arrays</span><span class="o">=</span><span class="p">[</span><span class="n">las</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">arrays</span><span class="o">=</span><span class="p">[</span><span class="n">points</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="n">target_las_path</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pdal_writer</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">)</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span><span class="n">las</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pdal_writer</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">)</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span></div>
 

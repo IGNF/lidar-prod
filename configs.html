@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Default configuration &mdash; lidar_prod M11V1.9.0 documentation</title>
+  <title>Default configuration &mdash; lidar_prod M11.1V1.9.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/sphinx_paramlinks.css" type="text/css" />
@@ -48,6 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="background/production_process.html">Production process used to transform point clouds classification</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="background/production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="background/production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-building-module">B) Building Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-1-building-validation">B.1) Building Validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-2-building-completion">B.2) Building Completion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-3-building-identification">B.3) Building Identification</a></li>
@@ -150,7 +151,8 @@
 <span class="w">    </span><span class="nt">uni_db_overlay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BDTopoOverlay</span><span class="w"></span>
 <span class="w">    </span><span class="nt">candidate_buildings_flag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">F_CandidateB</span><span class="w"></span>
 <span class="w">    </span><span class="nt">ClusterID_candidate_building</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CID_CandidateB</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ClusterID_isolated_plus_confirmed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CID_IsolatedOrConfirmed</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ClusterID_confirmed_or_high_proba</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CID_IsolatedOrConfirmed</span><span class="w"></span>
+<span class="w">    </span><span class="nt">completion_non_candidate_flag</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">F_NonCandidateCompletion</span><span class="w"></span>
 <span class="w">    </span><span class="nt">ai_building_identified</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Group</span><span class="w"></span>
 <span class="w">    </span><span class="nt">ai_vegetation_unclassified_groups</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Group</span><span class="w"></span>
 <span class="w">  </span><span class="nt">codes</span><span class="p">:</span><span class="w"></span>
@@ -320,7 +322,7 @@
 <span class="w">  </span><span class="nt">min_building_proba</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span><span class="w"></span>
 <span class="w">  </span><span class="nt">cluster</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">min_points</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span><span class="w"></span>
-<span class="w">    </span><span class="nt">tolerance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+<span class="w">    </span><span class="nt">tolerance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span><span class="w"></span>
 <span class="w">    </span><span class="nt">is3d</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
 <span class="nt">basic_identification</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">vegetation_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3923</span><span class="w"></span>

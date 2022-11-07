@@ -1,6 +1,6 @@
 # Production process used to transform point clouds classification
 
-The end goal of the tool is to edit the input (rules-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for human inspection.
+The end goal of the tool is to edit the input (rule-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for human inspection.
 
 **Input**: point cloud that went through a first geometric algorithm that identified `candidates building points` based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building, vegetation and/or unclassified, and calculate the associated entropy. The default name for those extra dimensions are `building`, `vegetation`, `unclassified` and `entropy` respectively. You can leverage this [package for aerial lidar deep learning segmentation](https://github.com/IGNF/lidar-deep-segmentation).
 
@@ -13,6 +13,10 @@ The identification is done by comparing the vegetation probability  of a point a
 **Goal**: Confirm or refute points as unclassified.
 
 Exactly as with vegetation detection, the identification is done by comparing the unclassified probability of a point against a `threshold`. That threshold has been previously established as the best on a test set of las files.
+
+## B) Building Module
+
+![](/img/lidar-prod-M11.1_BuildingModuleIllustration.png)
 
 ## B.1) Building Validation
 
@@ -40,16 +44,16 @@ Current performances on a 15km² test dataset, expressed as percentages of clust
 - Precision>=98%
 - Recall>=98%.
 
-![](/img/LidarBati-BuildingValidationM7.1V2.0.png)
-
 ## B.2) Building Completion
 
-**Goal**: Confirm points that have high-enough probability, but where not confirmed (because a) they were not candidate buildings points, or b) they were too scattered for clustering during validation).
+**Goal**: Confirm points that have high-enough probability, but where not confirmed because 
+- (a) they were too scattered for clustering during validation, or 
+- (b) they were not candidate buildings points.
 
-Cluster high-proba points (p >= 0.5) with previously confirmed building points in a relaxed, vertical fashion (higher tolerance, XY plan).
-For each cluster that includes already confirmed points, the rest (i.e. high probability points) are considered to belong to the same building, and are confirmed as well.
-
-![](/img/LidarBati-BuildingCompletion-M11.png)
+Cluster high-proba points (p >= 0.5) with previously confirmed building points in a vertical fashion (XY plan).
+For each cluster that includes already confirmed points, the rest (i.e. high probability points) are considered to belong to the same building. Then, it is one of two things:
+- If (a), then these candidate points are confirmed.
+- If (b), then these non-candidate points are added as a Group, for later human inspection/confirmation. This is to avoid a direct modification of the Classification dimension taking place outside of the scope of buildings detected in rule- based software.
 
 
 ## B.3) Building Identification

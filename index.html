@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lidar-Prod &gt; Documentation &mdash; lidar_prod M11V1.9.0 documentation</title>
+  <title>Lidar-Prod &gt; Documentation &mdash; lidar_prod M11.1V1.9.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/sphinx_paramlinks.css" type="text/css" />
@@ -48,6 +48,7 @@
 <li class="toctree-l1"><a class="reference internal" href="background/production_process.html">Production process used to transform point clouds classification</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="background/production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="background/production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-building-module">B) Building Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-1-building-validation">B.1) Building Validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-2-building-completion">B.2) Building Completion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="background/production_process.html#b-3-building-identification">B.3) Building Identification</a></li>
@@ -135,12 +136,12 @@
              
   <section id="lidar-prod-documentation">
 <h1>Lidar-Prod &gt; Documentation<a class="headerlink" href="#lidar-prod-documentation" title="Permalink to this headline"></a></h1>
-<p>Lidar-Prod is a production library which aims at augmenting rules-based semantic segmentation algorithms with deep learning neural network predictions (probabilities) and a public building vector database (BDUni). Its main entry-points are:</p>
+<p>Lidar-Prod is a production library which aims at augmenting rule- based semantic segmentation algorithms with deep learning neural network predictions (probabilities) and a public building vector database (BDUni). Its main entry-points are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">application.py</span></code>: The application takes a point cloud and update its Classification dimension based on its deep learning predictions and a public geographic database.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">optimization.py</span></code>: The right balance between automation of decision and error is found via a multi-objective optimization of of the decision thresholds, by means of a simple genetic algorithm.</p></li>
 </ul>
-<p>Our strategy is to fuse together different sources of informations (rules-based classification, deep learning predictions, databases), so that we can ensure a high-quality classification while minimizing the need for human correction. Deep learning probabilities might also be used to highlight area of uncertainty, or to spot elements that were missed by the other approaches.</p>
+<p>Our strategy is to fuse together different sources of informations (rule- based classification, deep learning predictions, databases), so that we can ensure a high-quality classification while minimizing the need for human correction. Deep learning probabilities might also be used to highlight area of uncertainty, or to spot elements that were missed by the other approaches.</p>
 <p>Right now, the class <code class="docutils literal notranslate"><span class="pre">building</span></code> is the only one that is addressed. The extension to other classes is dependent on the training of multiclass AI model, which requires high quality training datasets that are currently being produced.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Background</span></p>
