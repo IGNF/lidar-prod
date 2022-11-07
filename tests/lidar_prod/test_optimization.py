@@ -7,9 +7,7 @@ import hydra
 import numpy as np
 import pytest
 
-from lidar_prod.tasks.building_validation_optimization import (
-    BuildingValidationOptimizer,
-)
+from lidar_prod.tasks.building_validation_optimization import BuildingValidationOptimizer
 from tests.conftest import pdal_read_las_array
 
 """We test the building validation optimizer against two LAS:
@@ -56,24 +54,20 @@ LARGE_EXPECTED_METRICS = {
 RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS = 0.05
 
 
-def test_BVOptimization_on_subset(legacy_hydra_cfg):
+def test_BVOptimization_on_subset(hydra_cfg):
     with tempfile.TemporaryDirectory() as td:
         # Optimization output (thresholds and prepared/updated LASfiles) saved to td
-        legacy_hydra_cfg.building_validation.optimization.paths.results_output_dir = td
+        hydra_cfg.building_validation.optimization.paths.results_output_dir = td
 
         # We isolate the input file in a subdir, and prepare it for optimization
         input_las_dir = osp.join(td, "inputs/")
-        legacy_hydra_cfg.building_validation.optimization.paths.input_las_dir = (
-            input_las_dir
-        )
+        hydra_cfg.building_validation.optimization.paths.input_las_dir = input_las_dir
         os.makedirs(input_las_dir, exist_ok=False)
         src_las_copy_path = osp.join(input_las_dir, "copy.las")
         shutil.copy(LAS_SUBSET_FILE, src_las_copy_path)
 
         # Check that a full optimization run can pass successfully
-        bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
-            legacy_hydra_cfg.building_validation.optimization
-        )
+        bvo: BuildingValidationOptimizer = hydra.utils.instantiate(hydra_cfg.building_validation.optimization)
         bvo.run()
 
         # Assert that a prepared and an updated file are generated in the temporary dir
@@ -98,7 +92,7 @@ def test_BVOptimization_on_subset(legacy_hydra_cfg):
         arr = pdal_read_las_array(updated_las_path)
         # Check that we have either 1/2 (ground/unclassified), or one of
         # the final classification code of the module.
-        final_codes = legacy_hydra_cfg.data_format.codes.building.final
+        final_codes = hydra_cfg.data_format.codes.building.final
         expected_codes = {
             1,
             2,
@@ -111,45 +105,34 @@ def test_BVOptimization_on_subset(legacy_hydra_cfg):
 
 
 @pytest.mark.slow()
-def test_BVOptimization_on_large_file(legacy_hydra_cfg):
+def test_BVOptimization_on_large_file(hydra_cfg):
 
     if not os.path.isfile(LAS_LARGE_FILE):
         pytest.xfail(reason=f"File {LAS_LARGE_FILE} is not present in environment.")
 
     with tempfile.TemporaryDirectory() as td:
         # Optimization output (thresholds and prepared/updated LASfiles) saved to td
-        legacy_hydra_cfg.building_validation.optimization.paths.results_output_dir = td
+        hydra_cfg.building_validation.optimization.paths.results_output_dir = td
 
         # We isolate the input file in a subdir, and prepare it for optimization
         input_las_dir = osp.join(td, "inputs/")
-        legacy_hydra_cfg.building_validation.optimization.paths.input_las_dir = (
-            input_las_dir
-        )
+        hydra_cfg.building_validation.optimization.paths.input_las_dir = input_las_dir
         os.makedirs(input_las_dir, exist_ok=False)
         src_las_copy_path = osp.join(input_las_dir, "copy.las")
         shutil.copy(LAS_LARGE_FILE, src_las_copy_path)
 
         # Check that a full optimization run can pass successfully
-        bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
-            legacy_hydra_cfg.building_validation.optimization
-        )
+        bvo: BuildingValidationOptimizer = hydra.utils.instantiate(hydra_cfg.building_validation.optimization)
         bvo.prepare()
         metrics_dict = bvo.evaluate()
         print(metrics_dict)
 
         exact_expected_val = LARGE_EXPECTED_METRICS["exact"]
         for k in exact_expected_val:
-            assert (
-                pytest.approx(
-                    exact_expected_val[k], RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS
-                )
-                == metrics_dict[k]
-            )
+            assert pytest.approx(exact_expected_val[k], RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS) == metrics_dict[k]
         min_expected_val = LARGE_EXPECTED_METRICS["min"]
         for k in min_expected_val:
-            assert (
-                (1 - RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS) * min_expected_val[k]
-            ) <= metrics_dict[k]
+            assert ((1 - RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS) * min_expected_val[k]) <= metrics_dict[k]
 
 
 # All expected metrics for reference:

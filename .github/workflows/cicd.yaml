@@ -41,7 +41,7 @@ jobs:
     - name: Run slow tests last (evaluation on large file)
       run: >
         docker run --network host
-        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/evaluation/:/lidar/tests/files/large/
+        -v /var/data/cicd/CICD_github_assets/M11.1/inputs/evaluation/:/lidar/tests/files/large/
         lidar_prod
         python -m
         pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
@@ -49,21 +49,20 @@ jobs:
     - name: Test building module from CLI on a LAS subset.
       run: >
         docker run --network host
-        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
-        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/
+        -v /var/data/cicd/CICD_github_assets/M11.1/inputs/:/inputs/
+        -v /var/data/cicd/CICD_github_assets/M11.1/outputs/:/outputs/
         lidar_prod
         python 
         lidar_prod/run.py
-        data_format=legacy.yaml
         +task=apply_on_building
-        paths.src_las=/inputs/730000_6360000.subset.prototype_format202.las
+        paths.src_las=/inputs/Semis_2021_0937_6537_LA93_IGN69.150mx100m.for_full_building_module.las
         paths.output_dir=/outputs/
 
     - name: Test vegetation/unclassified detection from CLI on a LAS subset.
       run: >
         docker run
-        -v /var/data/cicd/CICD_github_assets/M8.4/inputs/:/inputs/
-        -v /var/data/cicd/CICD_github_assets/M8.4/outputs/:/outputs/
+        -v /var/data/cicd/CICD_github_assets/M11.1/inputs/:/inputs/
+        -v /var/data/cicd/CICD_github_assets/M11.1/outputs/:/outputs/
         lidar_prod
         python 
         lidar_prod/run.py

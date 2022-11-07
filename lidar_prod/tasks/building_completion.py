@@ -57,20 +57,22 @@ class BuildingCompletor:
         self.update_classification()
 
     def prepare_for_building_completion(self, pipeline: pdal.pipeline.Pipeline) -> None:
-        f"""Prepare for building completion.
+        """Prepare for building completion.
 
-        Identify candidates that were not clustered together by the BuildingValidator, but that
-        have high enough probability. Then, cluster them together with previously confirmed buildings.
+        Identify candidates that have high enough probability. Then, cluster them together with previously confirmed buildings.
         Cluster parameters are relaxed (2D, with high tolerance).
         If a cluster contains some confirmed points, the others are considered to belong to the same building
         and they will be confirmed as well.
 
         Args:
             src_las_path (pdal.pipeline.Pipeline): input LAS pipeline
-            target_las_path (str): output, prepared LAS with a new `{self.data_format.las_dimensions.ClusterID_isolated_plus_confirmed}`
-            dimension.
+            target_las_path (str): output, prepared LAS.
 
         """
+
+        # Reset Cluster dim out of safety
+        dim_cluster_id_pdal = self.data_format.las_dimensions.cluster_id
+        pipeline |= pdal.Filter.assign(value=f"{dim_cluster_id_pdal} = 0")
 
         # Candidates that where already confirmed by BuildingValidator.
         confirmed_buildings = f"Classification == {self.data_format.codes.building.final.building}"
@@ -82,11 +84,14 @@ class BuildingCompletor:
             is3d=self.cluster.is3d,
             where=where,
         )
-        # Always move, then reset ClusterID to avoid conflict with later tasks.
+        # Always move then reset ClusterID to avoid conflict with later tasks.
         pipeline |= pdal.Filter.ferry(
-            dimensions=f"{self.data_format.las_dimensions.cluster_id}=>{self.data_format.las_dimensions.ClusterID_isolated_plus_confirmed}"
+            dimensions=f"{self.data_format.las_dimensions.cluster_id}=>{self.data_format.las_dimensions.ClusterID_confirmed_or_high_proba}"
         )
         pipeline |= pdal.Filter.assign(value=f"{self.data_format.las_dimensions.cluster_id} = 0")
+        # Create a placeholder dimension that will hold non-candidate points with high enough probas
+        pipeline |= pdal.Filter.ferry(dimensions=f"=> {self.data_format.las_dimensions.completion_non_candidate_flag}")
+        # Run
         pipeline.execute()
 
         # set pipeline for access in next operations/tasks.
@@ -95,22 +100,28 @@ class BuildingCompletor:
     def update_classification(self) -> None:
         """Updates Classification dimension by completing buildings with high probability points."""
 
-        las = self.pipeline.arrays[0]
+        points = self.pipeline.arrays[0]
 
-        # las = laspy.read(prepared_las_path)
         _clf = self.data_format.las_dimensions.classification
-        _cid = self.data_format.las_dimensions.ClusterID_isolated_plus_confirmed
+        _cid = self.data_format.las_dimensions.ClusterID_confirmed_or_high_proba
+        _completion_flag = self.data_format.las_dimensions.completion_non_candidate_flag
+        _candidate_flag = self.data_format.las_dimensions.candidate_buildings_flag
 
         # 2) Decide at the group-level
-        split_idx = split_idx_by_dim(las[_cid])
+        split_idx = split_idx_by_dim(points[_cid])
         # Isolated/confirmed groups have a cluster index > 0
         split_idx = split_idx[1:]
         # For each group of isolated|confirmed points,
-        # Assess if the group already contains confirmed points.
-        # If it does, set all points to confirmed building class so that
-        # the other points are confirmed as part of the same building.
+        # Assess if the group already contains confirmed points. If it does, points
+        # with high proba may belong to the same building.
         for pts_idx in tqdm(split_idx, desc="Complete buildings with isolated points", unit="grp"):
-            pts = las[pts_idx]
-            if self.data_format.codes.building.final.building in pts[_clf]:
-                las[_clf][pts_idx] = self.data_format.codes.building.final.building
-        self.pipeline = pdal.Pipeline(arrays=[las])
+            if self.data_format.codes.building.final.building in points[_clf][pts_idx]:
+                candidates_mask = points[_candidate_flag][pts_idx] == 1
+                # (a) If a point is a candidate building, Then confirm it.
+                candidates_idx = pts_idx[candidates_mask]
+                points[_clf][candidates_idx] = self.data_format.codes.building.final.building
+                # (b) If a point is not a candidate building, set a flag to
+                # identify it as a potential completion, for future human inspection.
+                non_candidates_idx = pts_idx[~candidates_mask]
+                points[_completion_flag][non_candidates_idx] = 1
+        self.pipeline = pdal.Pipeline(arrays=[points])
