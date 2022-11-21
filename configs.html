@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Default configuration &mdash; lidar_prod M11.1V1.9.3 documentation</title>
+  <title>Default configuration &mdash; lidar_prod M11.1V1.9.5 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/sphinx_paramlinks.css" type="text/css" />
@@ -206,7 +206,7 @@
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.entropy}=float</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.terrascan_normal}=uint</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.terrascan_distance}=int</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.terrascan_deviation}=int</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.terrascan_deviation}=ushort</span><span class="w"></span>
 <span class="w">    </span><span class="nt">output_building</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar_prod.tasks.cleaning.Cleaner</span><span class="w"></span>
 <span class="w">      </span><span class="nt">extra_dims</span><span class="p">:</span><span class="w"></span>
@@ -214,7 +214,7 @@
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.ai_building_identified}=uint</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.terrascan_normal}=uint</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.terrascan_distance}=int</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.terrascan_deviation}=int</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format.las_dimensions.terrascan_deviation}=ushort</span><span class="w"></span>
 <span class="w">    </span><span class="nt">input_vegetation_unclassified</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar_prod.tasks.cleaning.Cleaner</span><span class="w"></span>
 <span class="w">      </span><span class="nt">extra_dims</span><span class="p">:</span><span class="w"></span>
