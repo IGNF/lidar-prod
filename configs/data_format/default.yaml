@@ -68,7 +68,7 @@ cleaning:
       - "${data_format.las_dimensions.entropy}=float"
       - "${data_format.las_dimensions.terrascan_normal}=uint"
       - "${data_format.las_dimensions.terrascan_distance}=int"
-      - "${data_format.las_dimensions.terrascan_deviation}=int"
+      - "${data_format.las_dimensions.terrascan_deviation}=ushort"
       # - "${data_format.las_dimensions.ai_vegetation_proba}=float"
       # - "${data_format.las_dimensions.ai_unclassified_proba}=float"
   output_building:
@@ -82,7 +82,7 @@ cleaning:
       - "${data_format.las_dimensions.ai_building_identified}=uint"
       - "${data_format.las_dimensions.terrascan_normal}=uint"
       - "${data_format.las_dimensions.terrascan_distance}=int"
-      - "${data_format.las_dimensions.terrascan_deviation}=int"
+      - "${data_format.las_dimensions.terrascan_deviation}=ushort"
       # - "${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint"
   input_vegetation_unclassified:
     # Extra dims added for storing the result of the vegetation/unclassified detection.
