@@ -96,7 +96,7 @@ class BuildingValidator:
         self.pipeline = get_pipeline(input_values)
         with TemporaryDirectory() as td:
             log.info(
-                "Preparation : Clustering of candidates buildings & Requesting BDUni"
+                "Preparation : Clustering of candidates buildings & Import vectors"
             )
             if type(input_values) == str:
                 log.info(f"Applying Building Validation to file \n{input_values}")
@@ -177,16 +177,22 @@ class BuildingValidator:
         if self.shp_path:
             temp_dirpath = None  # no need for a temporay directory to add the shapefile in it, we already have the shapefile
             _shp_p = self.shp_path
-            gdf = geopandas.read_file(_shp_p)
-            buildings_in_bd_topo = (
-                not len(gdf) == 0
-            )  # check if there are buildings in the shp
+            log.info(f"Read Shapefile\n{_shp_p}")
+            if os.path.exists(_shp_p):
+                gdf = geopandas.read_file(_shp_p)
+                buildings_in_bd_topo = (
+                    not len(gdf) == 0
+                )  # check if there are buildings in the shp
+            else:
+                buildings_in_bd_topo = False
+                log.info("Shapefile not found, no building in database here")
 
         else:
             temp_dirpath = mkdtemp()
             # TODO: extract coordinates from LAS directly using pdal.
             # Request BDUni to get a shapefile of the known buildings in the LAS
             _shp_p = os.path.join(temp_dirpath, "temp.shp")
+            log.info("Requesting BDUni")
             buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
                 self.bd_uni_connection_params, _shp_p, bbox
             )
