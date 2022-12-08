@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod M11.1V1.9.5 documentation</title>
+  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod M11.1V1.9.6 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -230,7 +230,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">input_values</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">td</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="s2">&quot;Preparation : Clustering of candidates buildings &amp; Requesting BDUni&quot;</span>
+                <span class="s2">&quot;Preparation : Clustering of candidates buildings &amp; Import vectors&quot;</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">input_values</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applying Building Validation to file </span><span class="se">\n</span><span class="si">{</span><span class="n">input_values</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -311,6 +311,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shp_path</span><span class="p">:</span>
             <span class="n">temp_dirpath</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># no need for a temporay directory to add the shapefile in it, we already have the shapefile</span>
             <span class="n">_shp_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shp_path</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Read shapefile</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">_shp_p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">gdf</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">_shp_p</span><span class="p">)</span>
             <span class="n">buildings_in_bd_topo</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
@@ -321,6 +322,7 @@
             <span class="c1"># TODO: extract coordinates from LAS directly using pdal.</span>
             <span class="c1"># Request BDUni to get a shapefile of the known buildings in the LAS</span>
             <span class="n">_shp_p</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp_dirpath</span><span class="p">,</span> <span class="s2">&quot;temp.shp&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Request Bd Uni&quot;</span><span class="p">)</span>
             <span class="n">buildings_in_bd_topo</span> <span class="o">=</span> <span class="n">request_bd_uni_for_building_shapefile</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bd_uni_connection_params</span><span class="p">,</span> <span class="n">_shp_p</span><span class="p">,</span> <span class="n">bbox</span>
             <span class="p">)</span>

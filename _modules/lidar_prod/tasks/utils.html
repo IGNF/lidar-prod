@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.utils &mdash; lidar_prod M11.1V1.9.5 documentation</title>
+  <title>lidar_prod.tasks.utils &mdash; lidar_prod M11.1V1.9.6 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -317,6 +317,13 @@
     <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="c1"># In empty zones, pgsql2shp does not create a shapefile</span>
         <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">output</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;Initializing... </span><span class="se">\n</span><span class="s2">ERROR: Could not determine table metadata (empty table)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">:</span>
+
+            <span class="c1"># write empty shapefile</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">],</span>
+                <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;EPSG:</span><span class="si">{</span><span class="n">Lambert_93_SRID</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">shapefile_path</span><span class="p">)</span>
+
             <span class="k">return</span> <span class="kc">False</span>
         <span class="c1"># Error can be due to something else entirely, like</span>
         <span class="c1"># an inability to translate host name to an address.</span>
