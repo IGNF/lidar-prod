@@ -44,6 +44,7 @@ class Cleaner:
         return_str = ",".join([f"{k}={v}" for k, v in self.extra_dims_as_dict.items()])
         return return_str if return_str else []
 
+    @profile()
     def run(self, src_las_path: str, target_las_path: str):
         """Clean out LAS extra dimensions.
 

@@ -38,6 +38,7 @@ class BuildingCompletor:
         self.data_format = data_format
         self.pipeline: pdal.pipeline.Pipeline = None
 
+    @profile()
     def run(self, input_values: Union[str, pdal.pipeline.Pipeline]):
         """Application.
 
