@@ -22,3 +22,6 @@ sphinxnotes-mock==1.0.0b0  # still a beta
 sphinx-argparse==0.3.*  #  Using 
 docutils==0.17
 sphinxcontrib-mermaid==0.7.1
+
+# --------- Profile tools --------- #
+memory-profiler
