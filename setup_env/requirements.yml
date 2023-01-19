@@ -11,7 +11,7 @@ dependencies:
   - isort # import sorting
   - flake8 # code analysis
   # --------- geo --------- #
-  - conda-forge:pdal==2.3.*
+  - conda-forge:pdal==2.5.*
   - conda-forge:python-pdal==3.0.*
   - numpy
   - scikit-learn
