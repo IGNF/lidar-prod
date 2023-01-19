@@ -47,7 +47,7 @@ def get_pipeline(input_value: Union[pdal.pipeline.Pipeline, str]):
 
 def get_las_metadata(entry_value: Union[pdal.pipeline.Pipeline, str]):
     pipeline = get_pipeline(entry_value)
-    return json.loads(pipeline.metadata)["metadata"]["readers.las"]
+    return pipeline.metadata["metadata"]["readers.las"]
 
 
 def get_integer_bbox(entry_value: Union[pdal.pipeline.Pipeline, str], buffer: Number = 0) -> Dict[str, int]:
@@ -185,9 +185,7 @@ def request_bd_uni_for_building_shapefile(
         if e.output == b"Initializing... \nERROR: Could not determine table metadata (empty table)\n":
 
             # write empty shapefile
-            df = geopandas.GeoDataFrame(
-                columns=["id", "geometry"],
-                geometry="geometry", crs=f"EPSG:{Lambert_93_SRID}")
+            df = geopandas.GeoDataFrame(columns=["id", "geometry"], geometry="geometry", crs=f"EPSG:{Lambert_93_SRID}")
             df.to_file(shapefile_path)
 
             return False
