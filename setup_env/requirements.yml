@@ -12,7 +12,7 @@ dependencies:
   - flake8 # code analysis
   # --------- geo --------- #
   - conda-forge:pdal==2.5.*
-  - conda-forge:python-pdal==3.0.*
+  - conda-forge:python-pdal==3.2.*
   - numpy
   - scikit-learn
   - geopandas
