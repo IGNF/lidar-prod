@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_validation_optimization &mdash; lidar_prod M11.1V1.9.6 documentation</title>
+  <title>lidar_prod.tasks.building_validation_optimization &mdash; lidar_prod M11.1V1.9.7 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -163,7 +163,7 @@
 
 
 <div class="viewcode-block" id="BuildingValidationOptimizer"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer">[docs]</a><span class="k">class</span> <span class="nc">BuildingValidationOptimizer</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Optimizer of the decision thresholds used by `BuildingValidator`.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Optimizer of the decision thresholds used by `BuildingValidator`.</span>
 
 <span class="sd">    In lidar-prod, each task is implemented by a dedicated python class.</span>
 <span class="sd">    Building Validation is implemented via a :class:`BuildingValidator` class.</span>
@@ -213,7 +213,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
 
 <div class="viewcode-block" id="BuildingValidationOptimizer.run"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Run decision threshold optimization.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run decision threshold optimization.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;prepare&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">todo</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">prepare</span><span class="p">()</span>
         <span class="k">if</span> <span class="s2">&quot;optimize&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">todo</span><span class="p">:</span>
@@ -224,7 +224,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="BuildingValidationOptimizer.setup"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Setup step.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup step.</span>
 
 <span class="sd">        Setup a few attributes and override BuildingValidator classification</span>
 <span class="sd">        codes to adapt to those of the optimization dataset.</span>
@@ -259,7 +259,7 @@
         <span class="p">]</span></div>
 
 <div class="viewcode-block" id="BuildingValidationOptimizer.prepare"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.prepare">[docs]</a>    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Preparation step.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Preparation step.</span>
 
 <span class="sd">        Prepares and saves each point cloud in the specified directory,</span>
 <span class="sd">        and extracts all cluster information in a list of</span>
@@ -279,7 +279,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_dump_clusters</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BuildingValidationOptimizer.optimize"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.optimize">[docs]</a>    <span class="k">def</span> <span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Optimization step.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optimization step.</span>
 
 <span class="sd">        Deserializes the clusters informations.</span>
 <span class="sd">        Runs the genetic algorithm for N generations.</span>
@@ -298,7 +298,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="p">:</span> <span class="n">thresholds</span> <span class="o">=</span> <span class="n">best_thresholds</span></div>
 
 <div class="viewcode-block" id="BuildingValidationOptimizer.evaluate"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Evaluation step.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluation step.</span>
 
 <span class="sd">        Deserializes the set of optimal thresholds.</span>
 <span class="sd">        Deserializes the clusters informations.</span>
@@ -333,7 +333,7 @@
             <span class="p">)</span>
 
 <div class="viewcode-block" id="BuildingValidationOptimizer.update"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Update step.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update step.</span>
 
 <span class="sd">        Deserializes the set of optimal thresholds.</span>
 <span class="sd">        `BuildingValidator` updates each prepared point cloud classification</span>
@@ -352,7 +352,7 @@
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved to </span><span class="si">{</span><span class="n">target_las_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_extract_clusters_from_las</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prepared_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BuildingValidationClusterInfo</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Extract a cluster information object  in a prepared LAS.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract a cluster information object  in a prepared LAS.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            prepared_las (str): path to LAS prepared for building validation.</span>
@@ -381,7 +381,7 @@
         <span class="k">return</span> <span class="n">clusters</span>
 
     <span class="k">def</span> <span class="nf">_define_MTS_ground_truth_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Based on the fraction of confirmed building points, set the nature of the shape or declare an ambiguous case&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Based on the fraction of confirmed building points, set the nature of the shape or declare an ambiguous case&quot;&quot;&quot;</span>
         <span class="n">tp_frac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
                 <span class="n">targets</span><span class="p">,</span>
@@ -395,7 +395,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">unsure</span>
 
     <span class="k">def</span> <span class="nf">_compute_penalty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auto</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Positive float indicative a solution violates the constraint of minimal auto/precision/metrics&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Positive float indicative a solution violates the constraint of minimal auto/precision/metrics&quot;&quot;&quot;</span>
         <span class="n">penalty</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">precision</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">min_precision_constraint</span><span class="p">:</span>
             <span class="n">penalty</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">min_precision_constraint</span> <span class="o">-</span> <span class="n">precision</span>
@@ -406,7 +406,7 @@
         <span class="k">return</span> <span class="p">[</span><span class="n">penalty</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_objective</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">clusters</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BuildingValidationClusterInfo</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Objective function for optuna optimization.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Objective function for optuna optimization.</span>
 <span class="sd">        Use prepared list to access group-level probas and targets.</span>
 
 <span class="sd">        Args:</span>
@@ -450,7 +450,7 @@
         <span class="k">return</span> <span class="n">auto</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span>
 
     <span class="k">def</span> <span class="nf">_select_best_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">study</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Find the trial that meet constraints and that maximizes automation.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the trial that meet constraints and that maximizes automation.&quot;&quot;&quot;</span>
         <span class="n">trials</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">study</span><span class="o">.</span><span class="n">best_trials</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">TRIALS_BELOW_ZERO_ARE_VALID</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">respect_constraints</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">trials</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">user_attrs</span><span class="p">[</span><span class="s2">&quot;constraint&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">TRIALS_BELOW_ZERO_ARE_VALID</span><span class="p">]</span>
@@ -468,26 +468,26 @@
         <span class="k">return</span> <span class="n">best_rules</span>
 
     <span class="k">def</span> <span class="nf">_dump_best_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">best_trial_params</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Serializes best thresholds.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serializes best thresholds.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">building_validation_thresholds_pickle</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">best_trial_params</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pickled best params to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">building_validation_thresholds_pickle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_dump_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Serializes the list of cluster-level information objects.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serializes the list of cluster-level information objects.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">group_info_pickle_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pickled groups to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">group_info_pickle_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_load_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Deserializes the list of cluster-level information objects.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deserializes the list of cluster-level information objects.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">group_info_pickle_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">clusters</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading pickled groups from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">group_info_pickle_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">clusters</span>
 
 <div class="viewcode-block" id="BuildingValidationOptimizer.evaluate_decisions"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.evaluate_decisions">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate_decisions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mts_gt</span><span class="p">,</span> <span class="n">ia_decision</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate confirmation and refutation decisions.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate confirmation and refutation decisions.</span>
 
 <span class="sd">        Get dict of metrics to evaluate how good module decisions were in reference to ground truths.</span>
 
@@ -620,9 +620,9 @@
         <span class="k">return</span> <span class="n">metrics_dict</span></div>
 
     <span class="k">def</span> <span class="nf">_get_results_logs_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Format all metrics as a str for logging.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Format all metrics as a str for logging.&quot;&quot;&quot;</span>
         <span class="n">results_logs</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">:{</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span> <span class="k">else</span> <span class="s1">&#39;.3&#39;</span><span class="si">}}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">value</span><span class="si">:{</span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;.3&#39;</span><span class="si">}}</span><span class="s2">&quot;</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">metrics_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">name</span>
             <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_identification &mdash; lidar_prod M11.1V1.9.6 documentation</title>
+  <title>lidar_prod.tasks.building_identification &mdash; lidar_prod M11.1V1.9.7 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -145,7 +145,7 @@
 
 
 <div class="viewcode-block" id="BuildingIdentifier"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_identification.BuildingIdentifier">[docs]</a><span class="k">class</span> <span class="nc">BuildingIdentifier</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Logic of building validation.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Logic of building validation.</span>
 
 <span class="sd">    Points that were not found by rule-based algorithms but which have a high-enough probability of</span>
 <span class="sd">    being a building are clustered into candidate groups of buildings.</span>
@@ -169,7 +169,7 @@
         <span class="n">input_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">],</span>
         <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Identify potential buildings in a new channel, excluding former candidates as well as already</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identify potential buildings in a new channel, excluding former candidates as well as already</span>
 <span class="sd">        confirmed building (confirmed by either Validation or Completion).</span>
 
 <span class="sd">        Args:</span>

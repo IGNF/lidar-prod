@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>How to optimize building validation decision thresholds? &mdash; lidar_prod M11.1V1.9.6 documentation</title>
+  <title>How to optimize building validation decision thresholds? &mdash; lidar_prod M11.1V1.9.7 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -156,26 +156,26 @@ They will keep the same basename as the original files.
 Be sure that the <code class="docutils literal notranslate"><span class="pre">data_format</span></code> configurations match your data, and in particular the (clasification) <code class="docutils literal notranslate"><span class="pre">codes</span></code> and <code class="docutils literal notranslate"><span class="pre">las_dimensions</span></code> configuration groups.
 A <code class="docutils literal notranslate"><span class="pre">todo</span></code> string parameter specifies the steps to run by including 1 or more of the following keywords: <code class="docutils literal notranslate"><span class="pre">prepare</span></code> | <code class="docutils literal notranslate"><span class="pre">otpimize</span></code> | <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> | <code class="docutils literal notranslate"><span class="pre">update</span></code>.</p>
 <p>Run the full optimization module with</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate lidar_prod
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>lidar_prod
 
-python lidar_prod/run.py <span class="se">\</span>
-++task<span class="o">=</span>optimize_building <span class="se">\</span>
-building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+optimize+evaluate+update&#39;</span> <span class="se">\</span>
-building_validation.optimization.paths.input_las_dir<span class="o">=[</span>path/to/labelled/val/dataset/<span class="o">]</span> <span class="se">\</span>
-building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span> 
+python<span class="w"> </span>lidar_prod/run.py<span class="w"> </span><span class="se">\</span>
+++task<span class="o">=</span>optimize_building<span class="w"> </span><span class="se">\</span>
+building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+optimize+evaluate+update&#39;</span><span class="w"> </span><span class="se">\</span>
+building_validation.optimization.paths.input_las_dir<span class="o">=[</span>path/to/labelled/val/dataset/<span class="o">]</span><span class="w"> </span><span class="se">\</span>
+building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span><span class="w"> </span>
 </pre></div>
 </div>
 </section>
 <section id="evaluation-of-optimized-thresholds-on-a-test-set">
 <h3>Evaluation of optimized thresholds on a test set<a class="headerlink" href="#evaluation-of-optimized-thresholds-on-a-test-set" title="Permalink to this headline"></a></h3>
 <p>Once an optimal solution was found, you may want to evaluate the decision process on unseen data to evaluate generalization capability. For that, you will need another test folder of corrected data in the same format as before (a different <code class="docutils literal notranslate"><span class="pre">input_las_dir</span></code>). You need to specify that no optimization is required using the <code class="docutils literal notranslate"><span class="pre">todo</span></code> params. You also need to give the path to the pickled decision thresholds from the previous step, and specify a different <code class="docutils literal notranslate"><span class="pre">results_output_dir</span></code> so that prepared data of test and val test are not pooled together.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate lidar_prod
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>lidar_prod
 
-python lidar_prod/run.py <span class="se">\</span>
-++task<span class="o">=</span>optimize_building <span class="se">\</span>
-building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+evaluate+update&#39;</span> <span class="se">\</span>
-building_validation.optimization.paths.input_las_dir<span class="o">=[</span>path/to/labelled/test/dataset/<span class="o">]</span> <span class="se">\</span>
-building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span> <span class="se">\</span>
+python<span class="w"> </span>lidar_prod/run.py<span class="w"> </span><span class="se">\</span>
+++task<span class="o">=</span>optimize_building<span class="w"> </span><span class="se">\</span>
+building_validation.optimization.todo<span class="o">=</span><span class="s1">&#39;prepare+evaluate+update&#39;</span><span class="w"> </span><span class="se">\</span>
+building_validation.optimization.paths.input_las_dir<span class="o">=[</span>path/to/labelled/test/dataset/<span class="o">]</span><span class="w"> </span><span class="se">\</span>
+building_validation.optimization.paths.results_output_dir<span class="o">=[</span>path/to/save/results<span class="o">]</span><span class="w"> </span><span class="se">\</span>
 building_validation.optimization.paths.building_validation_thresholds_pickle<span class="o">=[</span>path/to/optimized_thresholds.pickle<span class="o">]</span>
 </pre></div>
 </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.utils &mdash; lidar_prod M11.1V1.9.6 documentation</title>
+  <title>lidar_prod.tasks.utils &mdash; lidar_prod M11.1V1.9.7 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -132,8 +132,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for lidar_prod.tasks.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
@@ -150,7 +149,7 @@
 
 <div class="viewcode-block" id="BDUniConnectionParams"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.BDUniConnectionParams">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">BDUniConnectionParams</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;URL and public credentials to connect to a database - typically the BDUni&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;URL and public credentials to connect to a database - typically the BDUni&quot;&quot;&quot;</span>
 
     <span class="n">host</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">user</span><span class="p">:</span> <span class="nb">str</span>
@@ -159,7 +158,7 @@
 
 
 <div class="viewcode-block" id="split_idx_by_dim"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.split_idx_by_dim">[docs]</a><span class="k">def</span> <span class="nf">split_idx_by_dim</span><span class="p">(</span><span class="n">dim_array</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a sequence of arrays of indices of elements sharing the same value in dim_array</span>
 <span class="sd">    Groups are ordered by ascending value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -170,7 +169,7 @@
 
 
 <div class="viewcode-block" id="get_pipeline"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pipeline">[docs]</a><span class="k">def</span> <span class="nf">get_pipeline</span><span class="p">(</span><span class="n">input_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;If the input value is a pipeline, returns it, if it&#39;s a las path return the corresponding pipeline&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;If the input value is a pipeline, returns it, if it&#39;s a las path return the corresponding pipeline&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">()</span> <span class="o">|</span> <span class="n">get_pdal_reader</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span>
         <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
@@ -181,12 +180,12 @@
 
 <div class="viewcode-block" id="get_las_metadata"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_las_metadata">[docs]</a><span class="k">def</span> <span class="nf">get_las_metadata</span><span class="p">(</span><span class="n">entry_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
     <span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">entry_value</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pipeline</span><span class="o">.</span><span class="n">metadata</span><span class="p">)[</span><span class="s2">&quot;metadata&quot;</span><span class="p">][</span><span class="s2">&quot;readers.las&quot;</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">][</span><span class="s2">&quot;readers.las&quot;</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="get_integer_bbox"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_integer_bbox">[docs]</a><span class="k">def</span> <span class="nf">get_integer_bbox</span><span class="p">(</span><span class="n">entry_value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">buffer</span><span class="p">:</span> <span class="n">Number</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
     <span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">entry_value</span><span class="p">)</span>
-    <span class="sd">&quot;&quot;&quot;Get XY bounding box of a cloud, cast x/y min/max to integers.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get XY bounding box of a cloud, cast x/y min/max to integers.&quot;&quot;&quot;</span>
     <span class="n">metadata</span> <span class="o">=</span> <span class="n">get_las_metadata</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span>
     <span class="n">bbox</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;x_min&quot;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;minx&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">buffer</span><span class="p">),</span>
@@ -198,7 +197,7 @@
 
 
 <div class="viewcode-block" id="get_pdal_reader"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pdal_reader">[docs]</a><span class="k">def</span> <span class="nf">get_pdal_reader</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Reader</span><span class="o">.</span><span class="n">las</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Standard Reader which imposes Lamber 93 SRS.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standard Reader which imposes Lamber 93 SRS.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        las_path (str): input LAS path to read.</span>
@@ -215,12 +214,12 @@
 
 
 <div class="viewcode-block" id="get_las_data_from_las"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_las_data_from_las">[docs]</a><span class="k">def</span> <span class="nf">get_las_data_from_las</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Load las data from a las file&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load las data from a las file&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">laspy</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">las_path</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_pdal_writer"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pdal_writer">[docs]</a><span class="k">def</span> <span class="nf">get_pdal_writer</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extra_dims</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Writer</span><span class="o">.</span><span class="n">las</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Standard LAS Writer which imposes LAS 1.4 specification and dataformat 8.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standard LAS Writer which imposes LAS 1.4 specification and dataformat 8.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        target_las_path (str): output LAS path to write.</span>
@@ -240,12 +239,12 @@
 
 
 <div class="viewcode-block" id="save_las_data_to_las"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.save_las_data_to_las">[docs]</a><span class="k">def</span> <span class="nf">save_las_data_to_las</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">las_data</span><span class="p">:</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;save las data to a las file&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;save las data to a las file&quot;&quot;&quot;</span>
     <span class="n">las_data</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">las_path</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_a_las_to_las_pdal_pipeline"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_a_las_to_las_pdal_pipeline">[docs]</a><span class="k">def</span> <span class="nf">get_a_las_to_las_pdal_pipeline</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ops</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;Create a pdal pipeline, preserving format, forwarding every dimension.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a pdal pipeline, preserving format, forwarding every dimension.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        src_las_path (str): input LAS path</span>
@@ -262,7 +261,7 @@
 
 
 <div class="viewcode-block" id="pdal_read_las_array"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.pdal_read_las_array">[docs]</a><span class="k">def</span> <span class="nf">pdal_read_las_array</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Read LAS as a named array.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read LAS as a named array.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        las_path (str): input LAS path</span>
@@ -280,7 +279,7 @@
     <span class="n">shapefile_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">bbox</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Rrequest BD Uni for its buildings.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rrequest BD Uni for its buildings.</span>
 
 <span class="sd">    Create a shapefile with non destructed building on the area of interest</span>
 <span class="sd">    and saves it.</span>
@@ -319,9 +318,7 @@
         <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">output</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;Initializing... </span><span class="se">\n</span><span class="s2">ERROR: Could not determine table metadata (empty table)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">:</span>
 
             <span class="c1"># write empty shapefile</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
-                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">],</span>
-                <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;EPSG:</span><span class="si">{</span><span class="n">Lambert_93_SRID</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">],</span> <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;EPSG:</span><span class="si">{</span><span class="n">Lambert_93_SRID</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">df</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">shapefile_path</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="kc">False</span>

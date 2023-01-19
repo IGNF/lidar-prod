@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Using the app &mdash; lidar_prod M11.1V1.9.6 documentation</title>
+  <title>Using the app &mdash; lidar_prod M11.1V1.9.7 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -140,11 +140,11 @@
 <h2>Run within a docker container<a class="headerlink" href="#run-within-a-docker-container" title="Permalink to this headline"></a></h2>
 <p>Up to date docker images (named <code class="docutils literal notranslate"><span class="pre">lidar_prod</span></code>) are created via Github integration actions (see <a class="reference internal" href="../guides/development.html"><span class="doc std std-doc">Developer’s guide</span></a>).</p>
 <p>To run the app, use</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker run <span class="se">\</span>
--v <span class="o">{</span>local_src_las_dir<span class="o">}</span>:/inputs/ <span class="se">\</span>
--v <span class="o">{</span>local_output_dir<span class="o">}</span>:/outputs/
-lidar_prod <span class="se">\</span>
-python lidar_prod/run.py <span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
+-v<span class="w"> </span><span class="o">{</span>local_src_las_dir<span class="o">}</span>:/inputs/<span class="w"> </span><span class="se">\</span>
+-v<span class="w"> </span><span class="o">{</span>local_output_dir<span class="o">}</span>:/outputs/
+lidar_prod<span class="w"> </span><span class="se">\</span>
+python<span class="w"> </span>lidar_prod/run.py<span class="w"> </span><span class="se">\</span>
 paths.src_las<span class="o">=</span>/inputs/<span class="o">{</span>src_las_basename<span class="o">}</span>.las
 paths.output_dir<span class="o">=</span>/outputs/
 <span class="c1"># + other options...</span>
@@ -157,7 +157,7 @@ paths.output_dir<span class="o">=</span>/outputs/
 <h2>Run as a python module<a class="headerlink" href="#run-as-a-python-module" title="Permalink to this headline"></a></h2>
 <p>To run the module as a module, you will need a source cloud point in LAS format with an additional channel containing predicted building probabilities (<code class="docutils literal notranslate"><span class="pre">ai_building_proba</span></code>) and another one containing predictions entropy (<code class="docutils literal notranslate"><span class="pre">entropy</span></code>). The names of thes channel can be specified via hydra config <code class="docutils literal notranslate"><span class="pre">config.data_format.las_dimensions</span></code>.</p>
 <p>To run using default configurations of the installed module, use</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m lidar_prod.run paths.src_las<span class="o">=</span>&lt;/path/to/file.las&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>lidar_prod.run<span class="w"> </span>paths.src_las<span class="o">=</span>&lt;/path/to/file.las&gt;
 </pre></div>
 </div>
 <p>You can specify a different yaml config file with the flags <code class="docutils literal notranslate"><span class="pre">--config-path</span></code> and <code class="docutils literal notranslate"><span class="pre">--config-name</span></code>. You can also override specific parameters. Overriding <code class="docutils literal notranslate"><span class="pre">building_validation.application.shp_path</span></code> will force the use of the provided shapefile instead of querying DB Uni to build a shapefile on the fly. By default, results are saved to a <code class="docutils literal notranslate"><span class="pre">./outputs/</span></code> folder, but this can be overriden with <code class="docutils literal notranslate"><span class="pre">paths.output_dir</span></code> parameter. Refer to <a class="reference external" href="https://hydra.cc/docs/next/tutorials/basic/your_first_app/config_file/">hydra documentation</a> for the overriding syntax.</p>
@@ -167,8 +167,8 @@ paths.output_dir<span class="o">=</span>/outputs/
 <h2>Run from source directly<a class="headerlink" href="#run-from-source-directly" title="Permalink to this headline"></a></h2>
 <p>For developments and debugging, you can run the package directly from python sources instead:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate an env matching ./bash/setup_env.sh requirements.</span>
-conda activate lidar_prod
-python lidar_prod/run.py paths.src_las<span class="o">=[</span>/path/to/file.las<span class="o">]</span>
+conda<span class="w"> </span>activate<span class="w"> </span>lidar_prod
+python<span class="w"> </span>lidar_prod/run.py<span class="w"> </span>paths.src_las<span class="o">=[</span>/path/to/file.las<span class="o">]</span>
 </pre></div>
 </div>
 </section>
@@ -185,7 +185,7 @@ python lidar_prod/run.py paths.src_las<span class="o">=[</span>/path/to/file.las
 <li><p><code class="docutils literal notranslate"><span class="pre">cleaning</span></code> to prepare las file with the correct dimension (mostly useful in development)</p></li>
 </ul>
 <p>To use on of those tasks, simply add “+task=[task_name]” to the options list, like this:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python lidar_prod/run.py +task<span class="o">=</span>apply_on_building ...
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>lidar_prod/run.py<span class="w"> </span>+task<span class="o">=</span>apply_on_building<span class="w"> </span>...
 </pre></div>
 </div>
 </section>

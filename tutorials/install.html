@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; lidar_prod M11.1V1.9.6 documentation</title>
+  <title>Installation &mdash; lidar_prod M11.1V1.9.7 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -141,21 +141,21 @@
 <p>We use <a class="reference external" href="https://anaconda.org/">Anaconda</a>] to manage and isolate dependencies.
 The provided environment setup script also installs <a class="reference external" href="https://mamba.readthedocs.io/en/latest/index.html">Mamba</a>,
 which gets on top of conda for faster environment installs.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># clone project</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">git clone https://github.com/IGNF/lidar-prod-quality-control</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">cd lidar-prod-quality-control</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># clone project</span>
+<span class="l l-Scalar l-Scalar-Plain">git clone https://github.com/IGNF/lidar-prod-quality-control</span>
+<span class="l l-Scalar l-Scalar-Plain">cd lidar-prod-quality-control</span>
 
-<span class="l l-Scalar l-Scalar-Plain"># install conda</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain"># see https://www.anaconda.com/products/individual</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain"># install conda</span>
+<span class="l l-Scalar l-Scalar-Plain"># see https://www.anaconda.com/products/individual</span>
 
-<span class="l l-Scalar l-Scalar-Plain"># you need to install postgis to request a public database</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">sudo apt-get install postgis</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain"># you need to install postgis to request a public database</span>
+<span class="l l-Scalar l-Scalar-Plain">sudo apt-get install postgis</span>
 
-<span class="l l-Scalar l-Scalar-Plain"># create conda environment</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">source setup_env/setup_env.sh</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain"># create conda environment</span>
+<span class="l l-Scalar l-Scalar-Plain">source setup_env/setup_env.sh</span>
 
-<span class="l l-Scalar l-Scalar-Plain"># activate the virtual env</span><span class="w"></span>
-<span class="l l-Scalar l-Scalar-Plain">conda activate lidar_prod</span><span class="w"></span>
+<span class="l l-Scalar l-Scalar-Plain"># activate the virtual env</span>
+<span class="l l-Scalar l-Scalar-Plain">conda activate lidar_prod</span>
 </pre></div>
 </div>
 </section>
@@ -163,14 +163,14 @@ which gets on top of conda for faster environment installs.</p>
 <h2>Install the app as a python module<a class="headerlink" href="#install-the-app-as-a-python-module" title="Permalink to this headline"></a></h2>
 <p>To run the application from anywhere, you can install as a module in a your virtual environment.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate your env</span>
-conda activate lidar_prod
+conda<span class="w"> </span>activate<span class="w"> </span>lidar_prod
 
 <span class="c1"># install the package from github directly, using production branch</span>
-pip install --upgrade https://github.com/IGNF/lidar-prod-quality-control/tarball/prod
+pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>https://github.com/IGNF/lidar-prod-quality-control/tarball/prod
 </pre></div>
 </div>
 <p>During development, install in editable mode directly from source with</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install --editable .
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--editable<span class="w"> </span>.
 </pre></div>
 </div>
 <p>Then, refert to the <a class="reference internal" href="use.html"><span class="doc std std-doc">usage page</span></a>.</p>
