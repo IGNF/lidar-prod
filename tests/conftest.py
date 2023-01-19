@@ -21,7 +21,7 @@ def vegetation_unclassifed_hydra_cfg():
 @pytest.fixture
 def hydra_cfg():
     with initialize(config_path="./../configs/", job_name="config"):
-        return compose(config_name="config", overrides=["data_format=default.yaml"])
+        return compose(config_name="config", overrides=["data_format=default.yaml", "building_validation/optimization=pytest.yaml"])
 
 
 def check_las_invariance(las_path1, las_path2):
@@ -31,9 +31,7 @@ def check_las_invariance(las_path1, las_path2):
     array2 = pdal_read_las_array(las_path2)
     key_dims = ["X", "Y", "Z", "Infrared", "Red", "Blue", "Green", "Intensity"]
     assert array1.shape == array2.shape  # no loss of points
-    assert all(
-        dim in array2.dtype.fields.keys() for dim in key_dims
-    )  # key dimensions are here
+    assert all(dim in array2.dtype.fields.keys() for dim in key_dims)  # key dimensions are here
 
     # order of points is allowed to change, so we assess a relaxed equality.
     for dim in key_dims:

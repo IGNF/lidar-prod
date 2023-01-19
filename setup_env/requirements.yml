@@ -1,7 +1,6 @@
 name: lidar_prod
 channels:
   - conda-forge
-  - anaconda
 dependencies:
   - python==3.9.*
   - pip
@@ -11,8 +10,8 @@ dependencies:
   - isort # import sorting
   - flake8 # code analysis
   # --------- geo --------- #
-  - conda-forge:pdal==2.3.*
-  - conda-forge:python-pdal==3.0.*
+  - conda-forge:pdal==2.5.*
+  - conda-forge:python-pdal==3.2.*
   - numpy
   - scikit-learn
   - geopandas
