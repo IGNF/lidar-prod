@@ -154,15 +154,26 @@ def request_bd_uni_for_building_shapefile(
 
     """
     Lambert_93_SRID = 2154
-    sql_request = f'SELECT \
+    sql_batiment = f"""SELECT \
         st_setsrid(batiment.geometrie,{Lambert_93_SRID}) AS geometry, \
         1 as presence \
         FROM batiment \
         WHERE batiment.geometrie \
-            && \
-        ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
-        and \
-        not gcms_detruit'
+        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
+        AND not gcms_detruit"""
+
+    sql_reservoir = f"""SELECT \
+        st_setsrid(reservoir.geometrie,{Lambert_93_SRID}) AS geometry, \
+        1 as presence \
+        FROM reservoir \
+        WHERE reservoir.geometrie \
+        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
+        AND reservoir.nature = 'Château d''eau' OR reservoir.nature = 'Réservoir industriel' \
+        AND NOT gcms_detruit"""
+
+    sql_select_list = [sql_batiment, sql_reservoir]
+    sql_request = " UNION ".join(sql_select_list)
+
     cmd = [
         "pgsql2shp",
         "-f",
