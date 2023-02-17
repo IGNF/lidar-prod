@@ -168,7 +168,7 @@ def request_bd_uni_for_building_shapefile(
         FROM reservoir \
         WHERE reservoir.geometrie \
         && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
-        AND reservoir.nature = 'Château d''eau' OR reservoir.nature = 'Réservoir industriel' \
+        AND (reservoir.nature = 'Château d''eau' OR reservoir.nature = 'Réservoir industriel') \
         AND NOT gcms_detruit"""
 
     sql_select_list = [sql_batiment, sql_reservoir]
