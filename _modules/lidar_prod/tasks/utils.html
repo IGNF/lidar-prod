@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.utils &mdash; lidar_prod V1.9.9 documentation</title>
+  <title>lidar_prod.tasks.utils &mdash; lidar_prod V1.9.10 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
@@ -288,15 +288,26 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Lambert_93_SRID</span> <span class="o">=</span> <span class="mi">2154</span>
-    <span class="n">sql_request</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;SELECT </span><span class="se">\</span>
-<span class="s1">        st_setsrid(batiment.geometrie,</span><span class="si">{</span><span class="n">Lambert_93_SRID</span><span class="si">}</span><span class="s1">) AS geometry, </span><span class="se">\</span>
-<span class="s1">        1 as presence </span><span class="se">\</span>
-<span class="s1">        FROM batiment </span><span class="se">\</span>
-<span class="s1">        WHERE batiment.geometrie </span><span class="se">\</span>
-<span class="s1">            &amp;&amp; </span><span class="se">\</span>
-<span class="s1">        ST_MakeEnvelope(</span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;x_min&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;y_min&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;x_max&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;y_max&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">Lambert_93_SRID</span><span class="si">}</span><span class="s1">) </span><span class="se">\</span>
-<span class="s1">        and </span><span class="se">\</span>
-<span class="s1">        not gcms_detruit&#39;</span>
+    <span class="n">sql_batiment</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;SELECT </span><span class="se">\</span>
+<span class="s2">        st_setsrid(batiment.geometrie,</span><span class="si">{</span><span class="n">Lambert_93_SRID</span><span class="si">}</span><span class="s2">) AS geometry, </span><span class="se">\</span>
+<span class="s2">        1 as presence </span><span class="se">\</span>
+<span class="s2">        FROM batiment </span><span class="se">\</span>
+<span class="s2">        WHERE batiment.geometrie </span><span class="se">\</span>
+<span class="s2">        &amp;&amp; ST_MakeEnvelope(</span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;x_min&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;y_min&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;x_max&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;y_max&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">Lambert_93_SRID</span><span class="si">}</span><span class="s2">) </span><span class="se">\</span>
+<span class="s2">        AND not gcms_detruit&quot;&quot;&quot;</span>
+
+    <span class="n">sql_reservoir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;SELECT </span><span class="se">\</span>
+<span class="s2">        st_setsrid(reservoir.geometrie,</span><span class="si">{</span><span class="n">Lambert_93_SRID</span><span class="si">}</span><span class="s2">) AS geometry, </span><span class="se">\</span>
+<span class="s2">        1 as presence </span><span class="se">\</span>
+<span class="s2">        FROM reservoir </span><span class="se">\</span>
+<span class="s2">        WHERE reservoir.geometrie </span><span class="se">\</span>
+<span class="s2">        &amp;&amp; ST_MakeEnvelope(</span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;x_min&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;y_min&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;x_max&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">bbox</span><span class="p">[</span><span class="s2">&quot;y_max&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">Lambert_93_SRID</span><span class="si">}</span><span class="s2">) </span><span class="se">\</span>
+<span class="s2">        AND (reservoir.nature = &#39;Château d&#39;&#39;eau&#39; OR reservoir.nature = &#39;Réservoir industriel&#39;) </span><span class="se">\</span>
+<span class="s2">        AND NOT gcms_detruit&quot;&quot;&quot;</span>
+
+    <span class="n">sql_select_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">sql_batiment</span><span class="p">,</span> <span class="n">sql_reservoir</span><span class="p">]</span>
+    <span class="n">sql_request</span> <span class="o">=</span> <span class="s2">&quot; UNION &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sql_select_list</span><span class="p">)</span>
+
     <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;pgsql2shp&quot;</span><span class="p">,</span>
         <span class="s2">&quot;-f&quot;</span><span class="p">,</span>
