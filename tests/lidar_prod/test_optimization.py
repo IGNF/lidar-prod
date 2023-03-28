@@ -126,6 +126,10 @@ def test_BVOptimization_on_large_file(hydra_cfg):
 
         # Check that a full optimization run can pass successfully
         bvo: BuildingValidationOptimizer = hydra.utils.instantiate(hydra_cfg.building_validation.optimization)
+
+        bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(hydra_cfg.bd_uni_connection_params)
+        bvo.bv.bd_uni_connection_params = bd_uni_connection_params
+
         bvo.prepare()
         metrics_dict = bvo.evaluate()
         print(metrics_dict)
