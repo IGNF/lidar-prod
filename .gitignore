@@ -160,3 +160,6 @@ wandb/
 
 # optimize output directory
 opti/
+
+# credentials for database
+**/credentials.yaml

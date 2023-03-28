@@ -43,3 +43,8 @@ During development, install in editable mode directly from source with
  ```
 
 Then, refert to the [usage page](./use.md).
+
+## Provide credentials
+To help identify buildings, the BD_UNI database is used. To provide credentials, copy bd_uni_connection_params/credentials_template.yaml to bd_uni_connection_params/credentials.yaml
+```cp bd_uni_connection_params/credentials_template.yaml bd_uni_connection_params/credentials.yaml```
+Then fill the blanks in the file.

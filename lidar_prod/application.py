@@ -18,6 +18,7 @@ from lidar_prod.tasks.utils import (
     get_pipeline,
     request_bd_uni_for_building_shapefile,
     save_las_data_to_las,
+    BDUniConnectionParams
 )
 
 log = logging.getLogger(__name__)
@@ -128,8 +129,29 @@ def apply_building_module(
         cl.run(src_las_path, tmp_las_path)
 
         # Validate buildings (unsure/confirmed/refuted) on a per-group basis.
-        bv: BuildingValidator = hydra.utils.instantiate(
-            config.building_validation.application
+        # bv: BuildingValidator = hydra.utils.instantiate(
+        #     config.building_validation.application
+        # )
+
+        # self,
+        # shp_path: str = None,
+        # bd_uni_connection_params=None,
+        # cluster=None,
+        # bd_uni_request=None,
+        # data_format=None,
+        # thresholds=None,
+        # use_final_classification_codes: bool = True,
+
+        bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(config.bd_uni_connection_params)
+
+        bv = BuildingValidator(
+            shp_path=config.building_validation.application.shp_path,
+            bd_uni_connection_params=bd_uni_connection_params,
+            cluster=config.building_validation.application.cluster,
+            bd_uni_request=config.building_validation.application.bd_uni_request,
+            data_format=config.building_validation.application.data_format,
+            thresholds=config.building_validation.application.thresholds,
+            use_final_classification_codes=config.building_validation.application.use_final_classification_codes
         )
         bv.run(tmp_las_path)
 
@@ -160,7 +182,7 @@ def get_shapefile(config: DictConfig, src_las_path: str, dest_las_path: str):
     log.info(f"get shapefile for {src_las_path}")
     request_bd_uni_for_building_shapefile(
         hydra.utils.instantiate(
-            config.building_validation.application.bd_uni_connection_params
+            config.bd_uni_connection_params
         ),  # BDUniConnectionParams
         os.path.join(
             os.path.dirname(dest_las_path),
