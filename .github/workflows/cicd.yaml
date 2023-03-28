@@ -27,7 +27,7 @@ jobs:
 
     - name: replace BD_UNI credentials
       run: >
-        cp configs/bd_uni_connection_params/credentials_template.yaml configs/bd_uni_connection_params/credentials.yaml
+        mv configs/bd_uni_connection_params/credentials_template.yaml configs/bd_uni_connection_params/credentials.yaml
         sed -i '/user:/c\user: invite' configs/bd_uni_connection_params/credentials.yaml 
         sed -i '/pwd:/c\pwd: ${{ secrets.PASSWORD_BD_UNI }}' configs/bd_uni_connection_params/credentials.yaml 
 
