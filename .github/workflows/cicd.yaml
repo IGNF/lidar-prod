@@ -30,7 +30,7 @@ jobs:
         cp configs/bd_uni_connection_params/credentials_template.yaml configs/bd_uni_connection_params/credentials.yaml
         sed -i '/user:/c\user: invite' configs/bd_uni_connection_params/credentials.yaml 
         sed -i '/pwd:/c\pwd: ${{ secrets.PASSWORD_BD_UNI }}' configs/bd_uni_connection_params/credentials.yaml 
-        nano configs/bd_uni_connection_params/credentials.yaml 
+        cat configs/bd_uni_connection_params/credentials.yaml 
 
     - name: build docker image       
       run: docker build -t lidar_prod .
