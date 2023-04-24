@@ -75,7 +75,7 @@ class BuildingValidator:
             detailed: final for detailed, final in self.codes.detailed_to_final
         }
 
-    @profile()
+    # @profile()
     def run(
         self,
         input_values: Union[str, pdal.pipeline.Pipeline],
@@ -94,7 +94,6 @@ class BuildingValidator:
             str: returns `target_las_path`
 
         """
-        self.pipeline = get_pipeline(input_values)
         with TemporaryDirectory() as td:
             log.info(
                 "Preparation : Clustering of candidates buildings & Import vectors"
@@ -106,7 +105,7 @@ class BuildingValidator:
                 temp_f = ""
             self.prepare(input_values, temp_f)
             log.info("Using AI and Databases to update cloud Classification")
-            self.update()
+            self.update(target_las_path=target_las_path)
         return target_las_path
 
     def prepare(
@@ -210,6 +209,7 @@ class BuildingValidator:
 
         if temp_dirpath:
             shutil.rmtree(temp_dirpath)
+
 
     def update(self, src_las_path: str = None, target_las_path: str = None) -> None:
         """Updates point cloud classification channel."""

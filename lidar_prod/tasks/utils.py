@@ -38,7 +38,6 @@ def get_pipeline(input_value: Union[pdal.pipeline.Pipeline, str]):
     """If the input value is a pipeline, returns it, if it's a las path return the corresponding pipeline"""
     if type(input_value) == str:
         pipeline = pdal.Pipeline() | get_pdal_reader(input_value)
-        pipeline.execute()
     else:
         pipeline = input_value
     return pipeline

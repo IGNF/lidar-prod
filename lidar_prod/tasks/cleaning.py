@@ -6,10 +6,9 @@ from typing import Iterable, Optional, Union
 import laspy
 import pdal
 
-from lidar_prod.tasks.utils import get_pdal_writer, pdal_read_las_array
+from lidar_prod.tasks.utils import get_pdal_writer, get_pdal_reader
 
 log = logging.getLogger(__name__)
-
 
 class Cleaner:
     """Keep only necessary extra dimensions channels."""
@@ -44,7 +43,7 @@ class Cleaner:
         return_str = ",".join([f"{k}={v}" for k, v in self.extra_dims_as_dict.items()])
         return return_str if return_str else []
 
-    @profile()
+    # @profile()
     def run(self, src_las_path: str, target_las_path: str):
         """Clean out LAS extra dimensions.
 
@@ -52,15 +51,18 @@ class Cleaner:
             src_las_path (str): input LAS path
             target_las_path (str): output LAS path, with specified extra dims.
         """
-        points = pdal_read_las_array(src_las_path)
-        # Check input dims to see what we can keep.
-        input_dims = points.dtype.fields.keys()
+        pipeline = pdal.Pipeline() | get_pdal_reader(src_las_path)
+        pipeline.execute()
+
+        input_dims = pipeline.arrays[0].dtype.fields.keys()
         self.extra_dims_as_dict = {k: v for k, v in self.extra_dims_as_dict.items() if k in input_dims}
 
-        pipeline = pdal.Pipeline(arrays=[points]) | get_pdal_writer(target_las_path, extra_dims=self.get_extra_dims_as_str())
+        pipeline |= get_pdal_writer(target_las_path, extra_dims=self.get_extra_dims_as_str())
+
         os.makedirs(osp.dirname(target_las_path), exist_ok=True)
         pipeline.execute()
         log.info(f"Saved to {target_las_path}")
+
 
     def remove_dimensions(self, las_data: laspy.lasdata.LasData):
         """remove dimension from (laspy) data"""

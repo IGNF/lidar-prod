@@ -126,26 +126,32 @@ def apply_building_module(
             config.data_format.cleaning.input_building
         )
         cl.run(src_las_path, tmp_las_path)
+        del cl
 
         # Validate buildings (unsure/confirmed/refuted) on a per-group basis.
         bv: BuildingValidator = hydra.utils.instantiate(
             config.building_validation.application
         )
-        bv.run(tmp_las_path)
+        tmp_las_path_validation = os.path.join(td, "validation_" + os.path.basename(src_las_path))
+        path = bv.run(tmp_las_path, tmp_las_path_validation)
+        del bv
 
         # Complete buildings with non-candidates that were nevertheless confirmed
         bc: BuildingCompletor = hydra.utils.instantiate(config.building_completion)
-        bc.run(bv.pipeline)
+        bc.run(path)
 
         # Define groups of confirmed building points among non-candidates
         bi: BuildingIdentifier = hydra.utils.instantiate(config.building_identification)
         bi.run(bc.pipeline, tmp_las_path)
+        del bc
+        del bi
 
         # Remove unnecessary intermediary dimensions
         cl: Cleaner = hydra.utils.instantiate(
             config.data_format.cleaning.output_building
         )
         cl.run(tmp_las_path, dest_las_path)
+        del cl
 
     return dest_las_path
 
