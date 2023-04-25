@@ -75,7 +75,7 @@ class BuildingValidator:
             detailed: final for detailed, final in self.codes.detailed_to_final
         }
 
-    # @profile()
+    @profile()
     def run(
         self,
         input_values: Union[str, pdal.pipeline.Pipeline],

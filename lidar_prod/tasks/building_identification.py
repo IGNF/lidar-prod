@@ -30,7 +30,7 @@ class BuildingIdentifier:
         self.min_building_proba = min_building_proba
         self.pipeline: pdal.pipeline.Pipeline = None
 
-    # @profile()
+    @profile()
     def run(
         self,
         input_values: Union[str, pdal.pipeline.Pipeline],
