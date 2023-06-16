@@ -129,19 +129,6 @@ def apply_building_module(
         cl.run(src_las_path, tmp_las_path)
 
         # Validate buildings (unsure/confirmed/refuted) on a per-group basis.
-        # bv: BuildingValidator = hydra.utils.instantiate(
-        #     config.building_validation.application
-        # )
-
-        # self,
-        # shp_path: str = None,
-        # bd_uni_connection_params=None,
-        # cluster=None,
-        # bd_uni_request=None,
-        # data_format=None,
-        # thresholds=None,
-        # use_final_classification_codes: bool = True,
-
         bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(config.bd_uni_connection_params)
 
         bv = BuildingValidator(
