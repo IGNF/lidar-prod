@@ -9,6 +9,7 @@ import pytest
 
 from lidar_prod.tasks.building_validation_optimization import BuildingValidationOptimizer
 from tests.conftest import pdal_read_las_array
+from lidar_prod.tasks.utils import BDUniConnectionParams
 
 """We test the building validation optimizer against two LAS:
 
@@ -68,6 +69,8 @@ def test_BVOptimization_on_subset(hydra_cfg):
 
         # Check that a full optimization run can pass successfully
         bvo: BuildingValidationOptimizer = hydra.utils.instantiate(hydra_cfg.building_validation.optimization)
+        bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(hydra_cfg.bd_uni_connection_params)
+        bvo.bv.bd_uni_connection_params = bd_uni_connection_params
         bvo.run()
 
         # Assert that a prepared and an updated file are generated in the temporary dir
@@ -123,6 +126,10 @@ def test_BVOptimization_on_large_file(hydra_cfg):
 
         # Check that a full optimization run can pass successfully
         bvo: BuildingValidationOptimizer = hydra.utils.instantiate(hydra_cfg.building_validation.optimization)
+
+        bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(hydra_cfg.bd_uni_connection_params)
+        bvo.bv.bd_uni_connection_params = bd_uni_connection_params
+
         bvo.prepare()
         metrics_dict = bvo.evaluate()
         print(metrics_dict)

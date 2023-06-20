@@ -5,13 +5,6 @@ use_final_classification_codes: true
 
 shp_path: null
 
-bd_uni_connection_params:
-  _target_: lidar_prod.tasks.utils.BDUniConnectionParams
-  host: serveurbdudiff.ign.fr
-  user: invite
-  pwd: 28de#
-  bd_name: bduni_france_consultation
-
 cluster:
   tolerance: 0.5  # meters
   min_points: 10
