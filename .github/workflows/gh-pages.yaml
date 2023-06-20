@@ -53,6 +53,9 @@ jobs:
         run: mamba env update -n lidar_prod -f setup_env/requirements.yml
         if: steps.cache.outputs.cache-hit != 'true'
 
+      - name: replace BD_UNI credentials
+        run: cp configs/bd_uni_connection_params/credentials_template.yaml configs/bd_uni_connection_params/credentials.yaml
+
       # 2. Sphinx part : install tool and dependencies
       - name: "Build Sphinx Doc"
         working-directory: ./docs/
