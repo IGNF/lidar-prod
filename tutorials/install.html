@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; lidar_prod V1.9.10 documentation</title>
+  <title>Installation &mdash; lidar_prod V1.9.11 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
@@ -66,6 +66,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#set-up-a-virtual-environment">Set up a virtual environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#install-the-app-as-a-python-module">Install the app as a python module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#provide-credentials">Provide credentials</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="use.html">Using the app</a><ul>
@@ -174,6 +175,12 @@ pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="
 </pre></div>
 </div>
 <p>Then, refert to the <a class="reference internal" href="use.html"><span class="doc std std-doc">usage page</span></a>.</p>
+</section>
+<section id="provide-credentials">
+<h2>Provide credentials<a class="headerlink" href="#provide-credentials" title="Permalink to this headline"></a></h2>
+<p>To help identify buildings, the BD_UNI database is used. To provide credentials, copy bd_uni_connection_params/credentials_template.yaml to bd_uni_connection_params/credentials.yaml
+<code class="docutils literal notranslate"><span class="pre">cp</span> <span class="pre">bd_uni_connection_params/credentials_template.yaml</span> <span class="pre">bd_uni_connection_params/credentials.yaml</span></code>
+Then fill the blanks in the file, specifically “user” and “pwd”.</p>
 </section>
 </section>
 

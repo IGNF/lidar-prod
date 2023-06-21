@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Default configuration &mdash; lidar_prod V1.9.10 documentation</title>
+  <title>Default configuration &mdash; lidar_prod V1.9.11 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/sphinx_paramlinks.css" type="text/css" />
@@ -65,6 +65,7 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/install.html#set-up-a-virtual-environment">Set up a virtual environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/install.html#install-the-app-as-a-python-module">Install the app as a python module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/install.html#provide-credentials">Provide credentials</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/use.html">Using the app</a><ul>
@@ -234,12 +235,6 @@
 <span class="w">    </span><span class="nt">data_format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${data_format}</span>
 <span class="w">    </span><span class="nt">use_final_classification_codes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="w">    </span><span class="nt">shp_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
-<span class="w">    </span><span class="nt">bd_uni_connection_params</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar_prod.tasks.utils.BDUniConnectionParams</span>
-<span class="w">      </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">serveurbdudiff.ign.fr</span>
-<span class="w">      </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">invite</span>
-<span class="w">      </span><span class="nt">pwd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">28de#</span>
-<span class="w">      </span><span class="nt">bd_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bduni_france_consultation</span>
 <span class="w">    </span><span class="nt">cluster</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">tolerance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span>
 <span class="w">      </span><span class="nt">min_points</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
@@ -341,6 +336,12 @@
 <span class="w">  </span><span class="nt">unclassified_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2455</span>
 <span class="w">  </span><span class="nt">vegetation_nb_trials</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
 <span class="w">  </span><span class="nt">unclassified_nb_trials</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="nt">bd_uni_connection_params</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lidar_prod.tasks.utils.BDUniConnectionParams</span>
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">serveurbdudiff.ign.fr</span>
+<span class="w">  </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">  </span><span class="nt">pwd</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">  </span><span class="nt">bd_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bduni_france_consultation</span>
 <span class="nt">print_config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="nt">ignore_warnings</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </pre></div>
