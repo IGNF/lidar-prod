@@ -73,5 +73,4 @@ def main(config: DictConfig):  # pragma: no cover
 
 if __name__ == "__main__":  # pragma: no cover
     sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-    # OmegaConf.register_new_resolver("get_method", hydra.utils.get_method)
     main()
