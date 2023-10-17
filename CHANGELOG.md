@@ -1,5 +1,8 @@
 # main
 
+# 1.9.13
+- Be robust to pgsql2shp warnings when dealing with empty tables (i;e. no buildings).
+
 # 1.9.12
 - Instantiate bd_uni_connection_params externally to fix BV optimization.
 

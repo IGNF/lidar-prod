@@ -192,7 +192,7 @@ def request_bd_uni_for_building_shapefile(
         subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=120)
     except subprocess.CalledProcessError as e:
         # In empty zones, pgsql2shp does not create a shapefile
-        if e.output == b"Initializing... \nERROR: Could not determine table metadata (empty table)\n":
+        if b"Initializing... \nERROR: Could not determine table metadata (empty table)\n" in e.output:
 
             # write empty shapefile
             df = geopandas.GeoDataFrame(columns=["id", "geometry"], geometry="geometry", crs=f"EPSG:{Lambert_93_SRID}")
