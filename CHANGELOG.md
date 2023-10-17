@@ -1,5 +1,8 @@
 # main
 
+# 1.9.13
+- Run CICD operations for all branches prefixed with "staging-"
+
 # 1.9.12
 - Instantiate bd_uni_connection_params externally to fix BV optimization.
 
