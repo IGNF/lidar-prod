@@ -1,9 +1,12 @@
 # main
 
+# 1.10.0
+- Update optimized thresholds for Myria3D model "20230930_60k_basic_targetted_epoch37_Myria3DV3.4.0".
+
 ### 1.9.14
 - Be robust to pgsql2shp warnings when dealing with empty tables (i;e. no buildings).
 
-### 1.9.13
+# 1.9.13
 - Run CICD operations for all branches prefixed with "staging-"
 
 ### 1.9.12
