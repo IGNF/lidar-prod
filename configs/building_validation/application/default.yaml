@@ -12,7 +12,7 @@ cluster:
 bd_uni_request:
   buffer: 50
 
-# Associated Version(s) : M10.0-proto151_V1.0_epoch_40_Myria3DV3.0.1-proto151optimization
+# Associated Version(s) : 20230930_60k_basic_targetted_epoch37_Myria3DV3.4.0
 thresholds:
   min_confidence_confirmation: 0.14294501981220964  # min proba to validate a point
   min_frac_confirmation: 0.7823760038702608  # min fractin of confirmed points per group for confirmation
