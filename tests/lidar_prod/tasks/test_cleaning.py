@@ -9,6 +9,7 @@ from tests.conftest import check_las_invariance
 from tests.lidar_prod.test_application import check_las_format_versions_and_srs
 
 SRC_LAS_SUBSET_PATH = "tests/files/870000_6618000.subset.postIA.las"
+SRC_LAS_EPSG = "2154"
 LAS_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.las"
 
 
@@ -18,9 +19,9 @@ def test_cleaning_no_extra_dims(extra_dims):
 
     with tempfile.TemporaryDirectory() as td:
         clean_las_path = osp.join(td, "no_extra_dims.las")
-        cl.run(SRC_LAS_SUBSET_PATH, clean_las_path)
-        check_las_invariance(SRC_LAS_SUBSET_PATH, clean_las_path)
-        a = pdal_read_las_array(clean_las_path)
+        cl.run(SRC_LAS_SUBSET_PATH, clean_las_path, SRC_LAS_EPSG)
+        check_las_invariance(SRC_LAS_SUBSET_PATH, clean_las_path, SRC_LAS_EPSG)
+        a = pdal_read_las_array(clean_las_path, SRC_LAS_EPSG)
         las_dimensions = a.dtype.fields.keys()
         # Check that key dims were cleaned out
         assert all(dim not in las_dimensions for dim in ["building", "entropy"])
@@ -30,9 +31,9 @@ def test_cleaning_float_extra_dim():
     cl = Cleaner(extra_dims="entropy=float")
     with tempfile.TemporaryDirectory() as td:
         clean_las_path = osp.join(td, "float_extra_dim.las")
-        cl.run(SRC_LAS_SUBSET_PATH, clean_las_path)
-        check_las_invariance(SRC_LAS_SUBSET_PATH, clean_las_path)
-        a = pdal_read_las_array(clean_las_path)
+        cl.run(SRC_LAS_SUBSET_PATH, clean_las_path, SRC_LAS_EPSG)
+        check_las_invariance(SRC_LAS_SUBSET_PATH, clean_las_path, SRC_LAS_EPSG)
+        a = pdal_read_las_array(clean_las_path, SRC_LAS_EPSG)
         las_dimensions = a.dtype.fields.keys()
         assert "entropy" in las_dimensions
         assert "building" not in las_dimensions
@@ -46,9 +47,9 @@ def test_cleaning_two_float_extra_dims_and_one_fantasy_dim():
     cl = Cleaner(extra_dims=extra_dims)
     with tempfile.TemporaryDirectory() as td:
         clean_las_path = osp.join(td, "float_extra_dim.las")
-        cl.run(SRC_LAS_SUBSET_PATH, clean_las_path)
-        check_las_invariance(SRC_LAS_SUBSET_PATH, clean_las_path)
-        out_a = pdal_read_las_array(clean_las_path)
+        cl.run(SRC_LAS_SUBSET_PATH, clean_las_path, SRC_LAS_EPSG)
+        check_las_invariance(SRC_LAS_SUBSET_PATH, clean_las_path, SRC_LAS_EPSG)
+        out_a = pdal_read_las_array(clean_las_path, SRC_LAS_EPSG)
         assert d1 in out_a.dtype.fields.keys()
         assert d2 in out_a.dtype.fields.keys()
         assert d3 not in out_a.dtype.fields.keys()
@@ -59,8 +60,8 @@ def test_pdal_cleaning_format(extra_dims):
     cl = Cleaner(extra_dims=extra_dims)
     with tempfile.TemporaryDirectory() as td:
         clean_las_path = osp.join(td, "float_extra_dim.las")
-        cl.run(SRC_LAS_SUBSET_PATH, clean_las_path)
-        check_las_format_versions_and_srs(clean_las_path)
+        cl.run(SRC_LAS_SUBSET_PATH, clean_las_path, SRC_LAS_EPSG)
+        check_las_format_versions_and_srs(clean_las_path, SRC_LAS_EPSG)
 
 
 @pytest.mark.parametrize(

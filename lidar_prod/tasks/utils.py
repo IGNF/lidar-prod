@@ -3,7 +3,7 @@ import math
 import subprocess
 from dataclasses import dataclass
 from numbers import Number
-from typing import Any, Dict, Iterable, Union
+from typing import Any, Dict, Iterable
 
 import geopandas
 import laspy
@@ -34,25 +34,53 @@ def split_idx_by_dim(dim_array):
     return group_idx
 
 
-def get_pipeline(input_value: Union[pdal.pipeline.Pipeline, str]):
-    """If the input value is a pipeline, returns it, if it's a las path return the corresponding pipeline"""
-    if type(input_value) == str:
-        pipeline = pdal.Pipeline() | get_pdal_reader(input_value)
+def get_pipeline(input_value: pdal.pipeline.Pipeline | str, epsg: int | str):
+    """If the input value is a pipeline, returns it, if it's a las path return the corresponding pipeline
+
+    Args:
+        input_value (pdal.pipeline.Pipeline | str): input value to get a pipeline from
+        (las pipeline or path to a file to read with pdal)
+        epsg (int | str): if input_value is a string, use the epsg value to override the crs from the las header
+
+    Returns:
+        pdal pipeline
+    """
+    if isinstance(input_value, str):
+        pipeline = pdal.Pipeline() | get_pdal_reader(input_value, epsg)
         pipeline.execute()
     else:
         pipeline = input_value
     return pipeline
 
 
-def get_las_metadata(entry_value: Union[pdal.pipeline.Pipeline, str]):
-    pipeline = get_pipeline(entry_value)
+def get_las_metadata(entry_value: pdal.pipeline.Pipeline | str, epsg: int | str):
+    """Get las reader metadata from the input las pipeline (or the pipeline created by reading the input file)
+
+    Args:
+        entry_value (pdal.pipeline.Pipeline | str): input value to get a pipeline from (cf. get_pipeline)
+        epsg (int | str): if input_value is a string, use the epsg value to override the crs from the las header
+
+    """
+    pipeline = get_pipeline(entry_value, epsg)
     return pipeline.metadata["metadata"]["readers.las"]
 
 
-def get_integer_bbox(entry_value: Union[pdal.pipeline.Pipeline, str], buffer: Number = 0) -> Dict[str, int]:
-    pipeline = get_pipeline(entry_value)
-    """Get XY bounding box of a cloud, cast x/y min/max to integers."""
-    metadata = get_las_metadata(pipeline)
+def get_integer_bbox(
+    entry_value: pdal.pipeline.Pipeline, epsg: int | str, buffer: Number = 0
+) -> Dict[str, int]:
+    """Get XY bounding box of a cloud, cast x/y min/max to integers.
+
+    Args:
+        entry_value (pdal.pipeline.Pipeline | str): input value to get a pipeline from (cf. get_pipeline)
+        epsg (int | str): if input_value is a string, use the epsg value to override the crs from the las header
+        buffer (Number, optional): buffer to add to the bounds before casting it to integers. Defaults to 0.
+
+    Returns:
+        Dict[str, int]: x/y min/max values as a dictionary
+    """
+    pipeline = get_pipeline(entry_value, epsg)
+
+    metadata = get_las_metadata(pipeline, epsg)
     bbox = {
         "x_min": math.floor(metadata["minx"] - buffer),
         "y_min": math.floor(metadata["miny"] - buffer),
@@ -62,21 +90,32 @@ def get_integer_bbox(entry_value: Union[pdal.pipeline.Pipeline, str], buffer: Nu
     return bbox
 
 
-def get_pdal_reader(las_path: str) -> pdal.Reader.las:
+def get_pdal_reader(las_path: str, epsg: int | str) -> pdal.Reader.las:
     """Standard Reader which imposes Lamber 93 SRS.
 
     Args:
         las_path (str): input LAS path to read.
+        epsg (int | str): epsg code for the input file (if empty or None: infer
+        it from the las metadata)
 
     Returns:
         pdal.Reader.las: reader to use in a pipeline.
 
     """
-    return pdal.Reader.las(
-        filename=las_path,
-        nosrs=True,
-        override_srs="EPSG:2154",
-    )
+    if epsg:
+        reader = pdal.Reader.las(
+            filename=las_path,
+            nosrs=True,
+            override_srs=f"EPSG:{epsg}"
+            if (isinstance(epsg, int) or epsg.isdigit())
+            else epsg,
+        )
+    else:
+        reader = pdal.Reader.las(
+            filename=las_path,
+        )
+
+    return reader
 
 
 def get_las_data_from_las(las_path: str) -> laspy.lasdata.LasData:
@@ -109,33 +148,37 @@ def save_las_data_to_las(las_path: str, las_data: laspy.lasdata.LasData):
     las_data.write(las_path)
 
 
-def get_a_las_to_las_pdal_pipeline(src_las_path: str, target_las_path: str, ops: Iterable[Any]):
+def get_a_las_to_las_pdal_pipeline(
+    src_las_path: str, target_las_path: str, ops: Iterable[Any], epsg: int | str
+):
     """Create a pdal pipeline, preserving format, forwarding every dimension.
 
     Args:
         src_las_path (str): input LAS path
         target_las_path (str): output LAS path
         ops (Iterable[Any]): list of pdal operation (e.g. Filter.assign(...))
+        epsg (int | str): epsg code for the input file (if empty or None: infer it from the las metadata)
 
     """
     pipeline = pdal.Pipeline()
-    pipeline |= get_pdal_reader(src_las_path)
+    pipeline |= get_pdal_reader(src_las_path, epsg)
     for op in ops:
         pipeline |= op
     pipeline |= get_pdal_writer(target_las_path)
     return pipeline
 
 
-def pdal_read_las_array(las_path: str):
+def pdal_read_las_array(las_path: str, epsg: int | str):
     """Read LAS as a named array.
 
     Args:
         las_path (str): input LAS path
+        epsg (int | str): epsg code for the input file (if empty or None: infer it from the las metadata)
 
     Returns:
         np.ndarray: named array with all LAS dimensions, including extra ones, with dict-like access.
     """
-    p1 = pdal.Pipeline() | get_pdal_reader(las_path)
+    p1 = pdal.Pipeline() | get_pdal_reader(las_path, epsg)
     p1.execute()
     return p1.arrays[0]
 

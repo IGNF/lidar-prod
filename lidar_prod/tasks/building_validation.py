@@ -93,12 +93,12 @@ class BuildingValidator:
             str: returns `target_las_path`
 
         """
-        self.pipeline = get_pipeline(input_values)
+        self.pipeline = get_pipeline(input_values, self.data_format.epsg)
         with TemporaryDirectory() as td:
             log.info(
                 "Preparation : Clustering of candidates buildings & Import vectors"
             )
-            if type(input_values) == str:
+            if isinstance(input_values, str):
                 log.info(f"Applying Building Validation to file \n{input_values}")
                 temp_f = osp.join(td, osp.basename(input_values))
             else:
@@ -142,7 +142,7 @@ class BuildingValidator:
         )
         dim_overlay = self.data_format.las_dimensions.uni_db_overlay
 
-        self.pipeline = get_pipeline(input_values)
+        self.pipeline = get_pipeline(input_values, self.data_format.epsg)
         # Identify candidates buildings points with a boolean flag
         self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_candidate_flag}")
         _is_candidate_building = (
@@ -170,7 +170,9 @@ class BuildingValidator:
         )
         self.pipeline |= pdal.Filter.assign(value=f"{dim_cluster_id_pdal} = 0")
         self.pipeline.execute()
-        bbox = get_integer_bbox(self.pipeline, buffer=self.bd_uni_request.buffer)
+        bbox = get_integer_bbox(
+            self.pipeline, self.data_format.epsg, buffer=self.bd_uni_request.buffer
+        )
 
         self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_overlay}")
 
@@ -214,7 +216,7 @@ class BuildingValidator:
         """Updates point cloud classification channel."""
         if src_las_path:
             self.pipeline = pdal.Pipeline()
-            self.pipeline |= get_pdal_reader(src_las_path)
+            self.pipeline |= get_pdal_reader(src_las_path, self.data_format.epsg)
             self.pipeline.execute()
 
         points = self.pipeline.arrays[0]

@@ -228,7 +228,7 @@ class BuildingValidationOptimizer:
 
         """
         pipeline = pdal.Pipeline()
-        pipeline |= get_pdal_reader(prepared_las_path)
+        pipeline |= get_pdal_reader(prepared_las_path, self.bv.data_format.epsg)
         pipeline.execute()
         las = pipeline.arrays[0]
         # las: laspy.LasData = laspy.read(prepared_las_path)

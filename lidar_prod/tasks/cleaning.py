@@ -44,14 +44,17 @@ class Cleaner:
         return_str = ",".join([f"{k}={v}" for k, v in self.extra_dims_as_dict.items()])
         return return_str if return_str else []
 
-    def run(self, src_las_path: str, target_las_path: str):
+    def run(self, src_las_path: str, target_las_path: str, epsg: int | str):
         """Clean out LAS extra dimensions.
 
         Args:
             src_las_path (str): input LAS path
             target_las_path (str): output LAS path, with specified extra dims.
+            epsg (int | str): epsg code for the input file (if empty or None: infer
+        it from the las metadata)
+
         """
-        points = pdal_read_las_array(src_las_path)
+        points = pdal_read_las_array(src_las_path, epsg)
         # Check input dims to see what we can keep.
         input_dims = points.dtype.fields.keys()
         self.extra_dims_as_dict = {k: v for k, v in self.extra_dims_as_dict.items() if k in input_dims}

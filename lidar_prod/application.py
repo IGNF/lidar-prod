@@ -18,7 +18,7 @@ from lidar_prod.tasks.utils import (
     get_pipeline,
     request_bd_uni_for_building_shapefile,
     save_las_data_to_las,
-    BDUniConnectionParams
+    BDUniConnectionParams,
 )
 
 log = logging.getLogger(__name__)
@@ -54,7 +54,6 @@ def get_list_las_path_from_src(src_path: str):
 
 @commons.eval_time
 def identify_vegetation_unclassified(config, src_las_path: str, dest_las_path: str):
-
     log.info(f"Identifying on {src_las_path}")
     data_format = config["data_format"]
     las_data = get_las_data_from_las(src_las_path)
@@ -126,10 +125,12 @@ def apply_building_module(
         cl: Cleaner = hydra.utils.instantiate(
             config.data_format.cleaning.input_building
         )
-        cl.run(src_las_path, tmp_las_path)
+        cl.run(src_las_path, tmp_las_path, config.data_format.epsg)
 
         # Validate buildings (unsure/confirmed/refuted) on a per-group basis.
-        bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(config.bd_uni_connection_params)
+        bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(
+            config.bd_uni_connection_params
+        )
 
         bv = BuildingValidator(
             shp_path=config.building_validation.application.shp_path,
@@ -138,7 +139,7 @@ def apply_building_module(
             bd_uni_request=config.building_validation.application.bd_uni_request,
             data_format=config.building_validation.application.data_format,
             thresholds=config.building_validation.application.thresholds,
-            use_final_classification_codes=config.building_validation.application.use_final_classification_codes
+            use_final_classification_codes=config.building_validation.application.use_final_classification_codes,
         )
         bv.run(tmp_las_path)
 
@@ -154,7 +155,7 @@ def apply_building_module(
         cl: Cleaner = hydra.utils.instantiate(
             config.data_format.cleaning.output_building
         )
-        cl.run(tmp_las_path, dest_las_path)
+        cl.run(tmp_las_path, dest_las_path, config.data_format.epsg)
 
     return dest_las_path
 
@@ -176,7 +177,11 @@ def get_shapefile(config: DictConfig, src_las_path: str, dest_las_path: str):
             os.path.splitext(os.path.basename(src_las_path))[0] + ".shp",
         ),  # new shapefile path
         get_integer_bbox(
-            get_pipeline(src_las_path),
+            get_pipeline(
+                src_las_path,
+                config.data_format.epsg,
+            ),
+            config.data_format.epsg,
             buffer=config.building_validation.application.bd_uni_request.buffer,
         ),  # bbox
     )
