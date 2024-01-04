@@ -189,7 +189,7 @@ class BuildingValidator:
             _shp_p = os.path.join(temp_dirpath, "temp.shp")
             log.info("Request Bd Uni")
             buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
-                self.bd_uni_connection_params, _shp_p, bbox
+                self.bd_uni_connection_params, _shp_p, bbox, self.data_format.epsg
             )
 
         # Create overlay dim

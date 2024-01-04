@@ -177,6 +177,7 @@ def request_bd_uni_for_building_shapefile(
     bd_params: BDUniConnectionParams,
     shapefile_path: str,
     bbox: Dict[str, int],
+    epsg: int | str,
 ):
     """Rrequest BD Uni for its buildings.
 
@@ -186,21 +187,23 @@ def request_bd_uni_for_building_shapefile(
     Also add a "PRESENCE" column filled with 1 for later use by pdal.
 
     """
-    Lambert_93_SRID = 2154
+    epsg_srid = (
+        epsg if (isinstance(epsg, int) or epsg.isdigit()) else epsg.split(":")[-1]
+    )
     sql_batiment = f"""SELECT \
-        st_setsrid(batiment.geometrie,{Lambert_93_SRID}) AS geometry, \
+        st_setsrid(batiment.geometrie,{epsg_srid}) AS geometry, \
         1 as presence \
         FROM batiment \
         WHERE batiment.geometrie \
-        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
+        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {epsg_srid}) \
         AND not gcms_detruit"""
 
     sql_reservoir = f"""SELECT \
-        st_setsrid(reservoir.geometrie,{Lambert_93_SRID}) AS geometry, \
+        st_setsrid(reservoir.geometrie,{epsg_srid}) AS geometry, \
         1 as presence \
         FROM reservoir \
         WHERE reservoir.geometrie \
-        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
+        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {epsg_srid}) \
         AND (reservoir.nature = 'Château d''eau' OR reservoir.nature = 'Réservoir industriel') \
         AND NOT gcms_detruit"""
 
@@ -225,10 +228,16 @@ def request_bd_uni_for_building_shapefile(
         subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=120)
     except subprocess.CalledProcessError as e:
         # In empty zones, pgsql2shp does not create a shapefile
-        if b"Initializing... \nERROR: Could not determine table metadata (empty table)\n" in e.output:
-
+        if (
+            b"Initializing... \nERROR: Could not determine table metadata (empty table)\n"
+            in e.output
+        ):
             # write empty shapefile
-            df = geopandas.GeoDataFrame(columns=["id", "geometry"], geometry="geometry", crs=f"EPSG:{Lambert_93_SRID}")
+            df = geopandas.GeoDataFrame(
+                columns=["id", "geometry"],
+                geometry="geometry",
+                crs=f"EPSG:{epsg_srid}",
+            )
             df.to_file(shapefile_path)
 
             return False
