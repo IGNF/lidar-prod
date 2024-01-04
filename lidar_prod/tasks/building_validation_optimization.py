@@ -10,7 +10,6 @@ from typing import Any, Dict, List
 
 import numpy as np
 import optuna
-import pdal
 from sklearn.metrics import confusion_matrix
 from tqdm import tqdm
 
@@ -19,7 +18,10 @@ from lidar_prod.tasks.building_validation import (
     BuildingValidator,
     thresholds,
 )
-from lidar_prod.tasks.utils import get_pdal_reader, split_idx_by_dim
+from lidar_prod.tasks.utils import (
+    split_idx_by_dim,
+    pdal_read_las_array,
+)
 
 log = logging.getLogger(__name__)
 
@@ -227,10 +229,7 @@ class BuildingValidationOptimizer:
             List[BuildingValidationClusterInfo]: cluster information for each cluster of candidate buildings
 
         """
-        pipeline = pdal.Pipeline()
-        pipeline |= get_pdal_reader(prepared_las_path, self.bv.data_format.epsg)
-        pipeline.execute()
-        las = pipeline.arrays[0]
+        las = pdal_read_las_array(prepared_las_path, self.bv.data_format.epsg)
         # las: laspy.LasData = laspy.read(prepared_las_path)
         dim_cluster_id = las[self.bv.data_format.las_dimensions.ClusterID_candidate_building]
         dim_classification = las[self.bv.data_format.las_dimensions.classification]

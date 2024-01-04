@@ -53,34 +53,24 @@ def get_pipeline(input_value: pdal.pipeline.Pipeline | str, epsg: int | str):
     return pipeline
 
 
-def get_las_metadata(entry_value: pdal.pipeline.Pipeline | str, epsg: int | str):
-    """Get las reader metadata from the input las pipeline (or the pipeline created by reading the input file)
-
-    Args:
-        entry_value (pdal.pipeline.Pipeline | str): input value to get a pipeline from (cf. get_pipeline)
-        epsg (int | str): if input_value is a string, use the epsg value to override the crs from the las header
-
-    """
-    pipeline = get_pipeline(entry_value, epsg)
+def get_input_las_metadata(pipeline: pdal.pipeline.Pipeline):
+    """Get las reader metadata from the input pipeline"""
     return pipeline.metadata["metadata"]["readers.las"]
 
 
 def get_integer_bbox(
-    entry_value: pdal.pipeline.Pipeline, epsg: int | str, buffer: Number = 0
+    pipeline: pdal.pipeline.Pipeline, buffer: Number = 0
 ) -> Dict[str, int]:
-    """Get XY bounding box of a cloud, cast x/y min/max to integers.
+    """Get XY bounding box of the las input of a pipeline, cast x/y min/max to integers.
 
     Args:
-        entry_value (pdal.pipeline.Pipeline | str): input value to get a pipeline from (cf. get_pipeline)
-        epsg (int | str): if input_value is a string, use the epsg value to override the crs from the las header
+        pipeline (pdal.pipeline.Pipeline): pipeline for which to read the input bounding box
         buffer (Number, optional): buffer to add to the bounds before casting it to integers. Defaults to 0.
 
     Returns:
         Dict[str, int]: x/y min/max values as a dictionary
     """
-    pipeline = get_pipeline(entry_value, epsg)
-
-    metadata = get_las_metadata(pipeline, epsg)
+    metadata = get_input_las_metadata(pipeline)
     bbox = {
         "x_min": math.floor(metadata["minx"] - buffer),
         "y_min": math.floor(metadata["miny"] - buffer),

@@ -13,7 +13,6 @@ from tqdm import tqdm
 
 from lidar_prod.tasks.utils import (
     get_integer_bbox,
-    get_pdal_reader,
     get_pdal_writer,
     get_pipeline,
     request_bd_uni_for_building_shapefile,
@@ -170,9 +169,7 @@ class BuildingValidator:
         )
         self.pipeline |= pdal.Filter.assign(value=f"{dim_cluster_id_pdal} = 0")
         self.pipeline.execute()
-        bbox = get_integer_bbox(
-            self.pipeline, self.data_format.epsg, buffer=self.bd_uni_request.buffer
-        )
+        bbox = get_integer_bbox(self.pipeline, buffer=self.bd_uni_request.buffer)
 
         self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_overlay}")
 
@@ -215,9 +212,7 @@ class BuildingValidator:
     def update(self, src_las_path: str = None, target_las_path: str = None) -> None:
         """Updates point cloud classification channel."""
         if src_las_path:
-            self.pipeline = pdal.Pipeline()
-            self.pipeline |= get_pdal_reader(src_las_path, self.data_format.epsg)
-            self.pipeline.execute()
+            self.pipeline = get_pipeline(src_las_path, self.data_format.epsg)
 
         points = self.pipeline.arrays[0]
 

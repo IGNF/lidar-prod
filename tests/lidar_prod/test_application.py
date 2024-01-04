@@ -7,9 +7,24 @@ import pyproj
 import pytest
 from omegaconf import open_dict
 
-from lidar_prod.application import apply, apply_building_module, get_shapefile, identify_vegetation_unclassified, just_clean
-from lidar_prod.tasks.utils import get_a_las_to_las_pdal_pipeline, get_las_data_from_las, get_las_metadata
-from tests.conftest import check_las_contains_dims, check_las_invariance, pdal_read_las_array
+from lidar_prod.application import (
+    apply,
+    apply_building_module,
+    get_shapefile,
+    identify_vegetation_unclassified,
+    just_clean,
+)
+from lidar_prod.tasks.utils import (
+    get_a_las_to_las_pdal_pipeline,
+    get_las_data_from_las,
+    get_input_las_metadata,
+    get_pipeline,
+)
+from tests.conftest import (
+    check_las_contains_dims,
+    check_las_invariance,
+    pdal_read_las_array,
+)
 
 LAS_SUBSET_FILE_BUILDING = "tests/files/870000_6618000.subset.postIA.las"
 SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
@@ -105,10 +120,9 @@ def check_format_of_application_output_las(
     assert actual_codes.issubset(expected_codes)
 
 
-def check_las_format_versions_and_srs(
-    pipeline: pdal.pipeline.Pipeline, epsg: int | str
-):
-    metadata = get_las_metadata(pipeline, epsg)
+def check_las_format_versions_and_srs(input_path: str, epsg: int | str):
+    pipeline = get_pipeline(input_path, epsg)
+    metadata = get_input_las_metadata(pipeline)
     assert metadata["minor_version"] == 4
     assert metadata["dataformat_id"] == 8
     # Ensure that the final spatial reference is the same as in the config (if provided)

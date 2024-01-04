@@ -181,7 +181,6 @@ def get_shapefile(config: DictConfig, src_las_path: str, dest_las_path: str):
                 src_las_path,
                 config.data_format.epsg,
             ),
-            config.data_format.epsg,
             buffer=config.building_validation.application.bd_uni_request.buffer,
         ),  # bbox
     )
