@@ -179,36 +179,46 @@ def request_bd_uni_for_building_shapefile(
     bbox: Dict[str, int],
     epsg: int | str,
 ):
-    """Rrequest BD Uni for its buildings.
+    """Request BD Uni for its buildings.
 
-    Create a shapefile with non destructed building on the area of interest
-    and saves it.
+    Create a shapefile with non destructed building on the area of interest and saves it.
 
     Also add a "PRESENCE" column filled with 1 for later use by pdal.
 
+    Note on the projections:
+    Projections are mixed in the BDUni tables.
+    In PostGIS, the declared projection is 0 but the data are stored in the legal projection of the corresponding territories.
+    In each table, there is a a "gcms_territoire" field, which tells the corresponding territory (3 letters code).
+    The gcms_territoire table gives hints on each territory (SRID, footprint)
     """
+
     epsg_srid = (
         epsg if (isinstance(epsg, int) or epsg.isdigit()) else epsg.split(":")[-1]
     )
+
+    sql_territoire = f"""WITH territoire(code) as (SELECT code FROM public.gcms_territoire WHERE srid = {epsg_srid}) """
+
     sql_batiment = f"""SELECT \
         st_setsrid(batiment.geometrie,{epsg_srid}) AS geometry, \
         1 as presence \
-        FROM batiment \
-        WHERE batiment.geometrie \
-        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {epsg_srid}) \
+        FROM batiment, territoire \
+        WHERE (batiment.gcms_territoire = territoire.code) \
+        AND batiment.geometrie \
+        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, 0) \
         AND not gcms_detruit"""
 
     sql_reservoir = f"""SELECT \
         st_setsrid(reservoir.geometrie,{epsg_srid}) AS geometry, \
         1 as presence \
-        FROM reservoir \
-        WHERE reservoir.geometrie \
-        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {epsg_srid}) \
+        FROM reservoir, territoire \
+        WHERE (reservoir.gcms_territoire = territoire.code) \
+        AND reservoir.geometrie \
+        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, 0) \
         AND (reservoir.nature = 'Château d''eau' OR reservoir.nature = 'Réservoir industriel') \
         AND NOT gcms_detruit"""
 
     sql_select_list = [sql_batiment, sql_reservoir]
-    sql_request = " UNION ".join(sql_select_list)
+    sql_request = sql_territoire + " UNION ".join(sql_select_list)
 
     cmd = [
         "pgsql2shp",

@@ -1,6 +1,7 @@
 import os
 import tempfile
 
+import geopandas
 import numpy as np
 import pdal
 import pyproj
@@ -190,3 +191,5 @@ def test_get_shapefile(hydra_cfg):
         os.path.splitext(os.path.basename(LAS_SUBSET_FILE_BUILDING))[0] + ".shp",
     )
     assert os.path.exists(created_shapefile_path)
+    gdf = geopandas.read_file(created_shapefile_path)
+    assert len(gdf.index > 0)
