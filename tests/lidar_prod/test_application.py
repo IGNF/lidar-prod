@@ -33,6 +33,9 @@ LAS_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.las"
 LAZ_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.laz"
 DUMMY_DIRECTORY_PATH = "tests/files/dummy_folder"
 DUMMY_FILE_PATH = "tests/files/dummy_folder/dummy_file1.las"
+LAS_FILE_BUILDING_5490 = (
+    "tests/files/St_Barth_RGAF09_UTM20N_IGN_1988_SB_subset_100m.laz"
+)
 
 
 @pytest.mark.parametrize(
@@ -189,6 +192,22 @@ def test_get_shapefile(hydra_cfg):
     created_shapefile_path = os.path.join(
         os.path.dirname(destination_path),
         os.path.splitext(os.path.basename(LAS_SUBSET_FILE_BUILDING))[0] + ".shp",
+    )
+    assert os.path.exists(created_shapefile_path)
+    gdf = geopandas.read_file(created_shapefile_path)
+    assert len(gdf.index > 0)
+
+
+def test_get_shapefile_epsg_5490(hydra_cfg):
+    # Update EPSG in configuration for this test only
+    hydra_cfg_local = hydra_cfg.copy()
+    hydra_cfg_local.data_format.epsg = 5490
+
+    destination_path = tempfile.NamedTemporaryFile().name
+    get_shapefile(hydra_cfg_local, LAS_FILE_BUILDING_5490, destination_path)
+    created_shapefile_path = os.path.join(
+        os.path.dirname(destination_path),
+        os.path.splitext(os.path.basename(LAS_FILE_BUILDING_5490))[0] + ".shp",
     )
     assert os.path.exists(created_shapefile_path)
     gdf = geopandas.read_file(created_shapefile_path)
