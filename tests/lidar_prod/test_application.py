@@ -1,14 +1,31 @@
 import os
 import tempfile
 
+import geopandas
 import numpy as np
 import pdal
+import pyproj
 import pytest
 from omegaconf import open_dict
 
-from lidar_prod.application import apply, apply_building_module, get_shapefile, identify_vegetation_unclassified, just_clean
-from lidar_prod.tasks.utils import get_a_las_to_las_pdal_pipeline, get_las_data_from_las, get_las_metadata
-from tests.conftest import check_las_contains_dims, check_las_invariance, pdal_read_las_array
+from lidar_prod.application import (
+    apply,
+    apply_building_module,
+    get_shapefile,
+    identify_vegetation_unclassified,
+    just_clean,
+)
+from lidar_prod.tasks.utils import (
+    get_a_las_to_las_pdal_pipeline,
+    get_las_data_from_las,
+    get_input_las_metadata,
+    get_pipeline,
+)
+from tests.conftest import (
+    check_las_contains_dims,
+    check_las_invariance,
+    pdal_read_las_array,
+)
 
 LAS_SUBSET_FILE_BUILDING = "tests/files/870000_6618000.subset.postIA.las"
 SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
@@ -16,6 +33,9 @@ LAS_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.las"
 LAZ_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.laz"
 DUMMY_DIRECTORY_PATH = "tests/files/dummy_folder"
 DUMMY_FILE_PATH = "tests/files/dummy_folder/dummy_file1.las"
+LAS_FILE_BUILDING_5490 = (
+    "tests/files/St_Barth_RGAF09_UTM20N_IGN_1988_SB_subset_100m.laz"
+)
 
 
 @pytest.mark.parametrize(
@@ -59,44 +79,62 @@ def test_application_data_invariance_and_data_format(hydra_cfg, las_mutation, qu
     with tempfile.TemporaryDirectory() as hydra_cfg.paths.output_dir:
         # Copy the data and apply the "mutation"
         mutated_copy: str = tempfile.NamedTemporaryFile().name
-        pipeline = get_a_las_to_las_pdal_pipeline(LAS_SUBSET_FILE_BUILDING, mutated_copy, las_mutation)
+        pipeline = get_a_las_to_las_pdal_pipeline(
+            LAS_SUBSET_FILE_BUILDING,
+            mutated_copy,
+            las_mutation,
+            hydra_cfg.data_format.epsg,
+        )
         pipeline.execute()
         hydra_cfg.paths.src_las = mutated_copy
         if not query_db_Uni:  # we don't request db_uni, we use a shapefile instead
             hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
         updated_las_path_list = apply(hydra_cfg, apply_building_module)
         # Check output
-        check_las_invariance(mutated_copy, updated_las_path_list[0])
-        check_format_of_application_output_las(updated_las_path_list[0], expected_codes)
+        check_las_invariance(
+            mutated_copy, updated_las_path_list[0], hydra_cfg.data_format.epsg
+        )
+        check_format_of_application_output_las(
+            updated_las_path_list[0], hydra_cfg.data_format.epsg, expected_codes
+        )
 
 
-def check_format_of_application_output_las(output_las_path: str, expected_codes: dict):
+def check_format_of_application_output_las(
+    output_las_path: str, epsg: int | str, expected_codes: dict
+):
     """Check LAS format, dimensions, and classification codes of output
 
     Args:
         output_las_path (str): path of output LAS
+        epsg (int | str): epsg code for the file (if empty or None: infer
+        it from the las metadata). Used to read the data
         expected_codes (dict): set of expected classification codes.
 
     """
     # Check that we contain extra_dims that production needs
-    check_las_contains_dims(output_las_path, dims_to_check=["Group", "entropy"])
+    check_las_contains_dims(output_las_path, epsg, dims_to_check=["Group", "entropy"])
 
     # Ensure that the format versions are as expected
-    check_las_format_versions_and_srs(output_las_path)
+    check_las_format_versions_and_srs(output_las_path, epsg)
 
     # Check that we have either 1/2 (ground/unclassified),
     # or one of the three final classification code of the module
-    arr1 = pdal_read_las_array(output_las_path)
+    arr1 = pdal_read_las_array(output_las_path, epsg)
     actual_codes = {*np.unique(arr1["Classification"])}
     assert actual_codes.issubset(expected_codes)
 
 
-def check_las_format_versions_and_srs(pipeline: pdal.pipeline.Pipeline):
-    metadata = get_las_metadata(pipeline)
+def check_las_format_versions_and_srs(input_path: str, epsg: int | str):
+    pipeline = get_pipeline(input_path, epsg)
+    metadata = get_input_las_metadata(pipeline)
     assert metadata["minor_version"] == 4
     assert metadata["dataformat_id"] == 8
-    # Ensure that the final spatial reference is French CRS Lambert-93
-    assert "Lambert-93" in metadata["spatialreference"]
+    # Ensure that the final spatial reference is the same as in the config (if provided)
+    metadata_crs = metadata["srs"]["compoundwkt"]
+    assert metadata_crs
+    if epsg:
+        expected_crs = pyproj.crs.CRS(epsg)
+        assert expected_crs.equals(metadata_crs)
 
 
 @pytest.mark.parametrize(
@@ -156,3 +194,21 @@ def test_get_shapefile(hydra_cfg):
         os.path.splitext(os.path.basename(LAS_SUBSET_FILE_BUILDING))[0] + ".shp",
     )
     assert os.path.exists(created_shapefile_path)
+    gdf = geopandas.read_file(created_shapefile_path)
+    assert len(gdf.index > 0)
+
+
+def test_get_shapefile_epsg_5490(hydra_cfg):
+    # Update EPSG in configuration for this test only
+    hydra_cfg_local = hydra_cfg.copy()
+    hydra_cfg_local.data_format.epsg = 5490
+
+    destination_path = tempfile.NamedTemporaryFile().name
+    get_shapefile(hydra_cfg_local, LAS_FILE_BUILDING_5490, destination_path)
+    created_shapefile_path = os.path.join(
+        os.path.dirname(destination_path),
+        os.path.splitext(os.path.basename(LAS_FILE_BUILDING_5490))[0] + ".shp",
+    )
+    assert os.path.exists(created_shapefile_path)
+    gdf = geopandas.read_file(created_shapefile_path)
+    assert len(gdf.index > 0)

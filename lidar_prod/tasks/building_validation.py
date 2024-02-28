@@ -13,7 +13,6 @@ from tqdm import tqdm
 
 from lidar_prod.tasks.utils import (
     get_integer_bbox,
-    get_pdal_reader,
     get_pdal_writer,
     get_pipeline,
     request_bd_uni_for_building_shapefile,
@@ -93,12 +92,12 @@ class BuildingValidator:
             str: returns `target_las_path`
 
         """
-        self.pipeline = get_pipeline(input_values)
+        self.pipeline = get_pipeline(input_values, self.data_format.epsg)
         with TemporaryDirectory() as td:
             log.info(
                 "Preparation : Clustering of candidates buildings & Import vectors"
             )
-            if type(input_values) == str:
+            if isinstance(input_values, str):
                 log.info(f"Applying Building Validation to file \n{input_values}")
                 temp_f = osp.join(td, osp.basename(input_values))
             else:
@@ -142,7 +141,7 @@ class BuildingValidator:
         )
         dim_overlay = self.data_format.las_dimensions.uni_db_overlay
 
-        self.pipeline = get_pipeline(input_values)
+        self.pipeline = get_pipeline(input_values, self.data_format.epsg)
         # Identify candidates buildings points with a boolean flag
         self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_candidate_flag}")
         _is_candidate_building = (
@@ -190,7 +189,7 @@ class BuildingValidator:
             _shp_p = os.path.join(temp_dirpath, "temp.shp")
             log.info("Request Bd Uni")
             buildings_in_bd_topo = request_bd_uni_for_building_shapefile(
-                self.bd_uni_connection_params, _shp_p, bbox
+                self.bd_uni_connection_params, _shp_p, bbox, self.data_format.epsg
             )
 
         # Create overlay dim
@@ -213,9 +212,7 @@ class BuildingValidator:
     def update(self, src_las_path: str = None, target_las_path: str = None) -> None:
         """Updates point cloud classification channel."""
         if src_las_path:
-            self.pipeline = pdal.Pipeline()
-            self.pipeline |= get_pdal_reader(src_las_path)
-            self.pipeline.execute()
+            self.pipeline = get_pipeline(src_las_path, self.data_format.epsg)
 
         points = self.pipeline.arrays[0]
 

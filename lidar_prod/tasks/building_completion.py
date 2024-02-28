@@ -51,8 +51,10 @@ class BuildingCompletor:
             str: returns `target_las_path` for potential terminal piping.
 
         """
-        log.info("Completion of building with relatively distant points that have high enough probability")
-        pipeline = get_pipeline(input_values)
+        log.info(
+            "Completion of building with relatively distant points that have high enough probability"
+        )
+        pipeline = get_pipeline(input_values, self.data_format.epsg)
         self.prepare_for_building_completion(pipeline)
         self.update_classification()
 

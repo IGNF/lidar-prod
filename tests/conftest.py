@@ -24,11 +24,11 @@ def hydra_cfg():
         return compose(config_name="config", overrides=["data_format=default.yaml", "building_validation/optimization=pytest.yaml"])
 
 
-def check_las_invariance(las_path1, las_path2):
+def check_las_invariance(las_path1, las_path2, epsg):
     TOLERANCE = 0.0001
 
-    array1 = pdal_read_las_array(las_path1)
-    array2 = pdal_read_las_array(las_path2)
+    array1 = pdal_read_las_array(las_path1, epsg)
+    array2 = pdal_read_las_array(las_path2, epsg)
     key_dims = ["X", "Y", "Z", "Infrared", "Red", "Blue", "Green", "Intensity"]
     assert array1.shape == array2.shape  # no loss of points
     assert all(dim in array2.dtype.fields.keys() for dim in key_dims)  # key dimensions are here
@@ -41,7 +41,7 @@ def check_las_invariance(las_path1, las_path2):
         assert pytest.approx(np.sum(array2[dim]), TOLERANCE) == np.sum(array1[dim])
 
 
-def check_las_contains_dims(las1, dims_to_check=[]):
-    a1 = pdal_read_las_array(las1)
+def check_las_contains_dims(las1, epsg, dims_to_check=[]):
+    a1 = pdal_read_las_array(las1, epsg)
     for d in dims_to_check:
         assert d in a1.dtype.fields.keys()

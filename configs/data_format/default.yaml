@@ -1,3 +1,6 @@
+# EPSG code to override the las spatial reference
+epsg: 2154
+
 # Those names connect the logics between successive tasks
 las_dimensions:
   # input
@@ -18,7 +21,7 @@ las_dimensions:
   # Intermediary channels
   cluster_id: ClusterID  # pdal-defined -> created by clustering operations
   uni_db_overlay: BDTopoOverlay  # user-defined -> a 0/1 flag for presence of a BDUni vector
-  candidate_buildings_flag: F_CandidateB # -> a 0/1 flag identifying candidate buildings found by rule- based classification  
+  candidate_buildings_flag: F_CandidateB # -> a 0/1 flag identifying candidate buildings found by rule- based classification
   ClusterID_candidate_building: CID_CandidateB  # -> Cluster index from BuildingValidator, 0 if no cluster, 1-n otherwise
   ClusterID_confirmed_or_high_proba: CID_IsolatedOrConfirmed  # -> Cluster index from BuildingCompletor, 0 if no cluster, 1-n otherwise
   completion_non_candidate_flag: F_NonCandidateCompletion  # --> a 0/1 flag for non candidates points with high proba and close to confirmed buildings

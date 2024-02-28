@@ -92,7 +92,7 @@ def test_BVOptimization_on_subset(hydra_cfg):
         bvo.bv.use_final_classification_codes = True
         bvo.update()
         assert os.path.isfile(updated_las_path)
-        arr = pdal_read_las_array(updated_las_path)
+        arr = pdal_read_las_array(updated_las_path, hydra_cfg.data_format.epsg)
         # Check that we have either 1/2 (ground/unclassified), or one of
         # the final classification code of the module.
         final_codes = hydra_cfg.data_format.codes.building.final
