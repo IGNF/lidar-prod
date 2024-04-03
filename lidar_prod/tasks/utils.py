@@ -96,9 +96,9 @@ def get_pdal_reader(las_path: str, epsg: int | str) -> pdal.Reader.las:
         reader = pdal.Reader.las(
             filename=las_path,
             nosrs=True,
-            override_srs=f"EPSG:{epsg}"
-            if (isinstance(epsg, int) or epsg.isdigit())
-            else epsg,
+            override_srs=(
+                f"EPSG:{epsg}" if (isinstance(epsg, int) or epsg.isdigit()) else epsg
+            ),
         )
     else:
         reader = pdal.Reader.las(
@@ -199,7 +199,7 @@ def request_bd_uni_for_building_shapefile(
     sql_territoire = f"""WITH territoire(code) as (SELECT code FROM public.gcms_territoire WHERE srid = {epsg_srid}) """
 
     sql_batiment = f"""SELECT \
-        st_setsrid(batiment.geometrie,{epsg_srid}) AS geometry, \
+        ST_MakeValid(ST_Force2D(st_setsrid(batiment.geometrie,{epsg_srid}))) AS geometry, \
         1 as presence \
         FROM batiment, territoire \
         WHERE (batiment.gcms_territoire = territoire.code) \
@@ -208,7 +208,7 @@ def request_bd_uni_for_building_shapefile(
         AND not gcms_detruit"""
 
     sql_reservoir = f"""SELECT \
-        st_setsrid(reservoir.geometrie,{epsg_srid}) AS geometry, \
+        ST_MakeValid(ST_Force2D(st_setsrid(reservoir.geometrie,{epsg_srid}))) AS geometry, \
         1 as presence \
         FROM reservoir, territoire \
         WHERE (reservoir.gcms_territoire = territoire.code) \
@@ -220,6 +220,7 @@ def request_bd_uni_for_building_shapefile(
     sql_select_list = [sql_batiment, sql_reservoir]
     sql_request = sql_territoire + " UNION ".join(sql_select_list)
 
+    print(sql_request)
     cmd = [
         "pgsql2shp",
         "-f",
