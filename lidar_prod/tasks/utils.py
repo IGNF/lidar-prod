@@ -220,7 +220,6 @@ def request_bd_uni_for_building_shapefile(
     sql_select_list = [sql_batiment, sql_reservoir]
     sql_request = sql_territoire + " UNION ".join(sql_select_list)
 
-    print(sql_request)
     cmd = [
         "pgsql2shp",
         "-f",
@@ -266,10 +265,5 @@ def request_bd_uni_for_building_shapefile(
     except subprocess.TimeoutExpired as e:
         log.error("Time out when requesting BDUni.")
         raise e
-
-    # read & write to avoid unnacepted 3D shapefile format.
-    # Dissolve to avoid invalid shapefile that would make pdal hang in overlay filter.
-    gdf = geopandas.read_file(shapefile_path)
-    gdf[["PRESENCE", "geometry"]].dissolve().to_file(shapefile_path)
 
     return True
