@@ -29,7 +29,7 @@ jobs:
           sed -i '/pwd:/c\pwd: ${{ secrets.PASSWORD_BD_UNI }}' configs/bd_uni_connection_params/credentials.yaml
 
       - name: build docker image
-        run: docker build -t lidar_prod .
+        run: docker build --build-arg http_proxy=http://proxy.ign.fr:3128/ --build-arg https_proxy=http://proxy.ign.fr:3128/ -t lidar_prod .
 
       - name: Check code neatness (linter)
         run: docker run lidar_prod flake8
