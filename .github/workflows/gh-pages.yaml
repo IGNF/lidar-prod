@@ -5,10 +5,9 @@ name: "Documentation Build"
 on:
   push:
     branches:
-      - main  # <- only on main branch
+      - main # <- only on main branch
 
 jobs:
-
   build-and-deploy:
     runs-on: ubuntu-latest
 
@@ -20,7 +19,7 @@ jobs:
     steps:
       # Checkout the repository
       - name: "Checkout"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # See https://github.com/conda-incubator/setup-miniconda#caching-environments
 
@@ -28,12 +27,12 @@ jobs:
       - name: Setup a conda-incubator with an empty conda env
         uses: conda-incubator/setup-miniconda@v2
         with:
-            python-version: 3.9.12
-            miniforge-variant: Mambaforge
-            miniforge-version: latest
-            use-mamba: true
-            # Environment to create and activate for next steps
-            activate-environment: lidar_prod
+          python-version: 3.9.12
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          use-mamba: true
+          # Environment to create and activate for next steps
+          activate-environment: lidar_prod
 
       # Cache the env
       # See https://github.com/conda-incubator/setup-miniconda#caching-environments
@@ -66,5 +65,5 @@ jobs:
       - name: "Deploy Github Pages"
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
-          BRANCH: gh-pages     # <- Branch where generated doc files will be commited
-          FOLDER: ./docs/build/html/  # <- Dir where .nojekyll is created and from which to deploy github pages.
+          BRANCH: gh-pages # <- Branch where generated doc files will be commited
+          FOLDER: ./docs/build/html/ # <- Dir where .nojekyll is created and from which to deploy github pages.
