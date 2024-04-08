@@ -9,6 +9,7 @@ import geopandas
 import laspy
 import numpy as np
 import pdal
+import psycopg2
 
 log = logging.getLogger(__name__)
 
@@ -58,9 +59,7 @@ def get_input_las_metadata(pipeline: pdal.pipeline.Pipeline):
     return pipeline.metadata["metadata"]["readers.las"]
 
 
-def get_integer_bbox(
-    pipeline: pdal.pipeline.Pipeline, buffer: Number = 0
-) -> Dict[str, int]:
+def get_integer_bbox(pipeline: pdal.pipeline.Pipeline, buffer: Number = 0) -> Dict[str, int]:
     """Get XY bounding box of the las input of a pipeline, cast x/y min/max to integers.
 
     Args:
@@ -96,9 +95,7 @@ def get_pdal_reader(las_path: str, epsg: int | str) -> pdal.Reader.las:
         reader = pdal.Reader.las(
             filename=las_path,
             nosrs=True,
-            override_srs=(
-                f"EPSG:{epsg}" if (isinstance(epsg, int) or epsg.isdigit()) else epsg
-            ),
+            override_srs=(f"EPSG:{epsg}" if (isinstance(epsg, int) or epsg.isdigit()) else epsg),
         )
     else:
         reader = pdal.Reader.las(
@@ -173,6 +170,44 @@ def pdal_read_las_array(las_path: str, epsg: int | str):
     return p1.arrays[0]
 
 
+def check_bbox_intersects_territoire_with_srid(
+    bd_params: BDUniConnectionParams, bbox: Dict[str, int], epsg_srid: int | str
+):
+    """Check if a bounding box intersects one of the territories from the BDUni database
+    (public.gcms_territoire) with the expected srid.
+    As geometries are indicated with srid = 0 in the database (but stored in their original projection),
+    both geometries are compared using this common srid.
+    In the territoire geometry query, ST_Union is used to combine different territoires that would have the same
+    srid (eg. 5490 for Guadeloupe and Martinique)
+    """
+    conn = psycopg2.connect(
+        dbname=bd_params.bd_name,
+        user=bd_params.user,
+        password=bd_params.pwd,
+        host=bd_params.host,
+    )
+    try:
+        with conn:
+            with conn.cursor() as curs:
+                query = f"""select ST_Intersects(
+                    ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, 0),
+                    ST_SetSRID(ST_Envelope(ST_Union(ST_Force2D(geometrie))),0))::bool as consistency_bbox_srid
+                    from public.gcms_territoire
+                    where srid = '{epsg_srid}'
+                    limit 1;
+                """
+                curs.execute(query)
+                out = curs.fetchone()
+
+    # Unlike file objects or other resources, exiting the connection’s with block doesn’t close the connection
+    # hence we need to close it manually
+    # cf https://www.psycopg.org/docs/usage.html#with-statement
+    finally:
+        conn.close()
+
+    return out[0]
+
+
 def request_bd_uni_for_building_shapefile(
     bd_params: BDUniConnectionParams,
     shapefile_path: str,
@@ -187,14 +222,19 @@ def request_bd_uni_for_building_shapefile(
 
     Note on the projections:
     Projections are mixed in the BDUni tables.
-    In PostGIS, the declared projection is 0 but the data are stored in the legal projection of the corresponding territories.
+    In PostGIS, the declared projection is 0 but the data are stored in the legal projection of the corresponding
+    territories.
     In each table, there is a a "gcms_territoire" field, which tells the corresponding territory (3 letters code).
     The gcms_territoire table gives hints on each territory (SRID, footprint)
     """
 
-    epsg_srid = (
-        epsg if (isinstance(epsg, int) or epsg.isdigit()) else epsg.split(":")[-1]
-    )
+    epsg_srid = epsg if (isinstance(epsg, int) or epsg.isdigit()) else epsg.split(":")[-1]
+
+    if not check_bbox_intersects_territoire_with_srid(bd_params, bbox, epsg_srid):
+        raise ValueError(
+            f"The query bbox ({bbox}) does not intersect with any territoire in the database with "
+            + f"the query srid ({epsg_srid}). Please check that you passed the correct srid."
+        )
 
     sql_territoire = f"""WITH territoire(code) as (SELECT code FROM public.gcms_territoire WHERE srid = {epsg_srid}) """
 
