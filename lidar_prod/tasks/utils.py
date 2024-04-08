@@ -260,22 +260,18 @@ def request_bd_uni_for_building_shapefile(
     sql_select_list = [sql_batiment, sql_reservoir]
     sql_request = sql_territoire + " UNION ".join(sql_select_list)
 
-    cmd = [
-        "pgsql2shp",
-        "-f",
-        shapefile_path,
-        "-h",
-        bd_params.host,
-        "-u",
-        bd_params.user,
-        "-P",
-        bd_params.pwd,
-        bd_params.bd_name,
-        sql_request,
-    ]
+    cmd = f"""pgsql2shp -f {shapefile_path} \
+                        -h {bd_params.host} \
+                        -u {bd_params.user} \
+                        -P {bd_params.pwd} \
+                        {bd_params.bd_name} \
+                        \"{sql_request}\""""
+
     # This call may yield
     try:
-        subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=120)
+        subprocess.check_output(
+            cmd, shell=True, stderr=subprocess.STDOUT, timeout=120, encoding="utf-8"
+        )
     except subprocess.CalledProcessError as e:
         # In empty zones, pgsql2shp does not create a shapefile
         if (
