@@ -39,7 +39,7 @@ jobs:
           docker run --network host
           lidar_prod
           python -m
-          pytest -rA -v -m "not slow" --ignore=actions-runner
+          pytest -rA -vv -m "not slow" --ignore=actions-runner
 
       - name: Run slow tests last (evaluation on large file)
         run: >

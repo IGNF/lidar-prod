@@ -1,11 +1,12 @@
-FROM mambaorg/micromamba:latest
+# Fix mambaorg/micromamba tag (lastest was not updated on the ci computer)
+FROM mambaorg/micromamba:bookworm-slim
 
 # all the apt-get installs
 USER root
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y \
-    software-properties-common \
-    postgis
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y postgis>=3.3.0
 
 # Only copy necessary files to set up the environment, in order
 # to use docker caching if requirements files were not updated.
