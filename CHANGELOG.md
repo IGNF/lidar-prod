@@ -1,5 +1,8 @@
 # main
 
+## 1.10.0
+- Add support for EPSG reference other than 2154
+
 ### 1.9.14
 - Be robust to pgsql2shp warnings when dealing with empty tables (i;e. no buildings).
 

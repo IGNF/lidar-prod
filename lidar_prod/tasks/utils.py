@@ -3,12 +3,13 @@ import math
 import subprocess
 from dataclasses import dataclass
 from numbers import Number
-from typing import Any, Dict, Iterable, Union
+from typing import Any, Dict, Iterable
 
 import geopandas
 import laspy
 import numpy as np
 import pdal
+import psycopg2
 
 log = logging.getLogger(__name__)
 
@@ -34,25 +35,41 @@ def split_idx_by_dim(dim_array):
     return group_idx
 
 
-def get_pipeline(input_value: Union[pdal.pipeline.Pipeline, str]):
-    """If the input value is a pipeline, returns it, if it's a las path return the corresponding pipeline"""
-    if type(input_value) == str:
-        pipeline = pdal.Pipeline() | get_pdal_reader(input_value)
+def get_pipeline(input_value: pdal.pipeline.Pipeline | str, epsg: int | str):
+    """If the input value is a pipeline, returns it, if it's a las path return the corresponding pipeline
+
+    Args:
+        input_value (pdal.pipeline.Pipeline | str): input value to get a pipeline from
+        (las pipeline or path to a file to read with pdal)
+        epsg (int | str): if input_value is a string, use the epsg value to override the crs from the las header
+
+    Returns:
+        pdal pipeline
+    """
+    if isinstance(input_value, str):
+        pipeline = pdal.Pipeline() | get_pdal_reader(input_value, epsg)
         pipeline.execute()
     else:
         pipeline = input_value
     return pipeline
 
 
-def get_las_metadata(entry_value: Union[pdal.pipeline.Pipeline, str]):
-    pipeline = get_pipeline(entry_value)
+def get_input_las_metadata(pipeline: pdal.pipeline.Pipeline):
+    """Get las reader metadata from the input pipeline"""
     return pipeline.metadata["metadata"]["readers.las"]
 
 
-def get_integer_bbox(entry_value: Union[pdal.pipeline.Pipeline, str], buffer: Number = 0) -> Dict[str, int]:
-    pipeline = get_pipeline(entry_value)
-    """Get XY bounding box of a cloud, cast x/y min/max to integers."""
-    metadata = get_las_metadata(pipeline)
+def get_integer_bbox(pipeline: pdal.pipeline.Pipeline, buffer: Number = 0) -> Dict[str, int]:
+    """Get XY bounding box of the las input of a pipeline, cast x/y min/max to integers.
+
+    Args:
+        pipeline (pdal.pipeline.Pipeline): pipeline for which to read the input bounding box
+        buffer (Number, optional): buffer to add to the bounds before casting it to integers. Defaults to 0.
+
+    Returns:
+        Dict[str, int]: x/y min/max values as a dictionary
+    """
+    metadata = get_input_las_metadata(pipeline)
     bbox = {
         "x_min": math.floor(metadata["minx"] - buffer),
         "y_min": math.floor(metadata["miny"] - buffer),
@@ -62,21 +79,30 @@ def get_integer_bbox(entry_value: Union[pdal.pipeline.Pipeline, str], buffer: Nu
     return bbox
 
 
-def get_pdal_reader(las_path: str) -> pdal.Reader.las:
+def get_pdal_reader(las_path: str, epsg: int | str) -> pdal.Reader.las:
     """Standard Reader which imposes Lamber 93 SRS.
 
     Args:
         las_path (str): input LAS path to read.
+        epsg (int | str): epsg code for the input file (if empty or None: infer
+        it from the las metadata)
 
     Returns:
         pdal.Reader.las: reader to use in a pipeline.
 
     """
-    return pdal.Reader.las(
-        filename=las_path,
-        nosrs=True,
-        override_srs="EPSG:2154",
-    )
+    if epsg:
+        reader = pdal.Reader.las(
+            filename=las_path,
+            nosrs=True,
+            override_srs=(f"EPSG:{epsg}" if (isinstance(epsg, int) or epsg.isdigit()) else epsg),
+        )
+    else:
+        reader = pdal.Reader.las(
+            filename=las_path,
+        )
+
+    return reader
 
 
 def get_las_data_from_las(las_path: str) -> laspy.lasdata.LasData:
@@ -109,93 +135,155 @@ def save_las_data_to_las(las_path: str, las_data: laspy.lasdata.LasData):
     las_data.write(las_path)
 
 
-def get_a_las_to_las_pdal_pipeline(src_las_path: str, target_las_path: str, ops: Iterable[Any]):
+def get_a_las_to_las_pdal_pipeline(
+    src_las_path: str, target_las_path: str, ops: Iterable[Any], epsg: int | str
+):
     """Create a pdal pipeline, preserving format, forwarding every dimension.
 
     Args:
         src_las_path (str): input LAS path
         target_las_path (str): output LAS path
         ops (Iterable[Any]): list of pdal operation (e.g. Filter.assign(...))
+        epsg (int | str): epsg code for the input file (if empty or None: infer it from the las metadata)
 
     """
     pipeline = pdal.Pipeline()
-    pipeline |= get_pdal_reader(src_las_path)
+    pipeline |= get_pdal_reader(src_las_path, epsg)
     for op in ops:
         pipeline |= op
     pipeline |= get_pdal_writer(target_las_path)
     return pipeline
 
 
-def pdal_read_las_array(las_path: str):
+def pdal_read_las_array(las_path: str, epsg: int | str):
     """Read LAS as a named array.
 
     Args:
         las_path (str): input LAS path
+        epsg (int | str): epsg code for the input file (if empty or None: infer it from the las metadata)
 
     Returns:
         np.ndarray: named array with all LAS dimensions, including extra ones, with dict-like access.
     """
-    p1 = pdal.Pipeline() | get_pdal_reader(las_path)
+    p1 = pdal.Pipeline() | get_pdal_reader(las_path, epsg)
     p1.execute()
     return p1.arrays[0]
+
+
+def check_bbox_intersects_territoire_with_srid(
+    bd_params: BDUniConnectionParams, bbox: Dict[str, int], epsg_srid: int | str
+):
+    """Check if a bounding box intersects one of the territories from the BDUni database
+    (public.gcms_territoire) with the expected srid.
+    As geometries are indicated with srid = 0 in the database (but stored in their original projection),
+    both geometries are compared using this common srid.
+    In the territoire geometry query, ST_Union is used to combine different territoires that would have the same
+    srid (eg. 5490 for Guadeloupe and Martinique)
+    """
+    conn = psycopg2.connect(
+        dbname=bd_params.bd_name,
+        user=bd_params.user,
+        password=bd_params.pwd,
+        host=bd_params.host,
+    )
+    try:
+        with conn:
+            with conn.cursor() as curs:
+                query = f"""select ST_Intersects(
+                    ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, 0),
+                    ST_SetSRID(ST_Envelope(ST_Union(ST_Force2D(geometrie))),0))::bool as consistency_bbox_srid
+                    from public.gcms_territoire
+                    where srid = '{epsg_srid}'
+                    limit 1;
+                """
+                curs.execute(query)
+                out = curs.fetchone()
+
+    # Unlike file objects or other resources, exiting the connection’s with block doesn’t close the connection
+    # hence we need to close it manually
+    # cf https://www.psycopg.org/docs/usage.html#with-statement
+    finally:
+        conn.close()
+
+    return out[0]
 
 
 def request_bd_uni_for_building_shapefile(
     bd_params: BDUniConnectionParams,
     shapefile_path: str,
     bbox: Dict[str, int],
+    epsg: int | str,
 ):
-    """Rrequest BD Uni for its buildings.
+    """Request BD Uni for its buildings.
 
-    Create a shapefile with non destructed building on the area of interest
-    and saves it.
+    Create a shapefile with non destructed building on the area of interest and saves it.
 
     Also add a "PRESENCE" column filled with 1 for later use by pdal.
 
+    Note on the projections:
+    Projections are mixed in the BDUni tables.
+    In PostGIS, the declared projection is 0 but the data are stored in the legal projection of the corresponding
+    territories.
+    In each table, there is a a "gcms_territoire" field, which tells the corresponding territory (3 letters code).
+    The gcms_territoire table gives hints on each territory (SRID, footprint)
     """
-    Lambert_93_SRID = 2154
+
+    epsg_srid = epsg if (isinstance(epsg, int) or epsg.isdigit()) else epsg.split(":")[-1]
+
+    if not check_bbox_intersects_territoire_with_srid(bd_params, bbox, epsg_srid):
+        raise ValueError(
+            f"The query bbox ({bbox}) does not intersect with any territoire in the database with "
+            + f"the query srid ({epsg_srid}). Please check that you passed the correct srid."
+        )
+
+    sql_territoire = f"""WITH territoire(code) as (SELECT code FROM public.gcms_territoire WHERE srid = {epsg_srid}) """
+
     sql_batiment = f"""SELECT \
-        st_setsrid(batiment.geometrie,{Lambert_93_SRID}) AS geometry, \
+        ST_MakeValid(ST_Force2D(st_setsrid(batiment.geometrie,{epsg_srid}))) AS geometry, \
         1 as presence \
-        FROM batiment \
-        WHERE batiment.geometrie \
-        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
+        FROM batiment, territoire \
+        WHERE (batiment.gcms_territoire = territoire.code) \
+        AND batiment.geometrie \
+        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, 0) \
         AND not gcms_detruit"""
 
     sql_reservoir = f"""SELECT \
-        st_setsrid(reservoir.geometrie,{Lambert_93_SRID}) AS geometry, \
+        ST_MakeValid(ST_Force2D(st_setsrid(reservoir.geometrie,{epsg_srid}))) AS geometry, \
         1 as presence \
-        FROM reservoir \
-        WHERE reservoir.geometrie \
-        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, {Lambert_93_SRID}) \
+        FROM reservoir, territoire \
+        WHERE (reservoir.gcms_territoire = territoire.code) \
+        AND reservoir.geometrie \
+        && ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, 0) \
         AND (reservoir.nature = 'Château d''eau' OR reservoir.nature = 'Réservoir industriel') \
         AND NOT gcms_detruit"""
 
     sql_select_list = [sql_batiment, sql_reservoir]
-    sql_request = " UNION ".join(sql_select_list)
+    sql_request = sql_territoire + " UNION ".join(sql_select_list)
 
-    cmd = [
-        "pgsql2shp",
-        "-f",
-        shapefile_path,
-        "-h",
-        bd_params.host,
-        "-u",
-        bd_params.user,
-        "-P",
-        bd_params.pwd,
-        bd_params.bd_name,
-        sql_request,
-    ]
+    cmd = f"""pgsql2shp -f {shapefile_path} \
+                        -h {bd_params.host} \
+                        -u {bd_params.user} \
+                        -P {bd_params.pwd} \
+                        {bd_params.bd_name} \
+                        \"{sql_request}\""""
+
     # This call may yield
     try:
-        subprocess.check_output(cmd, stderr=subprocess.STDOUT, timeout=120)
+        subprocess.check_output(
+            cmd, shell=True, stderr=subprocess.STDOUT, timeout=120, encoding="utf-8"
+        )
     except subprocess.CalledProcessError as e:
         # In empty zones, pgsql2shp does not create a shapefile
-        if b"Initializing... \nERROR: Could not determine table metadata (empty table)\n" in e.output:
-
+        if (
+            b"Initializing... \nERROR: Could not determine table metadata (empty table)\n"
+            in e.output
+        ):
             # write empty shapefile
-            df = geopandas.GeoDataFrame(columns=["id", "geometry"], geometry="geometry", crs=f"EPSG:{Lambert_93_SRID}")
+            df = geopandas.GeoDataFrame(
+                columns=["id", "geometry"],
+                geometry="geometry",
+                crs=f"EPSG:{epsg_srid}",
+            )
             df.to_file(shapefile_path)
 
             return False
@@ -213,10 +301,5 @@ def request_bd_uni_for_building_shapefile(
     except subprocess.TimeoutExpired as e:
         log.error("Time out when requesting BDUni.")
         raise e
-
-    # read & write to avoid unnacepted 3D shapefile format.
-    # Dissolve to avoid invalid shapefile that would make pdal hang in overlay filter.
-    gdf = geopandas.read_file(shapefile_path)
-    gdf[["PRESENCE", "geometry"]].dissolve().to_file(shapefile_path)
 
     return True

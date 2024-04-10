@@ -2,7 +2,7 @@ name: lidar_prod
 channels:
   - conda-forge
 dependencies:
-  - python==3.9.*
+  - python==3.10.*
   - pip
   # --------- linters --------- #
   - pre-commit # hooks for applying linters on commit
@@ -15,11 +15,13 @@ dependencies:
   - numpy
   - scikit-learn
   - geopandas
+  - pyproj
   # --------- others --------- #
+  - psycopg2 # database interaction
   - jupyterlab # better jupyter notebooks
   - pudb # debugger
-  - rich==11.2.*  # rich text formatting
-  - pytest==6.2.*  # tests
+  - rich==11.2.* # rich text formatting
+  - pytest>=7.1.2 # tests
   - pytest-cov==3.0.*
   # --------- torch --------- #
   - pip:
