@@ -13,12 +13,12 @@ from lidar_prod.tasks.building_identification import BuildingIdentifier
 from lidar_prod.tasks.building_validation import BuildingValidator
 from lidar_prod.tasks.cleaning import Cleaner
 from lidar_prod.tasks.utils import (
+    BDUniConnectionParams,
     get_integer_bbox,
     get_las_data_from_las,
     get_pipeline,
     request_bd_uni_for_building_shapefile,
     save_las_data_to_las,
-    BDUniConnectionParams,
 )
 
 log = logging.getLogger(__name__)
@@ -28,9 +28,7 @@ log = logging.getLogger(__name__)
 def apply(config: DictConfig, logic: Callable):
     applied_file_list = []
     for src_las_path in get_list_las_path_from_src(config.paths.src_las):
-        target_las_path = os.path.join(
-            config.paths.output_dir, os.path.basename(src_las_path)
-        )
+        target_las_path = os.path.join(config.paths.output_dir, os.path.basename(src_las_path))
         logic(config, src_las_path, target_las_path)
         applied_file_list.append(target_las_path)
     return applied_file_list
@@ -59,9 +57,7 @@ def identify_vegetation_unclassified(config, src_las_path: str, dest_las_path: s
     las_data = get_las_data_from_las(src_las_path)
 
     # add the necessary dimension to store the results
-    cleaner: Cleaner = hydra.utils.instantiate(
-        data_format.cleaning.input_vegetation_unclassified
-    )
+    cleaner: Cleaner = hydra.utils.instantiate(data_format.cleaning.input_vegetation_unclassified)
     cleaner.add_dimensions(las_data)
 
     # detect vegetation
@@ -83,9 +79,7 @@ def identify_vegetation_unclassified(config, src_las_path: str, dest_las_path: s
     unclassified_identifier.identify(las_data)
 
     # keeping only the wanted dimensions for the result las
-    cleaner = hydra.utils.instantiate(
-        data_format.cleaning.output_vegetation_unclassified
-    )
+    cleaner = hydra.utils.instantiate(data_format.cleaning.output_vegetation_unclassified)
     cleaner.remove_dimensions(las_data)
 
     save_las_data_to_las(dest_las_path, las_data)
@@ -108,9 +102,7 @@ def just_clean(config, src_las_path: str, dest_las_path: str):
 
 
 @commons.eval_time
-def apply_building_module(
-    config: DictConfig, src_las_path: str, dest_las_path: str = None
-):
+def apply_building_module(config: DictConfig, src_las_path: str, dest_las_path: str = None):
     """call every desired step to process a las
     Args:
         src_las_path: the path of the source las
@@ -122,9 +114,7 @@ def apply_building_module(
         tmp_las_path = os.path.join(td, os.path.basename(src_las_path))
 
         # Removes unnecessary input dimensions to reduce memory usage
-        cl: Cleaner = hydra.utils.instantiate(
-            config.data_format.cleaning.input_building
-        )
+        cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.input_building)
         cl.run(src_las_path, tmp_las_path, config.data_format.epsg)
 
         # Validate buildings (unsure/confirmed/refuted) on a per-group basis.
@@ -152,9 +142,7 @@ def apply_building_module(
         bi.run(bc.pipeline, tmp_las_path)
 
         # Remove unnecessary intermediary dimensions
-        cl: Cleaner = hydra.utils.instantiate(
-            config.data_format.cleaning.output_building
-        )
+        cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.output_building)
         cl.run(tmp_las_path, dest_las_path, config.data_format.epsg)
 
     return dest_las_path
@@ -169,9 +157,7 @@ def get_shapefile(config: DictConfig, src_las_path: str, dest_las_path: str):
     """
     log.info(f"get shapefile for {src_las_path}")
     request_bd_uni_for_building_shapefile(
-        hydra.utils.instantiate(
-            config.bd_uni_connection_params
-        ),  # BDUniConnectionParams
+        hydra.utils.instantiate(config.bd_uni_connection_params),  # BDUniConnectionParams
         os.path.join(
             os.path.dirname(dest_las_path),
             os.path.splitext(os.path.basename(src_las_path))[0] + ".shp",

@@ -1,6 +1,6 @@
 _target_: lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer
 
-todo: "prepare+optimize+evaluate+update"  # for test data use prepare+evaluate+update
+todo: "prepare+optimize+evaluate+update" # for test data use prepare+evaluate+update
 
 # By default we update corrected data and keep detailed codes instead of final ones.
 # This enables inspection of updated files post-optimization, with maximum details.
@@ -8,33 +8,31 @@ use_final_classification_codes: false
 building_validator: ${building_validation.application}
 
 paths:
-  input_las_dir:  "/path/to/folder/"  # contains .las/.laz files
-  results_output_dir: "/path/to/folder/"  # will contain best optimization trial and (optionnaly) updated las
+  input_las_dir: "/path/to/folder/" # contains .las/.laz files
+  results_output_dir: "/path/to/folder/" # will contain best optimization trial and (optionnaly) updated las
   group_info_pickle_path: ${.results_output_dir}/group_info.pickle
   prepared_las_dir: ${.results_output_dir}/prepared/
   updated_las_dir: ${.results_output_dir}/updated/
   building_validation_thresholds_pickle: ${.results_output_dir}/optimized_thresholds.pickle # Wher
 
-
-# CLASSIFICATION CODES of a dataset which was inspected 
+# CLASSIFICATION CODES of a dataset which was inspected
 # and labeled post TerraSolid macro
 # Those are used to override the app default codes.
 buildings_correction_labels:
   codes:
     true_positives: [19] # building that was found by the macro
     false_positives: [20, 110, 112, 114, 115] # e.g. trees, hedge, trucks
-    false_negatives: [21]  # e.g. buildings under vegetation, low building
+    false_negatives: [21] # e.g. buildings under vegetation, low building
   # Sometimes a cluster will be ambiguous and we need
   # thresholds to decice if it is a TP or FP.
   min_frac:
     true_positives: 0.95 # >=x% of confirmed points --> cluster is a building
     false_positives: 0.05 # <x% of confirmed points --> cluster is not a building
 
-
 study:
   _target_: optuna.create_study
   study_name: "auto_precision_recall"
-  directions: ["maximize","maximize","maximize"]
+  directions: ["maximize", "maximize", "maximize"]
   sampler:
     _target_: optuna.samplers.NSGAIISampler
     population_size: 50
@@ -74,5 +72,3 @@ design:
     # constraints:
     refutation_accuracy: "a_refute"
     confirmation_accuracy: "a_confirm"
-
-

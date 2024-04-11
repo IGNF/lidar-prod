@@ -2,7 +2,7 @@
 
 ## Set up a virtual environment
 
-We use [Anaconda](https://anaconda.org/)] to manage and isolate dependencies. 
+We use [Anaconda](https://anaconda.org/)] to manage and isolate dependencies.
 The provided environment setup script also installs [Mamba](https://mamba.readthedocs.io/en/latest/index.html),
 which gets on top of conda for faster environment installs.
 

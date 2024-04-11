@@ -1,2 +1,2 @@
 src_las: /path/to/input.las
-output_dir:  ${hydra:runtime.cwd}/outputs/  # in current working director by default
+output_dir: ${hydra:runtime.cwd}/outputs/ # in current working director by default

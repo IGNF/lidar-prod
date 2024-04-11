@@ -8,8 +8,8 @@ import numpy as np
 import pytest
 
 from lidar_prod.tasks.building_validation_optimization import BuildingValidationOptimizer
-from tests.conftest import pdal_read_las_array
 from lidar_prod.tasks.utils import BDUniConnectionParams
+from tests.conftest import pdal_read_las_array
 
 """We test the building validation optimizer against two LAS:
 
@@ -68,8 +68,12 @@ def test_BVOptimization_on_subset(hydra_cfg):
         shutil.copy(LAS_SUBSET_FILE, src_las_copy_path)
 
         # Check that a full optimization run can pass successfully
-        bvo: BuildingValidationOptimizer = hydra.utils.instantiate(hydra_cfg.building_validation.optimization)
-        bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(hydra_cfg.bd_uni_connection_params)
+        bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
+            hydra_cfg.building_validation.optimization
+        )
+        bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(
+            hydra_cfg.bd_uni_connection_params
+        )
         bvo.bv.bd_uni_connection_params = bd_uni_connection_params
         bvo.run()
 
@@ -125,9 +129,13 @@ def test_BVOptimization_on_large_file(hydra_cfg):
         shutil.copy(LAS_LARGE_FILE, src_las_copy_path)
 
         # Check that a full optimization run can pass successfully
-        bvo: BuildingValidationOptimizer = hydra.utils.instantiate(hydra_cfg.building_validation.optimization)
+        bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
+            hydra_cfg.building_validation.optimization
+        )
 
-        bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(hydra_cfg.bd_uni_connection_params)
+        bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(
+            hydra_cfg.bd_uni_connection_params
+        )
         bvo.bv.bd_uni_connection_params = bd_uni_connection_params
 
         bvo.prepare()
@@ -136,10 +144,15 @@ def test_BVOptimization_on_large_file(hydra_cfg):
 
         exact_expected_val = LARGE_EXPECTED_METRICS["exact"]
         for k in exact_expected_val:
-            assert pytest.approx(exact_expected_val[k], RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS) == metrics_dict[k]
+            assert (
+                pytest.approx(exact_expected_val[k], RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS)
+                == metrics_dict[k]
+            )
         min_expected_val = LARGE_EXPECTED_METRICS["min"]
         for k in min_expected_val:
-            assert ((1 - RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS) * min_expected_val[k]) <= metrics_dict[k]
+            assert (
+                (1 - RELATIVE_MIN_TOLERANCE_OF_EXPECTED_METRICS) * min_expected_val[k]
+            ) <= metrics_dict[k]
 
 
 # All expected metrics for reference:

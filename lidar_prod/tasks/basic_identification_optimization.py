@@ -46,9 +46,7 @@ class BasicIdentifierOptimizer:
         self.result_code = result_code
         self.truth_column = target_column
         self.n_trials = n_trials
-        self.truth_result_code = (
-            target_result_code if target_result_code else result_code
-        )
+        self.truth_result_code = target_result_code if target_result_code else result_code
 
     def optimize(self) -> None:
         """Search the best threshold."""

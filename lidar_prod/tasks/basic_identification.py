@@ -2,9 +2,8 @@
 Takes vegetation probabilities as input, and defines vegetation
 
 """
-from __future__ import (
-    annotations,
-)  # to recognize IoU as a type by itself (in __add__())
+
+from __future__ import annotations  # to recognize IoU as a type by itself (in __add__())
 
 import logging
 from typing import Union
@@ -93,19 +92,13 @@ class BasicIdentifier:
         self.result_code = result_code
         self.evaluate_iou = evaluate_iou
         self.target_column = target_column
-        self.target_result_code = (
-            target_result_code if target_result_code else result_code
-        )
+        self.target_result_code = target_result_code if target_result_code else result_code
 
     def identify(self, las_data: laspy.lasdata.LasData) -> None:
         """Identify the points above the threshold and set them to the wanted value."""
         # if the result column doesn't exist, we add it
-        if self.result_column not in [
-            dim for dim in las_data.point_format.extra_dimension_names
-        ]:
-            las_data.add_extra_dim(
-                laspy.ExtraBytesParams(name=self.result_column, type="uint32")
-            )
+        if self.result_column not in [dim for dim in las_data.point_format.extra_dimension_names]:
+            las_data.add_extra_dim(laspy.ExtraBytesParams(name=self.result_column, type="uint32"))
 
         # get the mask listing the points above the threshold
         threshold_mask = las_data.points[self.proba_column] >= self.threshold
@@ -116,13 +109,9 @@ class BasicIdentifier:
         # calculate ious if necessary
         if self.evaluate_iou:
             if isinstance(self.target_result_code, int):
-                target_mask = (
-                    las_data.points[self.target_column] == self.target_result_code
-                )
+                target_mask = las_data.points[self.target_column] == self.target_result_code
             else:  # if not an int, truth_mask should be a list
-                target_mask = np.isin(
-                    las_data.points[self.target_column], self.target_result_code
-                )
+                target_mask = np.isin(las_data.points[self.target_column], self.target_result_code)
             self.iou = IoU.iou_by_mask(threshold_mask, target_mask)
 
         # MONKEY PATCHING !!! for debugging

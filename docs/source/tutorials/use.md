@@ -2,7 +2,7 @@
 
 ## Run within a docker container
 
-Up to date docker images (named `lidar_prod`) are created via Github integration actions (see [Developer's guide](../guides/development.md)). 
+Up to date docker images (named `lidar_prod`) are created via Github integration actions (see [Developer's guide](../guides/development.md)).
 
 To run the app, use
 

@@ -23,7 +23,11 @@ class Cleaner:
 
         """
         # turn a listconfig into a 'normal' list
-        self.extra_dims = [extra_dims] if isinstance(extra_dims, str) else [dimension for dimension in extra_dims]
+        self.extra_dims = (
+            [extra_dims]
+            if isinstance(extra_dims, str)
+            else [dimension for dimension in extra_dims]
+        )
 
         # creating a dict where key = dimension's name and value = diemnsion's type
         #  if no "=type" in extra_dims then value = None
@@ -57,9 +61,13 @@ class Cleaner:
         points = pdal_read_las_array(src_las_path, epsg)
         # Check input dims to see what we can keep.
         input_dims = points.dtype.fields.keys()
-        self.extra_dims_as_dict = {k: v for k, v in self.extra_dims_as_dict.items() if k in input_dims}
+        self.extra_dims_as_dict = {
+            k: v for k, v in self.extra_dims_as_dict.items() if k in input_dims
+        }
 
-        pipeline = pdal.Pipeline(arrays=[points]) | get_pdal_writer(target_las_path, extra_dims=self.get_extra_dims_as_str())
+        pipeline = pdal.Pipeline(arrays=[points]) | get_pdal_writer(
+            target_las_path, extra_dims=self.get_extra_dims_as_str()
+        )
         os.makedirs(osp.dirname(target_las_path), exist_ok=True)
         pipeline.execute()
         log.info(f"Saved to {target_las_path}")
@@ -118,5 +126,7 @@ class Cleaner:
         # case: 2+ dimensions to add
         extra_bytes_list = []
         for dimension in dimensions_to_add:
-            extra_bytes_list.append(laspy.ExtraBytesParams(dimension, type=self.extra_dims_as_dict[dimension]))
+            extra_bytes_list.append(
+                laspy.ExtraBytesParams(dimension, type=self.extra_dims_as_dict[dimension])
+            )
         las_data.add_extra_dims(extra_bytes_list)

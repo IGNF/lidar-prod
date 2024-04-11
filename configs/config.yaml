@@ -11,4 +11,4 @@ defaults:
   - building_completion: default.yaml
   - basic_identification: default.yaml
   - bd_uni_connection_params: credentials.yaml
-  - _self_  # needed by pdal for legacy reasons
+  - _self_ # needed by pdal for legacy reasons

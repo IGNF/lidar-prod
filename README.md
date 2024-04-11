@@ -17,7 +17,7 @@ The Lidar HD project ambitions to map France in 3D using 10 pulse/m² aerial Lid
 
 To produce this classification, geometric rule- based classification are familiar and present advantages such as scalability, high geometric regularity, and predictability. But rule- based algorithm often lack the fine-grain understanding needed for complex Lidar scenes, which results in a need for time-consuming human correction.
 
-Additionnaly, some valuable information exist in 2D public geographical database, but finding a way to leverage it on a point cloud classification is not straightforward considering database incompletness, potential out-of-dateness, and frequent x-y offsets. 
+Additionnaly, some valuable information exist in 2D public geographical database, but finding a way to leverage it on a point cloud classification is not straightforward considering database incompletness, potential out-of-dateness, and frequent x-y offsets.
 
 Considering the scale of this task, deep learning is leveraged to as a production tool. A [deep learning library](https://github.com/IGNF/lidar-deep-segmentation) was developed with a focused scope: the multiclass semantic segmentation of large scale, high density aerial Lidar points cloud. Using a classification produced directly by a deep learning model might be tempting, but they usually presents some limitations including unexpected failure modes, inconsistant geometric regularity, noise.
 
@@ -33,7 +33,7 @@ Our strategy is to fuse together different sources of informations (rule- based 
 Right now, the class `building` is the only one that is addressed. The extension to other classes is dependent on the training of multiclass AI model, which requires high quality training datasets that are currently being produced.
 
 > Please refer to the documentation for [installation and usage](https://ignf.github.io/lidar-prod/tutorials/install.html).
-    
+
 > Please refer to the documentation to understand the [production process](https://ignf.github.io/lidar-prod/background/production_process.html).
 
 ## Version

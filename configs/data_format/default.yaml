@@ -4,27 +4,26 @@ epsg: 2154
 # Those names connect the logics between successive tasks
 las_dimensions:
   # input
-  classification: Classification  # las format
+  classification: Classification # las format
   terrascan_normal: Normal
   terrascan_distance: Distance
   terrascan_deviation: Deviation
-  terrascan_reliability: confidence  # Appears as "Reliability" in TerraScan. Unsigned char according to LASinfo.
+  terrascan_reliability: confidence # Appears as "Reliability" in TerraScan. Unsigned char according to LASinfo.
 
   # Extra dims
   # ATTENTION: If extra dimensions are added, you may want to add them in cleaning.in parameter as well.
   ai_vegetation_proba: vegetation
   ai_unclassified_proba: unclassified
-  ai_building_proba: building  # user-defined - output by deep learning model
+  ai_building_proba: building # user-defined - output by deep learning model
   entropy: entropy # user-defined - output by deep learning model
 
-
   # Intermediary channels
-  cluster_id: ClusterID  # pdal-defined -> created by clustering operations
-  uni_db_overlay: BDTopoOverlay  # user-defined -> a 0/1 flag for presence of a BDUni vector
+  cluster_id: ClusterID # pdal-defined -> created by clustering operations
+  uni_db_overlay: BDTopoOverlay # user-defined -> a 0/1 flag for presence of a BDUni vector
   candidate_buildings_flag: F_CandidateB # -> a 0/1 flag identifying candidate buildings found by rule- based classification
-  ClusterID_candidate_building: CID_CandidateB  # -> Cluster index from BuildingValidator, 0 if no cluster, 1-n otherwise
-  ClusterID_confirmed_or_high_proba: CID_IsolatedOrConfirmed  # -> Cluster index from BuildingCompletor, 0 if no cluster, 1-n otherwise
-  completion_non_candidate_flag: F_NonCandidateCompletion  # --> a 0/1 flag for non candidates points with high proba and close to confirmed buildings
+  ClusterID_candidate_building: CID_CandidateB # -> Cluster index from BuildingValidator, 0 if no cluster, 1-n otherwise
+  ClusterID_confirmed_or_high_proba: CID_IsolatedOrConfirmed # -> Cluster index from BuildingCompletor, 0 if no cluster, 1-n otherwise
+  completion_non_candidate_flag: F_NonCandidateCompletion # --> a 0/1 flag for non candidates points with high proba and close to confirmed buildings
 
   # Additionnal output channel
   ai_building_identified: Group
@@ -34,34 +33,57 @@ codes:
   unclassified: 1
   vegetation: 3
   vegetation_target:
-      vegetation_low: 3
-      vegetation_medium: 4
-      vegetation_high: 5
+    vegetation_low: 3
+    vegetation_medium: 4
+    vegetation_high: 5
   building:
-    candidates: [202]  # found by rule- based classification (TerraScan)
-    detailed:  # used for detailed output when doing threshold optimization
+    candidates: [202] # found by rule- based classification (TerraScan)
+    detailed: # used for detailed output when doing threshold optimization
       unsure_by_entropy: 200 # unsure (based on entropy)
-      unclustered: 202  # refuted
-      ia_refuted: 110  # refuted
-      ia_refuted_but_under_db_uni: 111  # unsure
-      both_unsure: 112  # unsure (otherwise)
-      ia_confirmed_only: 113  # confirmed
-      db_overlayed_only: 114  # confirmed
-      both_confirmed: 115  # confirmed
-    final:  # used at the end of the building process
-      unsure: 214  # unsure
-      not_building: 208  # refuted
-      building: 6  # confirmed
+      unclustered: 202 # refuted
+      ia_refuted: 110 # refuted
+      ia_refuted_but_under_db_uni: 111 # unsure
+      both_unsure: 112 # unsure (otherwise)
+      ia_confirmed_only: 113 # confirmed
+      db_overlayed_only: 114 # confirmed
+      both_confirmed: 115 # confirmed
+    final: # used at the end of the building process
+      unsure: 214 # unsure
+      not_building: 208 # refuted
+      building: 6 # confirmed
     detailed_to_final:
-      - ["${data_format.codes.building.detailed.unclustered}","${data_format.codes.building.final.not_building}"]
-      - ["${data_format.codes.building.detailed.ia_refuted}","${data_format.codes.building.final.not_building}"]
-      - ["${data_format.codes.building.detailed.ia_refuted_but_under_db_uni}","${data_format.codes.building.final.unsure}"]
-      - ["${data_format.codes.building.detailed.both_unsure}","${data_format.codes.building.final.unsure}"]
-      - ["${data_format.codes.building.detailed.unsure_by_entropy}","${data_format.codes.building.final.unsure}"]
-      - ["${data_format.codes.building.detailed.ia_confirmed_only}","${data_format.codes.building.final.building}"]
-      - ["${data_format.codes.building.detailed.db_overlayed_only}","${data_format.codes.building.final.building}"]
-      - ["${data_format.codes.building.detailed.both_confirmed}","${data_format.codes.building.final.building}"]
-
+      - [
+          "${data_format.codes.building.detailed.unclustered}",
+          "${data_format.codes.building.final.not_building}",
+        ]
+      - [
+          "${data_format.codes.building.detailed.ia_refuted}",
+          "${data_format.codes.building.final.not_building}",
+        ]
+      - [
+          "${data_format.codes.building.detailed.ia_refuted_but_under_db_uni}",
+          "${data_format.codes.building.final.unsure}",
+        ]
+      - [
+          "${data_format.codes.building.detailed.both_unsure}",
+          "${data_format.codes.building.final.unsure}",
+        ]
+      - [
+          "${data_format.codes.building.detailed.unsure_by_entropy}",
+          "${data_format.codes.building.final.unsure}",
+        ]
+      - [
+          "${data_format.codes.building.detailed.ia_confirmed_only}",
+          "${data_format.codes.building.final.building}",
+        ]
+      - [
+          "${data_format.codes.building.detailed.db_overlayed_only}",
+          "${data_format.codes.building.final.building}",
+        ]
+      - [
+          "${data_format.codes.building.detailed.both_confirmed}",
+          "${data_format.codes.building.final.building}",
+        ]
 
 cleaning:
   # Extra dims that are kept when application starts. Others are removed to lighten the LAS.

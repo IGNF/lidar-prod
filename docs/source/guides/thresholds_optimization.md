@@ -8,7 +8,7 @@ To optimize the decision thresholds you must be able to evaluate the level of au
 
 Furthermore, the point cloud data must include predictions from the deep learning model trained to detect buildings. This consists in two channels : a `building` channel with predicted probabilities and an `entropy` channel.
 
-A large validation dataset might help having a better sense of the app performances. We used 15km² of corrected data to optimize thresholds, but a larger set might provide more diversity. This being said, performance on an unseen test set was almost equal to performance on the validation set, which indicates a robust evaluation for such volume of data. 
+A large validation dataset might help having a better sense of the app performances. We used 15km² of corrected data to optimize thresholds, but a larger set might provide more diversity. This being said, performance on an unseen test set was almost equal to performance on the validation set, which indicates a robust evaluation for such volume of data.
 
 
 ## Running thresholds optimization
@@ -17,11 +17,11 @@ A large validation dataset might help having a better sense of the app performan
 
 > Refer to the [installation tutorial](../tutorials/install.md) to set up your python environment.
 
-Your corrected data must live in a single `input_las_dir` directory as a set of LAS/LAZ files. 
+Your corrected data must live in a single `input_las_dir` directory as a set of LAS/LAZ files.
 Prepared and updated files will be saved in subfolder of a `results_output_dir` directory (`./prepared` and `./updated/`, respectively).
 They will keep the same basename as the original files.
 Be sure that the `data_format` configurations match your data, and in particular the (clasification) `codes` and `las_dimensions` configuration groups.
-A `todo` string parameter specifies the steps to run by including 1 or more of the following keywords: `prepare` | `otpimize` | `evaluate` | `update`. 
+A `todo` string parameter specifies the steps to run by including 1 or more of the following keywords: `prepare` | `otpimize` | `evaluate` | `update`.
 
 Run the full optimization module with
 
@@ -32,7 +32,7 @@ python lidar_prod/run.py \
 ++task=optimize_building \
 building_validation.optimization.todo='prepare+optimize+evaluate+update' \
 building_validation.optimization.paths.input_las_dir=[path/to/labelled/val/dataset/] \
-building_validation.optimization.paths.results_output_dir=[path/to/save/results] 
+building_validation.optimization.paths.results_output_dir=[path/to/save/results]
 ```
 
 ### Evaluation of optimized thresholds on a test set
