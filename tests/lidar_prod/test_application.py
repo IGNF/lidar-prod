@@ -21,7 +21,11 @@ from lidar_prod.tasks.utils import (
     get_las_data_from_las,
     get_pipeline,
 )
-from tests.conftest import check_las_contains_dims, check_las_invariance, pdal_read_las_array
+from tests.conftest import (
+    check_las_contains_dims,
+    check_las_invariance,
+    pdal_read_las_array,
+)
 
 LAS_SUBSET_FILE_BUILDING = "tests/files/870000_6618000.subset.postIA.las"
 SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
@@ -48,12 +52,14 @@ LAS_FILE_BUILDING_5490 = "tests/files/St_Barth_RGAF09_UTM20N_IGN_1988_SB_subset_
             [pdal.Filter.assign(value="Classification = 202")],
             False,
         ),  # only candidate buildings
-    ],  # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
+    ],
+    # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
 )
 def test_application_data_invariance_and_data_format(hydra_cfg, las_mutation, query_db_Uni):
     """We test the application against a LAS subset (~2500m²).
 
-    Data contains a few buildings, a few classification mistakes, and necessary fields (building probability, entropy)
+    Data contains a few buildings, a few classification mistakes, and necessary fields
+    (building probability, entropy)
     for validation.
     We apply different "mutations" to the data in order to test for multiple scenarii.
 

@@ -115,12 +115,14 @@ class BuildingValidationOptimizer:
                 osp.join(self.paths.updated_las_dir, osp.basename(f)) for f in self.las_filepaths
             ]
 
-        # We must adapt BuildingValidator to corrected data by specifying the codes to use as candidates
+        # We must adapt BuildingValidator to corrected data by specifying the codes to use as
+        # candidates
         self.bv.candidate_buildings_codes = (
             self.buildings_correction_labels.codes.true_positives
             + self.buildings_correction_labels.codes.false_positives
         )
-        # We also specify if, when updating corrected data (for inspection) we want final codes or detailed ones.
+        # We also specify if, when updating corrected data (for inspection) we want final codes
+        # or detailed ones.
         self.bv.use_final_classification_codes = self.use_final_classification_codes
         self.design.confusion_matrix_order = [
             self.bv.codes.final.unsure,
@@ -196,9 +198,9 @@ class BuildingValidationOptimizer:
                 self.bv.thresholds = pickle.load(f)
         except FileNotFoundError:
             warnings.warn(
-                "Using default thresholds from hydra config to perform decisions."
-                "You may want to specify different thresholds via a pickled object by"
-                "specifying building_validation.optimization.paths.building_validation_thresholds_pickle",
+                "Using default thresholds from hydra config to perform decisions. "
+                "You may want to specify different thresholds via a pickled object by specifying "
+                "building_validation.optimization.paths.building_validation_thresholds_pickle",
                 UserWarning,
             )
 
@@ -230,7 +232,8 @@ class BuildingValidationOptimizer:
             prepared_las (str): path to LAS prepared for building validation.
 
         Returns:
-            List[BuildingValidationClusterInfo]: cluster information for each cluster of candidate buildings
+            List[BuildingValidationClusterInfo]: cluster information for each cluster of
+            candidate buildings
 
         """
         las = pdal_read_las_array(prepared_las_path, self.bv.data_format.epsg)
@@ -252,7 +255,8 @@ class BuildingValidationOptimizer:
         return clusters
 
     def _define_MTS_ground_truth_flag(self, targets) -> int:
-        """Based on the fraction of confirmed building points, set the nature of the shape or declare an ambiguous case"""
+        """Based on the fraction of confirmed building points, set the nature of the shape or
+        declare an ambiguous case"""
         tp_frac = np.mean(
             np.isin(
                 targets,
@@ -266,7 +270,8 @@ class BuildingValidationOptimizer:
         return self.bv.codes.final.unsure
 
     def _compute_penalty(self, auto, precision, recall):
-        """Positive float indicative a solution violates the constraint of minimal auto/precision/metrics"""
+        """Positive float indicative a solution violates the constraint of minimal
+        auto/precision/metrics"""
         penalty = 0
         if precision < self.design.constraints.min_precision_constraint:
             penalty += self.design.constraints.min_precision_constraint - precision
@@ -282,7 +287,8 @@ class BuildingValidationOptimizer:
 
         Args:
             trial: optuna trial
-            clusters (List[BuildngValidationClusterInfo], optional): _description_. Defaults to None.
+            clusters (List[BuildngValidationClusterInfo], optional): _description_.
+            Defaults to None.
 
         Returns:
             float, float, float: automatisation, precision, recall
@@ -370,7 +376,8 @@ class BuildingValidationOptimizer:
     def evaluate_decisions(self, mts_gt, ia_decision) -> Dict[str, Any]:
         r"""Evaluate confirmation and refutation decisions.
 
-        Get dict of metrics to evaluate how good module decisions were in reference to ground truths.
+        Get dict of metrics to evaluate how good module decisions were in reference to
+        ground truths.
 
         Targets: U=Unsure, N=No (not a building), Y=Yes (building)
 
@@ -392,7 +399,8 @@ class BuildingValidationOptimizer:
 
         Quality
         Precision and Recall, assuming perfect posterior decision for unsure predictions.
-        Only candidate shapes with known ground truths are considered (ambiguous labels are ignored).
+        Only candidate shapes with known ground truths are considered
+        (ambiguous labels are ignored).
 
         Precision : (Yu + Yc) / (Yu + Yc + Nc)
 

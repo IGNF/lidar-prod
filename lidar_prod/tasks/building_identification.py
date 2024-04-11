@@ -35,11 +35,12 @@ class BuildingIdentifier:
         input_values: Union[str, pdal.pipeline.Pipeline],
         target_las_path: str = None,
     ) -> str:
-        """Identify potential buildings in a new channel, excluding former candidates as well as already
-        confirmed building (confirmed by either Validation or Completion).
+        """Identify potential buildings in a new channel, excluding former candidates as well as
+        already confirmed building (confirmed by either Validation or Completion).
 
         Args:
-            input_values (str | pdal.pipeline.Pipeline): path or pipeline to input LAS file with a building probability channel
+            input_values (str | pdal.pipeline.Pipeline): path or pipeline to input LAS file with
+            a building probability channel
             target_las_path (str): output LAS
 
         """
@@ -52,10 +53,16 @@ class BuildingIdentifier:
 
         # Considered for identification:
         non_candidates = f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
-        not_already_confirmed = f"({self.data_format.las_dimensions.classification} != {self.data_format.codes.building.final.building})"
+        not_already_confirmed = (
+            f"({self.data_format.las_dimensions.classification} "
+            + f"!= {self.data_format.codes.building.final.building})"
+        )
         not_a_potential_completion = f"({_completion_flag} != 1)"
         p_heq_threshold = f"(building>={self.min_building_proba})"
-        where = f"({non_candidates} && {not_already_confirmed} && {not_a_potential_completion} && {p_heq_threshold})"
+        where = (
+            f"({non_candidates} && {not_already_confirmed} "
+            + f"&& {not_a_potential_completion} && {p_heq_threshold})"
+        )
         pipeline |= pdal.Filter.cluster(
             min_points=self.cluster.min_points,
             tolerance=self.cluster.tolerance,

@@ -7,15 +7,19 @@ import hydra
 import numpy as np
 import pytest
 
-from lidar_prod.tasks.building_validation_optimization import BuildingValidationOptimizer
+from lidar_prod.tasks.building_validation_optimization import (
+    BuildingValidationOptimizer,
+)
 from lidar_prod.tasks.utils import BDUniConnectionParams
 from tests.conftest import pdal_read_las_array
 
 """We test the building validation optimizer against two LAS:
 
-These datasets must have the right classification codes, i.e. the ones defined in buildings_correction_labels.
+These datasets must have the right classification codes, i.e. the ones defined in
+buildings_correction_labels.
 
-WARNING: The large LAS cannot be versionned by git. If it is absent from environment, pytest expects the test to fail.
+WARNING: The large LAS cannot be versionned by git. If it is absent from environment,
+pytest expects the test to fail.
 This is to enable a shallower run of these tests without the file.
 
 """

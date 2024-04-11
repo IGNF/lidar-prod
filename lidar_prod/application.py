@@ -121,15 +121,15 @@ def apply_building_module(config: DictConfig, src_las_path: str, dest_las_path: 
         bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(
             config.bd_uni_connection_params
         )
-
+        bv_cfg = config.building_validation.application
         bv = BuildingValidator(
-            shp_path=config.building_validation.application.shp_path,
+            shp_path=bv_cfg.shp_path,
             bd_uni_connection_params=bd_uni_connection_params,
-            cluster=config.building_validation.application.cluster,
-            bd_uni_request=config.building_validation.application.bd_uni_request,
-            data_format=config.building_validation.application.data_format,
-            thresholds=config.building_validation.application.thresholds,
-            use_final_classification_codes=config.building_validation.application.use_final_classification_codes,
+            cluster=bv_cfg.cluster,
+            bd_uni_request=bv_cfg.bd_uni_request,
+            data_format=bv_cfg.data_format,
+            thresholds=bv_cfg.thresholds,
+            use_final_classification_codes=bv_cfg.use_final_classification_codes,
         )
         bv.run(tmp_las_path)
 

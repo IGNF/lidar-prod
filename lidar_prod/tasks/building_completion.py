@@ -12,12 +12,13 @@ log = logging.getLogger(__name__)
 class BuildingCompletor:
     """Logic of building completion.
 
-    The BuildingValidator only considered points that were 1) candidate, and 2) formed clusers of sufficient size.
+    The BuildingValidator only considered points that were 1) candidate, and 2) formed clusters
+    of sufficient size.
 
     Some points were too isolated, or where not clustered, even though they might have a
     high predicted building probabiliy.
-    We assume that we can trust AI probabilities (if high enough) in the neigborhood of large groups (clusters)
-    of candidate points already confirmed by the BuildingValidator.
+    We assume that we can trust AI probabilities (if high enough) in the neigborhood
+    of large groups (clusters) of candidate points already confirmed by the BuildingValidator.
 
     We will update points classification based on their probability as well as their surrounding:
     - We select points that have p>=0.5 (+ a BDUni factor when applicable)
@@ -52,7 +53,8 @@ class BuildingCompletor:
 
         """
         log.info(
-            "Completion of building with relatively distant points that have high enough probability"
+            "Completion of building with relatively distant points that have high enough "
+            + "probability"
         )
         pipeline = get_pipeline(input_values, self.data_format.epsg)
         self.prepare_for_building_completion(pipeline)
@@ -61,10 +63,11 @@ class BuildingCompletor:
     def prepare_for_building_completion(self, pipeline: pdal.pipeline.Pipeline) -> None:
         """Prepare for building completion.
 
-        Identify candidates that have high enough probability. Then, cluster them together with previously confirmed buildings.
+        Identify candidates that have high enough probability. Then, cluster them together with
+        previously confirmed buildings.
         Cluster parameters are relaxed (2D, with high tolerance).
-        If a cluster contains some confirmed points, the others are considered to belong to the same building
-        and they will be confirmed as well.
+        If a cluster contains some confirmed points, the others are considered to belong to
+        the same building and they will be confirmed as well.
 
         Args:
             src_las_path (pdal.pipeline.Pipeline): input LAS pipeline
@@ -88,10 +91,14 @@ class BuildingCompletor:
         )
         # Always move then reset ClusterID to avoid conflict with later tasks.
         pipeline |= pdal.Filter.ferry(
-            dimensions=f"{self.data_format.las_dimensions.cluster_id}=>{self.data_format.las_dimensions.ClusterID_confirmed_or_high_proba}"
+            dimensions=(
+                f"{self.data_format.las_dimensions.cluster_id}"
+                + f"=>{self.data_format.las_dimensions.ClusterID_confirmed_or_high_proba}"
+            )
         )
         pipeline |= pdal.Filter.assign(value=f"{self.data_format.las_dimensions.cluster_id} = 0")
-        # Create a placeholder dimension that will hold non-candidate points with high enough probas
+        # Create a placeholder dimension that will hold non-candidate points with high enough
+        # probas
         pipeline |= pdal.Filter.ferry(
             dimensions=f"=> {self.data_format.las_dimensions.completion_non_candidate_flag}"
         )
@@ -102,7 +109,7 @@ class BuildingCompletor:
         self.pipeline = pipeline
 
     def update_classification(self) -> None:
-        """Updates Classification dimension by completing buildings with high probability points."""
+        """Update Classification dimension by completing buildings with high probability points."""
 
         points = self.pipeline.arrays[0]
 
