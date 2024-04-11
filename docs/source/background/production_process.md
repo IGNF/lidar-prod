@@ -24,12 +24,12 @@ Exactly as with vegetation detection, the identification is done by comparing th
 
 1) Clustering of _candidate buildings points_ into connected components.
 2) Point-level decision
-   1) Identification of points with ambiguous probability: `high entropy` if entropy >= E1 
+   1) Identification of points with ambiguous probability: `high entropy` if entropy >= E1
    2) Identification of points that are `overlayed` by a building vector from the database.
-   3) Decision at the point-level based on probabilities : 
+   3) Decision at the point-level based on probabilities :
       1) `confirmed` if:
          1) p>=`C1`, or
-         2) `overlayed` and p>= (`C1` * `Cr`), where `Cr` is a relaxation factor that reduces the confidence we require to confirm when a point overlayed by a building vector. 
+         2) `overlayed` and p>= (`C1` * `Cr`), where `Cr` is a relaxation factor that reduces the confidence we require to confirm when a point overlayed by a building vector.
       2) `refuted` if (1-p) >= `R1`
 3) Group-level decision :
     1) Uncertain due to high entropy: if proportion of `high entropy` points >=  `E2`
@@ -38,7 +38,7 @@ Exactly as with vegetation detection, the identification is done by comparing th
     4) Uncertainty: elsewise (this is a safeguard: uncertain groups are supposed to be already captured via their entropy)
 4) Update of the point cloud classification
 
-Decision thresholds `E1`, `E2` , `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a [multi-objective hyperparameter optimization](/background/thresholds_optimization_process.md) that aims to maximize automation, precision, and recall of the decisions. 
+Decision thresholds `E1`, `E2` , `C1`, `C2`, `R1`, `R2`, `O1` are chosen via a [multi-objective hyperparameter optimization](/background/thresholds_optimization_process.md) that aims to maximize automation, precision, and recall of the decisions.
 Current performances on a 15km² test dataset, expressed as percentages of clusters, are:
 - Automation=86.5%
 - Precision>=98%
@@ -46,8 +46,8 @@ Current performances on a 15km² test dataset, expressed as percentages of clust
 
 ## B.2) Building Completion
 
-**Goal**: Confirm points that have high-enough probability, but where not confirmed because 
-- (a) they were too scattered for clustering during validation, or 
+**Goal**: Confirm points that have high-enough probability, but where not confirmed because
+- (a) they were too scattered for clustering during validation, or
 - (b) they were not candidate buildings points.
 
 Cluster high-proba points (p >= 0.5) with previously confirmed building points in a vertical fashion (XY plan).
@@ -58,7 +58,7 @@ For each cluster that includes already confirmed points, the rest (i.e. high pro
 
 ## B.3) Building Identification
 
-**Goal**: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection. 
+**Goal**: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection.
 
 Among points that were **not** _candidate buildings points_ and not already confirmed, identify those with high enough probabiltity (p >= 0.5) and cluster.
 

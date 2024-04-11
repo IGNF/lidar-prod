@@ -21,7 +21,10 @@ def vegetation_unclassifed_hydra_cfg():
 @pytest.fixture
 def hydra_cfg():
     with initialize(config_path="./../configs/", job_name="config"):
-        return compose(config_name="config", overrides=["data_format=default.yaml", "building_validation/optimization=pytest.yaml"])
+        return compose(
+            config_name="config",
+            overrides=["data_format=default.yaml", "building_validation/optimization=pytest.yaml"],
+        )
 
 
 def check_las_invariance(las_path1, las_path2, epsg):

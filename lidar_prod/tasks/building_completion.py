@@ -92,7 +92,9 @@ class BuildingCompletor:
         )
         pipeline |= pdal.Filter.assign(value=f"{self.data_format.las_dimensions.cluster_id} = 0")
         # Create a placeholder dimension that will hold non-candidate points with high enough probas
-        pipeline |= pdal.Filter.ferry(dimensions=f"=> {self.data_format.las_dimensions.completion_non_candidate_flag}")
+        pipeline |= pdal.Filter.ferry(
+            dimensions=f"=> {self.data_format.las_dimensions.completion_non_candidate_flag}"
+        )
         # Run
         pipeline.execute()
 

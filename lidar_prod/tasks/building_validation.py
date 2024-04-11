@@ -94,9 +94,7 @@ class BuildingValidator:
         """
         self.pipeline = get_pipeline(input_values, self.data_format.epsg)
         with TemporaryDirectory() as td:
-            log.info(
-                "Preparation : Clustering of candidates buildings & Import vectors"
-            )
+            log.info("Preparation : Clustering of candidates buildings & Import vectors")
             if isinstance(input_values, str):
                 log.info(f"Applying Building Validation to file \n{input_values}")
                 temp_f = osp.join(td, osp.basename(input_values))
@@ -136,9 +134,7 @@ class BuildingValidator:
 
         dim_candidate_flag = self.data_format.las_dimensions.candidate_buildings_flag
         dim_cluster_id_pdal = self.data_format.las_dimensions.cluster_id
-        dim_cluster_id_candidates = (
-            self.data_format.las_dimensions.ClusterID_candidate_building
-        )
+        dim_cluster_id_candidates = self.data_format.las_dimensions.ClusterID_candidate_building
         dim_overlay = self.data_format.las_dimensions.uni_db_overlay
 
         self.pipeline = get_pipeline(input_values, self.data_format.epsg)
@@ -178,9 +174,7 @@ class BuildingValidator:
             _shp_p = self.shp_path
             log.info(f"Read shapefile\n {_shp_p}")
             gdf = geopandas.read_file(_shp_p)
-            buildings_in_bd_topo = (
-                not len(gdf) == 0
-            )  # check if there are buildings in the shp
+            buildings_in_bd_topo = not len(gdf) == 0  # check if there are buildings in the shp
 
         else:
             temp_dirpath = mkdtemp()
@@ -235,16 +229,12 @@ class BuildingValidator:
 
         # Get the index of points of each cluster
         # Remove unclustered group that have ClusterID = 0 (i.e. the first "group")
-        cluster_id_dim = points[
-            self.data_format.las_dimensions.ClusterID_candidate_building
-        ]
+        cluster_id_dim = points[self.data_format.las_dimensions.ClusterID_candidate_building]
         split_idx = split_idx_by_dim(cluster_id_dim)
         split_idx = split_idx[1:]
 
         # Iterate over groups and update their classification
-        for pts_idx in tqdm(
-            split_idx, desc="Update cluster classification", unit="clusters"
-        ):
+        for pts_idx in tqdm(split_idx, desc="Update cluster classification", unit="clusters"):
             infos = self._extract_cluster_info_by_idx(points, pts_idx)
             points[dim_clf][pts_idx] = decision_func(infos)
 
@@ -273,9 +263,7 @@ class BuildingValidator:
         overlays = pts[self.data_format.las_dimensions.uni_db_overlay]
         entropies = pts[self.data_format.las_dimensions.entropy]
         targets = pts[self.data_format.las_dimensions.classification]
-        return BuildingValidationClusterInfo(
-            probabilities, overlays, entropies, targets
-        )
+        return BuildingValidationClusterInfo(probabilities, overlays, entropies, targets)
 
     def _make_group_decision(self, *args, **kwargs) -> int:
         f"""Wrapper to simplify decision codes during LAS update.
@@ -286,9 +274,7 @@ class BuildingValidator:
         detailed_code = self._make_detailed_group_decision(*args, **kwargs)
         return self.detailed_to_final_map[detailed_code]
 
-    def _make_detailed_group_decision(
-        self, infos: BuildingValidationClusterInfo
-    ) -> int:
+    def _make_detailed_group_decision(self, infos: BuildingValidationClusterInfo) -> int:
         """Decision process at the cluster level.
 
         Confirm or refute candidate building groups based on fraction of confirmed/refuted points and
@@ -311,9 +297,7 @@ class BuildingValidator:
         )
 
         # CONFIRMATION - threshold is relaxed under BDUni
-        p_heq_threshold = (
-            infos.probabilities >= self.thresholds.min_confidence_confirmation
-        )
+        p_heq_threshold = infos.probabilities >= self.thresholds.min_confidence_confirmation
 
         relaxed_threshold = (
             self.thresholds.min_confidence_confirmation
@@ -326,20 +310,14 @@ class BuildingValidator:
             np.logical_and(infos.overlays, p_heq_relaxed_threshold),
         )
 
-        ia_confirmed = (
-            np.mean(ia_confirmed_flag) >= self.thresholds.min_frac_confirmation
-        )
+        ia_confirmed = np.mean(ia_confirmed_flag) >= self.thresholds.min_frac_confirmation
 
         # REFUTATION
         ia_refuted = (
-            np.mean(
-                (1 - infos.probabilities) >= self.thresholds.min_confidence_refutation
-            )
+            np.mean((1 - infos.probabilities) >= self.thresholds.min_confidence_refutation)
             >= self.thresholds.min_frac_refutation
         )
-        uni_overlayed = (
-            np.mean(infos.overlays) >= self.thresholds.min_uni_db_overlay_frac
-        )
+        uni_overlayed = np.mean(infos.overlays) >= self.thresholds.min_uni_db_overlay_frac
         # If low entropy, we may trust AI to confirm/refute
         if not high_entropy:
             if ia_refuted:

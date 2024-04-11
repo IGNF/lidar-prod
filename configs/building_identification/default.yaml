@@ -5,7 +5,6 @@ data_format: ${data_format}
 min_building_proba: 0.5
 
 cluster:
-  min_points: 200  # Large so that small isolated artefacts are ignored
-  tolerance: 0.75  # meters
-  is3d: false  # group in 2d for better detection
-
+  min_points: 200 # Large so that small isolated artefacts are ignored
+  tolerance: 0.75 # meters
+  is3d: false # group in 2d for better detection

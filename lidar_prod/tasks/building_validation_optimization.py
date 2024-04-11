@@ -18,10 +18,7 @@ from lidar_prod.tasks.building_validation import (
     BuildingValidator,
     thresholds,
 )
-from lidar_prod.tasks.utils import (
-    split_idx_by_dim,
-    pdal_read_las_array,
-)
+from lidar_prod.tasks.utils import pdal_read_las_array, split_idx_by_dim
 
 log = logging.getLogger(__name__)
 
@@ -110,13 +107,18 @@ class BuildingValidationOptimizer:
             if self.debug:
                 self.las_filepaths = self.las_filepaths[:1]
             os.makedirs(self.paths.prepared_las_dir, exist_ok=True)
-            self.prepared_las_filepaths = [osp.join(self.paths.prepared_las_dir, osp.basename(f)) for f in self.las_filepaths]
+            self.prepared_las_filepaths = [
+                osp.join(self.paths.prepared_las_dir, osp.basename(f)) for f in self.las_filepaths
+            ]
             os.makedirs(self.paths.updated_las_dir, exist_ok=True)
-            self.out_las_filepaths = [osp.join(self.paths.updated_las_dir, osp.basename(f)) for f in self.las_filepaths]
+            self.out_las_filepaths = [
+                osp.join(self.paths.updated_las_dir, osp.basename(f)) for f in self.las_filepaths
+            ]
 
         # We must adapt BuildingValidator to corrected data by specifying the codes to use as candidates
         self.bv.candidate_buildings_codes = (
-            self.buildings_correction_labels.codes.true_positives + self.buildings_correction_labels.codes.false_positives
+            self.buildings_correction_labels.codes.true_positives
+            + self.buildings_correction_labels.codes.false_positives
         )
         # We also specify if, when updating corrected data (for inspection) we want final codes or detailed ones.
         self.bv.use_final_classification_codes = self.use_final_classification_codes
@@ -219,7 +221,9 @@ class BuildingValidationOptimizer:
             self.bv.update(prepared_las_path, target_las_path)
             log.info(f"Saved to {target_las_path}")
 
-    def _extract_clusters_from_las(self, prepared_las_path: str) -> List[BuildingValidationClusterInfo]:
+    def _extract_clusters_from_las(
+        self, prepared_las_path: str
+    ) -> List[BuildingValidationClusterInfo]:
         """Extract a cluster information object  in a prepared LAS.
 
         Args:
@@ -240,7 +244,9 @@ class BuildingValidationOptimizer:
         split_idx = split_idx[START_IDX_OF_CLUSTERS:]
         clusters = []
         for pts_idx in tqdm(split_idx, desc="Extract cluster info from LAS", unit="clusters"):
-            infos: BuildingValidationClusterInfo = self.bv._extract_cluster_info_by_idx(las, pts_idx)
+            infos: BuildingValidationClusterInfo = self.bv._extract_cluster_info_by_idx(
+                las, pts_idx
+            )
             infos.target = self._define_MTS_ground_truth_flag(dim_classification[pts_idx])
             clusters += [infos]
         return clusters
@@ -283,9 +289,13 @@ class BuildingValidationOptimizer:
 
         """
         params = {
-            "min_confidence_confirmation": trial.suggest_float("min_confidence_confirmation", 0.0, 1.0),
+            "min_confidence_confirmation": trial.suggest_float(
+                "min_confidence_confirmation", 0.0, 1.0
+            ),
             "min_frac_confirmation": trial.suggest_float("min_frac_confirmation", 0.0, 1.0),
-            "min_confidence_refutation": trial.suggest_float("min_confidence_refutation", 0.0, 1.0),
+            "min_confidence_refutation": trial.suggest_float(
+                "min_confidence_refutation", 0.0, 1.0
+            ),
             "min_frac_refutation": trial.suggest_float("min_frac_refutation", 0.0, 1.0),
             "min_uni_db_overlay_frac": trial.suggest_float("min_uni_db_overlay_frac", 0.5, 1.0),
             "min_frac_confirmation_factor_if_bd_uni_overlay": trial.suggest_float(
@@ -294,8 +304,12 @@ class BuildingValidationOptimizer:
             # Max entropy for 7 classes. When looking at prediction's entropy,
             # the observed maximal value is aqual to the Shannon entropy divided by two,
             # so this is what we consider as the max for the min entropy for uncertainty.
-            "min_entropy_uncertainty": trial.suggest_float("min_entropy_uncertainty", 0.0, -math.log2(1 / 7) / 2.0),
-            "min_frac_entropy_uncertain": trial.suggest_float("min_frac_entropy_uncertain", 0.33, 1.0),
+            "min_entropy_uncertainty": trial.suggest_float(
+                "min_entropy_uncertainty", 0.0, -math.log2(1 / 7) / 2.0
+            ),
+            "min_frac_entropy_uncertain": trial.suggest_float(
+                "min_frac_entropy_uncertain", 0.33, 1.0
+            ),
         }
         self.bv.thresholds = thresholds(**params)
         decisions = np.array([self.bv._make_group_decision(c) for c in clusters])
@@ -318,7 +332,9 @@ class BuildingValidationOptimizer:
         """Find the trial that meet constraints and that maximizes automation."""
         trials = sorted(study.best_trials, key=lambda x: x.values[0], reverse=True)
         TRIALS_BELOW_ZERO_ARE_VALID = 0
-        respect_constraints = [s for s in trials if s.user_attrs["constraint"][0] <= TRIALS_BELOW_ZERO_ARE_VALID]
+        respect_constraints = [
+            s for s in trials if s.user_attrs["constraint"][0] <= TRIALS_BELOW_ZERO_ARE_VALID
+        ]
         try:
             best = respect_constraints[0]
         except Exception:

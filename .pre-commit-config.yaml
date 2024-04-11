@@ -17,11 +17,18 @@ repos:
       - id: black
         args: [--line-length, "99"]
 
+  # python code analysis
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+
   # python import sorting
   - repo: https://github.com/PyCQA/isort
     rev: 5.13.2
     hooks:
       - id: isort
+        args: ["--profile", "black", --line-length, "99"]
 
   # yaml formatting
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -29,9 +36,3 @@ repos:
     hooks:
       - id: prettier
         types: [yaml]
-
-  # python code analysis
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
-    hooks:
-      - id: flake8

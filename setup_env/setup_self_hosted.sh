@@ -1,4 +1,4 @@
-# This is a setup script for the self-hosted server 
+# This is a setup script for the self-hosted server
 # used for CI/CD workflows.
 
 # Install git
@@ -37,7 +37,7 @@ curl -O -L https://github.com/actions/runner/releases/download/v2.263.0/actions-
 
 # Extract the installer
 tar xzf actions-runner-linux-x64-2.263.0.tar.gz
-        
+
 # Create the runner and start the configuration experience
 # Copied from "settings" -> actions ->runners -> "new runner"
 ./config.sh --url https://github.com/IGNF/lidar-prod-quality-control --token AWMVYAOSJSSOP7POSEDVNODCBIPVU

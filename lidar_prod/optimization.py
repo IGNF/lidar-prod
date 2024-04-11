@@ -5,9 +5,7 @@ from omegaconf import DictConfig
 
 from lidar_prod.commons import commons
 from lidar_prod.tasks.basic_identification_optimization import BasicIdentifierOptimizer
-from lidar_prod.tasks.building_validation_optimization import (
-    BuildingValidationOptimizer,
-)
+from lidar_prod.tasks.building_validation_optimization import BuildingValidationOptimizer
 from lidar_prod.tasks.utils import BDUniConnectionParams
 
 log = logging.getLogger(__name__)
@@ -31,7 +29,9 @@ def optimize_building(
     bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
         config.building_validation.optimization
     )
-    bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(config.bd_uni_connection_params)
+    bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(
+        config.bd_uni_connection_params
+    )
     bvo.bv.bd_uni_connection_params = bd_uni_connection_params
     bvo.run()
 

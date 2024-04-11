@@ -17,15 +17,11 @@ from lidar_prod.application import (
 )
 from lidar_prod.tasks.utils import (
     get_a_las_to_las_pdal_pipeline,
-    get_las_data_from_las,
     get_input_las_metadata,
+    get_las_data_from_las,
     get_pipeline,
 )
-from tests.conftest import (
-    check_las_contains_dims,
-    check_las_invariance,
-    pdal_read_las_array,
-)
+from tests.conftest import check_las_contains_dims, check_las_invariance, pdal_read_las_array
 
 LAS_SUBSET_FILE_BUILDING = "tests/files/870000_6618000.subset.postIA.las"
 SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
@@ -33,9 +29,7 @@ LAS_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.las"
 LAZ_SUBSET_FILE_VEGETATION = "tests/files/436000_6478000.subset.postIA.laz"
 DUMMY_DIRECTORY_PATH = "tests/files/dummy_folder"
 DUMMY_FILE_PATH = "tests/files/dummy_folder/dummy_file1.las"
-LAS_FILE_BUILDING_5490 = (
-    "tests/files/St_Barth_RGAF09_UTM20N_IGN_1988_SB_subset_100m.laz"
-)
+LAS_FILE_BUILDING_5490 = "tests/files/St_Barth_RGAF09_UTM20N_IGN_1988_SB_subset_100m.laz"
 
 
 @pytest.mark.parametrize(
@@ -91,9 +85,7 @@ def test_application_data_invariance_and_data_format(hydra_cfg, las_mutation, qu
             hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
         updated_las_path_list = apply(hydra_cfg, apply_building_module)
         # Check output
-        check_las_invariance(
-            mutated_copy, updated_las_path_list[0], hydra_cfg.data_format.epsg
-        )
+        check_las_invariance(mutated_copy, updated_las_path_list[0], hydra_cfg.data_format.epsg)
         check_format_of_application_output_las(
             updated_las_path_list[0], hydra_cfg.data_format.epsg, expected_codes
         )
@@ -160,8 +152,14 @@ def test_detect_vegetation_unclassified(vegetation_unclassifed_hydra_cfg):
         destination_path,
     )
     las_data = get_las_data_from_las(destination_path)
-    vegetation_count = np.count_nonzero(las_data.points.classification == vegetation_unclassifed_hydra_cfg.data_format.codes.vegetation)
-    unclassified_count = np.count_nonzero(las_data.points.classification == vegetation_unclassifed_hydra_cfg.data_format.codes.unclassified)
+    vegetation_count = np.count_nonzero(
+        las_data.points.classification
+        == vegetation_unclassifed_hydra_cfg.data_format.codes.vegetation
+    )
+    unclassified_count = np.count_nonzero(
+        las_data.points.classification
+        == vegetation_unclassifed_hydra_cfg.data_format.codes.unclassified
+    )
     assert vegetation_count == 17
     assert unclassified_count == 23222
 
@@ -181,7 +179,9 @@ def test_applying(vegetation_unclassifed_hydra_cfg, path, expected):
     vegetation_unclassifed_hydra_cfg.paths.src_las = path
     with tempfile.TemporaryDirectory() as td:
         vegetation_unclassifed_hydra_cfg.paths.output_dir = td
-    with open_dict(vegetation_unclassifed_hydra_cfg):  # needed to open the config dict and add elements
+    with open_dict(
+        vegetation_unclassifed_hydra_cfg
+    ):  # needed to open the config dict and add elements
         vegetation_unclassifed_hydra_cfg.expected = expected
     apply(vegetation_unclassifed_hydra_cfg, dummy_method)
 

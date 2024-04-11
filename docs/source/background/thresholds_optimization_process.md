@@ -2,11 +2,11 @@
 
 ## Motivations
 
-As described in section [Building Validation](./production_process.md) of the production process, the decision to validate or not a group of candidate buildings is based on several decision thresholds. Those thresholds represents different levels of confidence, for different sources of data. 
+As described in section [Building Validation](./production_process.md) of the production process, the decision to validate or not a group of candidate buildings is based on several decision thresholds. Those thresholds represents different levels of confidence, for different sources of data.
 
-They may depend on the AI model which produces the probabilities as well as on the rule-based classification from which the clusters of candidates are derived. They are highly coupled. For instance, if a lower probability is required at the point level to be confirmed as a building (threshold `C1`), we might require a higher percentage of confirmed points in a cluster of candidates (thresholds `C2`) to validate it. There must therefore be optimized jointly. 
+They may depend on the AI model which produces the probabilities as well as on the rule-based classification from which the clusters of candidates are derived. They are highly coupled. For instance, if a lower probability is required at the point level to be confirmed as a building (threshold `C1`), we might require a higher percentage of confirmed points in a cluster of candidates (thresholds `C2`) to validate it. There must therefore be optimized jointly.
 
-These thresholds define how much we automate decisions, but also the quantity of errors we may introduce: there is a balance to be found between `recall` (proportion of buildings group that were confirmed), `precision` (proportion of buildings among confirmed groups), and `automation` (proportion of groups for which a decision was made i.e. that are not flagged as "unsure"). 
+These thresholds define how much we automate decisions, but also the quantity of errors we may introduce: there is a balance to be found between `recall` (proportion of buildings group that were confirmed), `precision` (proportion of buildings among confirmed groups), and `automation` (proportion of groups for which a decision was made i.e. that are not flagged as "unsure").
 
 ## Strategy
 

@@ -51,9 +51,7 @@ class BuildingIdentifier:
         pipeline = get_pipeline(input_values, self.data_format.epsg)
 
         # Considered for identification:
-        non_candidates = (
-            f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
-        )
+        non_candidates = f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
         not_already_confirmed = f"({self.data_format.las_dimensions.classification} != {self.data_format.codes.building.final.building})"
         not_a_potential_completion = f"({_completion_flag} != 1)"
         p_heq_threshold = f"(building>={self.min_building_proba})"
@@ -65,12 +63,8 @@ class BuildingIdentifier:
             where=where,
         )
         # Increment ClusterID, so that points from building completion can become cluster 1
-        pipeline |= pdal.Filter.assign(
-            value=f"{_cid} = {_cid} + 1", where=f"{_cid} != 0"
-        )
-        pipeline |= pdal.Filter.assign(
-            value=f"{_cid} = 1", where=f"{_completion_flag} == 1"
-        )
+        pipeline |= pdal.Filter.assign(value=f"{_cid} = {_cid} + 1", where=f"{_cid} != 0")
+        pipeline |= pdal.Filter.assign(value=f"{_cid} = 1", where=f"{_completion_flag} == 1")
         # Duplicate ClusterID to have an explicit name for it for inspection.
         # Do not reset it to zero to have access to it at human inspection stage.
         pipeline |= pdal.Filter.ferry(

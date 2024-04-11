@@ -6,6 +6,5 @@ min_building_proba: 0.5
 
 cluster:
   min_points: 10 # including isolated points (in BuildingValidator) and confirmed candidates points.
-  tolerance: 0.3  # meters, small to capture building superstructures only
-  is3d: false  # group in 2d for better detection
-
+  tolerance: 0.3 # meters, small to capture building superstructures only
+  is3d: false # group in 2d for better detection
