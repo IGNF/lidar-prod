@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from hydra.experimental import compose, initialize
+from hydra import compose, initialize
 
 from lidar_prod.tasks.utils import pdal_read_las_array
 
@@ -23,7 +23,10 @@ def hydra_cfg():
     with initialize(config_path="./../configs/", job_name="config"):
         return compose(
             config_name="config",
-            overrides=["data_format=default.yaml", "building_validation/optimization=pytest.yaml"],
+            overrides=[
+                "data_format=default.yaml",
+                "building_validation/optimization=pytest.yaml",
+            ],
         )
 
 
