@@ -1,10 +1,12 @@
 # main
 
-- Update pdal version to 2.6
-- code and packaging cleanup
+### 1.10.1
+- Fix edge case when BD uni does not have data for the requested bbox
 
 ## 1.10.0
 - Add support for EPSG reference other than 2154
+- Update pdal version to 2.6
+- code and packaging cleanup
 
 ### 1.9.14
 - Be robust to pgsql2shp warnings when dealing with empty tables (i;e. no buildings).

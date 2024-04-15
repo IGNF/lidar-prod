@@ -288,7 +288,7 @@ def request_bd_uni_for_building_shapefile(
     except subprocess.CalledProcessError as e:
         # In empty zones, pgsql2shp does not create a shapefile
         if (
-            b"Initializing... \nERROR: Could not determine table metadata (empty table)\n"
+            "Initializing... \nERROR: Could not determine table metadata (empty table)\n"
             in e.output
         ):
             # write empty shapefile
