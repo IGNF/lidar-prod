@@ -20,8 +20,8 @@ def setup_module(module):
 
 
 def test_shapefile_overlay_in_building_module(hydra_cfg):
-    """Check that that the prepare function does not add any presence data if the laz geometry does not intersect the
-    BDUni territoire corresponding with the configured epsg"""
+    """Check that that the prepare function does not add any presence data if the laz geometry
+    does not intersect the BDUni territoire corresponding with the configured epsg"""
     # Run application on the data subset for which vector data is expected to be invalid.
     laz_input_file = "tests/files/St_Barth_RGAF09_UTM20N_IGN_1988_SB_subset_100m.laz"
     epsg = 5490
@@ -33,15 +33,16 @@ def test_shapefile_overlay_in_building_module(hydra_cfg):
     bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(
         cfg.bd_uni_connection_params
     )
+    bv_cfg = cfg.building_validation.application
 
     bv = BuildingValidator(
-        shp_path=cfg.building_validation.application.shp_path,
+        shp_path=bv_cfg.shp_path,
         bd_uni_connection_params=bd_uni_connection_params,
-        cluster=cfg.building_validation.application.cluster,
-        bd_uni_request=cfg.building_validation.application.bd_uni_request,
-        data_format=cfg.building_validation.application.data_format,
-        thresholds=cfg.building_validation.application.thresholds,
-        use_final_classification_codes=cfg.building_validation.application.use_final_classification_codes,
+        cluster=bv_cfg.cluster,
+        bd_uni_request=bv_cfg.bd_uni_request,
+        data_format=bv_cfg.data_format,
+        thresholds=bv_cfg.thresholds,
+        use_final_classification_codes=bv_cfg.use_final_classification_codes,
     )
 
     bv.prepare(laz_input_file, target_las_path, save_result=True)
@@ -67,15 +68,15 @@ def test_shapefile_overlay_in_building_module_fail(hydra_cfg):
     bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(
         cfg.bd_uni_connection_params
     )
-
+    bv_cfg = cfg.building_validation.application
     bv = BuildingValidator(
-        shp_path=cfg.building_validation.application.shp_path,
+        shp_path=bv_cfg.shp_path,
         bd_uni_connection_params=bd_uni_connection_params,
-        cluster=cfg.building_validation.application.cluster,
-        bd_uni_request=cfg.building_validation.application.bd_uni_request,
-        data_format=cfg.building_validation.application.data_format,
-        thresholds=cfg.building_validation.application.thresholds,
-        use_final_classification_codes=cfg.building_validation.application.use_final_classification_codes,
+        cluster=bv_cfg.cluster,
+        bd_uni_request=bv_cfg.bd_uni_request,
+        data_format=bv_cfg.data_format,
+        thresholds=bv_cfg.thresholds,
+        use_final_classification_codes=bv_cfg.use_final_classification_codes,
     )
 
     with pytest.raises(ValueError):
@@ -89,12 +90,14 @@ def test_shapefile_overlay_in_building_module_fail(hydra_cfg):
 # If a regression occurs, the pdal execution will hang and a timeout would make it more apparent.
 # However, pytest-timeout does not stop pdal for some reasons. For now this should be sufficient.
 def test_shapefile_overlay_in_building_module_invalid_overlay(hydra_cfg):
-    """We test the application against a LAS subset for which the BDUni shapefile shows overlapping vectors.
+    """We test the application against a LAS subset for which the BDUni shapefile shows overlapping
+    vectors.
 
-    We only need points at the borders of the area in order to request the error-generating shapefile.
+    We only need points at the borders of the area in order to request the error-generating
+    shapefile.
 
-    These overlaps caused a hanging overlay fiter, and we added a dissolve operation on the requested
-    shapefile to remove this bug.
+    These overlaps caused a hanging overlay fiter, and we added a dissolve operation on the
+    requested shapefile to remove this bug.
 
     """
     invalid_overlay_laz_path = (
@@ -106,15 +109,15 @@ def test_shapefile_overlay_in_building_module_invalid_overlay(hydra_cfg):
     bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(
         hydra_cfg.bd_uni_connection_params
     )
-
+    bv_cfg = hydra_cfg.building_validation.application
     bv = BuildingValidator(
-        shp_path=hydra_cfg.building_validation.application.shp_path,
+        shp_path=bv_cfg.shp_path,
         bd_uni_connection_params=bd_uni_connection_params,
-        cluster=hydra_cfg.building_validation.application.cluster,
-        bd_uni_request=hydra_cfg.building_validation.application.bd_uni_request,
-        data_format=hydra_cfg.building_validation.application.data_format,
-        thresholds=hydra_cfg.building_validation.application.thresholds,
-        use_final_classification_codes=hydra_cfg.building_validation.application.use_final_classification_codes,
+        cluster=bv_cfg.cluster,
+        bd_uni_request=bv_cfg.bd_uni_request,
+        data_format=bv_cfg.data_format,
+        thresholds=bv_cfg.thresholds,
+        use_final_classification_codes=bv_cfg.use_final_classification_codes,
     )
 
     bv.prepare(invalid_overlay_laz_path, target_las_path)

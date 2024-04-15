@@ -24,7 +24,8 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class BuildingValidationClusterInfo:
-    """Elements needed to confirm, refute, or be uncertain about a cluster of candidate building points."""
+    """Elements needed to confirm, refute, or be uncertain about a cluster
+    of candidate building points."""
 
     probabilities: np.ndarray
     overlays: np.ndarray
@@ -38,8 +39,10 @@ class BuildingValidator:
     """Logic of building validation.
 
     The candidate building points identified with a rule-based algorithm are cluster together.
-    The BDUni building vectors are overlayed on the points clouds, and points that fall under a vector are flagged.
-    Then, classification dim is updated on a per-group basis, based on both AI probabilities and BDUni flag.
+    The BDUni building vectors are overlayed on the points clouds, and points that fall under
+    a vector are flagged.
+    Then, classification dim is updated on a per-group basis, based on both AI probabilities and
+    BDUni flag.
 
     See `README.md` for the detailed process.
     """
@@ -85,7 +88,8 @@ class BuildingValidator:
         and saves it to `target_las_path`
 
         Args:
-            input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with a building probability channel
+            input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with
+            a building probability channel
             target_las_path (str): path for saving updated LAS file.
 
         Returns:
@@ -113,7 +117,8 @@ class BuildingValidator:
     ) -> None:
         f"""
         Prepare las for later decision process. .
-        1. Cluster candidates points, in a new `{self.data_format.las_dimensions.ClusterID_candidate_building}`
+        1. Cluster candidates points, in a new
+        `{self.data_format.las_dimensions.ClusterID_candidate_building}`
         dimension where the index of clusters starts at 1 (0 means no cluster).
         2. Identify points overlayed by a BD Uni building, in a new
         `{self.data_format.las_dimensions.uni_db_overlay}` dimension (0/1 flag).
@@ -126,7 +131,8 @@ class BuildingValidator:
         do this step once before testing multiple decision parameters on the same prepared data.
 
         Args:
-            input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with a building probability channel
+            input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with
+            a building probability channel
             target_las_path (str): path for saving prepared LAS file.
             save_result (bool): True to save a las instead of propagating a pipeline
 
@@ -170,7 +176,9 @@ class BuildingValidator:
         self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_overlay}")
 
         if self.shp_path:
-            temp_dirpath = None  # no need for a temporay directory to add the shapefile in it, we already have the shapefile
+            # no need for a temporay directory to add the shapefile in it, we already have the
+            # shapefile
+            temp_dirpath = None
             _shp_p = self.shp_path
             log.info(f"Read shapefile\n {_shp_p}")
             gdf = geopandas.read_file(_shp_p)
@@ -219,8 +227,9 @@ class BuildingValidator:
         points[dim_clf][candidates_mask] = self.codes.final.not_building
 
         # 2) Decide at the group-level
-        # TODO: check if this can be moved somewhere else. WARNING: use_final_classification_codes may be modified in
-        # an unsafe manner during optimization. Consider using a setter that will change decision_func alongside.
+        # TODO: check if this can be moved somewhere else.
+        # WARNING: use_final_classification_codes may be modified in an unsafe manner during
+        # optimization. Consider using a setter that will change decision_func alongside.
 
         # Decide level of details of classification codes
         decision_func = self._make_detailed_group_decision
@@ -277,13 +286,14 @@ class BuildingValidator:
     def _make_detailed_group_decision(self, infos: BuildingValidationClusterInfo) -> int:
         """Decision process at the cluster level.
 
-        Confirm or refute candidate building groups based on fraction of confirmed/refuted points and
-        on fraction of points overlayed by a building vector in BDUni.
+        Confirm or refute candidate building groups based on fraction of confirmed/refuted points
+        and on fraction of points overlayed by a building vector in BDUni.
 
         See Readme for details of this group-level decision process.
 
         Args:
-            infos (BuildngValidationClusterInfo): arrays describing the cluster of candidate builiding points
+            infos (BuildngValidationClusterInfo): arrays describing the cluster of candidate
+            builiding points
 
         Returns:
             int: detailed classification code for the considered group.

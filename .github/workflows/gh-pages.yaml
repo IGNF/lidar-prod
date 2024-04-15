@@ -23,34 +23,15 @@ jobs:
 
       # See https://github.com/conda-incubator/setup-miniconda#caching-environments
 
-      # Setup empty conda environment
-      - name: Setup a conda-incubator with an empty conda env
-        uses: conda-incubator/setup-miniconda@v2
+      # See https://github.com/marketplace/actions/setup-micromamba
+      - name: install
+        uses: mamba-org/setup-micromamba@v1.4.3
         with:
-          python-version: 3.9.12
-          miniforge-variant: Mambaforge
-          miniforge-version: latest
-          use-mamba: true
-          # Environment to create and activate for next steps
-          activate-environment: lidar_prod
-
-      # Cache the env
-      # See https://github.com/conda-incubator/setup-miniconda#caching-environments
-      - name: Get Date
-        id: get-date
-        run: echo "::set-output name=today::$(/bin/date -u '+%Y%m%d')"
-        shell: bash
-
-      - name: Cache conda environment
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.CONDA }}/envs
-          key: conda-${{ runner.os }}--${{ runner.arch }}--${{ steps.get-date.outputs.today }}-${{ hashFiles('setup_env/requirements.yml') }}-${{ hashFiles('setup_env/requirements.txt') }}
-        id: cache
-
-      - name: Update environment if there was no cached env.
-        run: mamba env update -n lidar_prod -f setup_env/requirements.yml
-        if: steps.cache.outputs.cache-hit != 'true'
+          environment-file: environment.yml
+          environment-name: lidar_prod # activate the environment
+          cache-environment: true
+          cache-downloads: true
+          generate-run-shell: true
 
       - name: replace BD_UNI credentials
         run: cp configs/bd_uni_connection_params/credentials_template.yaml configs/bd_uni_connection_params/credentials.yaml

@@ -36,12 +36,14 @@ def split_idx_by_dim(dim_array):
 
 
 def get_pipeline(input_value: pdal.pipeline.Pipeline | str, epsg: int | str):
-    """If the input value is a pipeline, returns it, if it's a las path return the corresponding pipeline
+    """If the input value is a pipeline, returns it, if it's a las path return the corresponding
+    pipeline
 
     Args:
         input_value (pdal.pipeline.Pipeline | str): input value to get a pipeline from
         (las pipeline or path to a file to read with pdal)
-        epsg (int | str): if input_value is a string, use the epsg value to override the crs from the las header
+        epsg (int | str): if input_value is a string, use the epsg value to override the crs from
+        the las header
 
     Returns:
         pdal pipeline
@@ -64,7 +66,8 @@ def get_integer_bbox(pipeline: pdal.pipeline.Pipeline, buffer: Number = 0) -> Di
 
     Args:
         pipeline (pdal.pipeline.Pipeline): pipeline for which to read the input bounding box
-        buffer (Number, optional): buffer to add to the bounds before casting it to integers. Defaults to 0.
+        buffer (Number, optional): buffer to add to the bounds before casting it to integers.
+        Defaults to 0.
 
     Returns:
         Dict[str, int]: x/y min/max values as a dictionary
@@ -144,7 +147,8 @@ def get_a_las_to_las_pdal_pipeline(
         src_las_path (str): input LAS path
         target_las_path (str): output LAS path
         ops (Iterable[Any]): list of pdal operation (e.g. Filter.assign(...))
-        epsg (int | str): epsg code for the input file (if empty or None: infer it from the las metadata)
+        epsg (int | str): epsg code for the input file (if empty or None: infer it from the
+        las metadata)
 
     """
     pipeline = pdal.Pipeline()
@@ -160,10 +164,12 @@ def pdal_read_las_array(las_path: str, epsg: int | str):
 
     Args:
         las_path (str): input LAS path
-        epsg (int | str): epsg code for the input file (if empty or None: infer it from the las metadata)
+        epsg (int | str): epsg code for the input file (if empty or None: infer it from the
+        las metadata)
 
     Returns:
-        np.ndarray: named array with all LAS dimensions, including extra ones, with dict-like access.
+        np.ndarray: named array with all LAS dimensions, including extra ones, with dict-like
+        access.
     """
     p1 = pdal.Pipeline() | get_pdal_reader(las_path, epsg)
     p1.execute()
@@ -175,9 +181,11 @@ def check_bbox_intersects_territoire_with_srid(
 ):
     """Check if a bounding box intersects one of the territories from the BDUni database
     (public.gcms_territoire) with the expected srid.
-    As geometries are indicated with srid = 0 in the database (but stored in their original projection),
+    As geometries are indicated with srid = 0 in the database (but stored in their original
+    projection),
     both geometries are compared using this common srid.
-    In the territoire geometry query, ST_Union is used to combine different territoires that would have the same
+    In the territoire geometry query, ST_Union is used to combine different territoires that
+    would have the same
     srid (eg. 5490 for Guadeloupe and Martinique)
     """
     conn = psycopg2.connect(
@@ -190,8 +198,11 @@ def check_bbox_intersects_territoire_with_srid(
         with conn:
             with conn.cursor() as curs:
                 query = f"""select ST_Intersects(
-                    ST_MakeEnvelope({bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, 0),
-                    ST_SetSRID(ST_Envelope(ST_Union(ST_Force2D(geometrie))),0))::bool as consistency_bbox_srid
+                    ST_MakeEnvelope(
+                        {bbox["x_min"]}, {bbox["y_min"]}, {bbox["x_max"]}, {bbox["y_max"]}, 0
+                        ),
+                    ST_SetSRID(ST_Envelope(ST_Union(ST_Force2D(geometrie))),0))::bool
+                    as consistency_bbox_srid
                     from public.gcms_territoire
                     where srid = '{epsg_srid}'
                     limit 1;
@@ -199,8 +210,8 @@ def check_bbox_intersects_territoire_with_srid(
                 curs.execute(query)
                 out = curs.fetchone()
 
-    # Unlike file objects or other resources, exiting the connection’s with block doesn’t close the connection
-    # hence we need to close it manually
+    # Unlike file objects or other resources, exiting the connection’s with block doesn’t
+    # close the connection hence we need to close it manually
     # cf https://www.psycopg.org/docs/usage.html#with-statement
     finally:
         conn.close()
@@ -222,9 +233,10 @@ def request_bd_uni_for_building_shapefile(
 
     Note on the projections:
     Projections are mixed in the BDUni tables.
-    In PostGIS, the declared projection is 0 but the data are stored in the legal projection of the corresponding
-    territories.
-    In each table, there is a a "gcms_territoire" field, which tells the corresponding territory (3 letters code).
+    In PostGIS, the declared projection is 0 but the data are stored in the legal projection of
+    the corresponding territories.
+    In each table, there is a a "gcms_territoire" field, which tells the corresponding territory
+    (3 letters code).
     The gcms_territoire table gives hints on each territory (SRID, footprint)
     """
 
@@ -236,7 +248,8 @@ def request_bd_uni_for_building_shapefile(
             + f"the query srid ({epsg_srid}). Please check that you passed the correct srid."
         )
 
-    sql_territoire = f"""WITH territoire(code) as (SELECT code FROM public.gcms_territoire WHERE srid = {epsg_srid}) """
+    sql_territoire = f"""WITH territoire(code) as (SELECT code FROM public.gcms_territoire \
+        WHERE srid = {epsg_srid}) """
 
     sql_batiment = f"""SELECT \
         ST_MakeValid(ST_Force2D(st_setsrid(batiment.geometrie,{epsg_srid}))) AS geometry, \

@@ -1,5 +1,8 @@
 # main
 
+- Update pdal version to 2.6
+- code and packaging cleanup
+
 ## 1.10.0
 - Add support for EPSG reference other than 2154
 

@@ -11,7 +11,7 @@
 set -e
 
 conda install mamba --yes -n base -c conda-forge  # mamba is a conda on steroids
-mamba env create -f setup_env/requirements.yml --force
+mamba env create -f environment.yml --force
 conda activate lidar_prod
 
 # Troubleshooting:

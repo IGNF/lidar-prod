@@ -18,7 +18,8 @@ class Cleaner:
         """Format extra_dims parameter from config.
 
         Args:
-            extra_dims (Optional[Union[Iterable[str], str]]): each dim should have format dim_name:pdal_type.
+            extra_dims (Optional[Union[Iterable[str], str]]): each dim should have format
+            dim_name:pdal_type.
             If a string, used directly; if an iterable, dimensions are joined together.
 
         """
@@ -43,7 +44,8 @@ class Cleaner:
                 pass
 
     def get_extra_dims_as_str(self):
-        """'stringify' the extra_dims list and return it, or an empty list if there is no extra dims"""
+        """'stringify' the extra_dims list and return it, or an empty list if there is
+        no extra dims"""
         self.extra_dims_as_dict
         return_str = ",".join([f"{k}={v}" for k, v in self.extra_dims_as_dict.items()])
         return return_str if return_str else []

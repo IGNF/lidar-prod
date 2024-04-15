@@ -3,7 +3,9 @@ Takes vegetation probabilities as input, and defines vegetation
 
 """
 
-from __future__ import annotations  # to recognize IoU as a type by itself (in __add__())
+from __future__ import (
+    annotations,  # to recognize IoU as a type by itself (in __add__())
+)
 
 import logging
 from typing import Union
@@ -39,9 +41,11 @@ class IoU:
         )
 
     def __str__(self):
-        return "IoU: {:0.3f} |  true positive: {:,} | false negative: {:,} | false positive: {:,}".format(
-            self.iou, self.true_positive, self.false_negative, self.false_positive
+        s = (
+            f"IoU: {self.iou:0.3f} |  true positive: {self.true_positive:,} | "
+            + f"false negative: {self.false_negative:,} | false positive: {self.false_positive:,}"
         )
+        return s
 
     @staticmethod
     def combine_iou(iou_list: list):
@@ -73,7 +77,8 @@ class BasicIdentifier:
         target_result_code: Union[int, list] = None,
     ) -> None:
         """
-        BasicIdentifier set all points with a value from a column above a threshold to another value in another column
+        BasicIdentifier set all points with a value from a column above a threshold to another
+        value in another column
 
         args:
             threshold: above the threshold, a point is set
@@ -81,10 +86,12 @@ class BasicIdentifier:
             result_column: the column to store the result
             result_code: the value the point will be set to
             evaluate_iou: True if we want to evaluate the IoU of that selection
-            target_column: if we want to evaluate the IoU, this is the column with the real results to compare againt
-            target_result_code: if we want to evaluate the IoU, this is/are the code(s) of the target.
-                                Can be an int of a list of int, if we want an IoU but target_result_code
-                                is not provided then result_code is used instead.
+            target_column: if we want to evaluate the IoU, this is the column with the real
+            results to compare against
+            target_result_code: if we want to evaluate the IoU, this is/are the code(s) of
+                                the target. Can be an int of a list of int, if we want an IoU
+                                but target_result_code is not provided then result_code is used
+                                instead.
         """
         self.threshold = threshold
         self.proba_column = proba_column
@@ -115,20 +122,34 @@ class BasicIdentifier:
             self.iou = IoU.iou_by_mask(threshold_mask, target_mask)
 
         # MONKEY PATCHING !!! for debugging
-        # if self.result_code == 1:   # unclassified
+        # if self.result_code == 1:  # unclassified
         #     truth_mask = las_data.points["classification"] == 1
-        # else:   # vegetation
+        # else:  # vegetation
         #     truth_mask = np.isin(las_data.points["classification"], [3, 4, 5])
 
-        # print("threshold_mask size: ", np.count_nonzero(threshold_mask), "truth_mask size: ", np.count_nonzero(truth_mask))
-
-        # self.result_code = self.result_code if self.result_code ==1 else 11
-
-        # las_data.points[self.result_column][np.logical_and(truth_mask, threshold_mask)] = self.result_code # correct values
-        # las_data.points[self.result_column][np.logical_and(truth_mask, ~threshold_mask)] = self.result_code+1 # false positive
-        # las_data.points[self.result_column][np.logical_and(~truth_mask, threshold_mask)] = self.result_code+2 # false negative
         # print(
-        #     "true positive: ", np.count_nonzero(np.logical_and(truth_mask, threshold_mask)),
-        #     "False positive: ", np.count_nonzero(np.logical_and(truth_mask, ~threshold_mask)),
-        #     "False negative: ", np.count_nonzero(np.logical_and(~truth_mask, threshold_mask))
+        #     "threshold_mask size: ",
+        #     np.count_nonzero(threshold_mask),
+        #     "truth_mask size: ",
+        #     np.count_nonzero(truth_mask),
+        # )
+
+        # self.result_code = self.result_code if self.result_code == 1 else 11
+
+        # las_data.points[self.result_column][
+        #     np.logical_and(truth_mask, threshold_mask)
+        # ] = self.result_code  # correct values
+        # las_data.points[self.result_column][np.logical_and(truth_mask, ~threshold_mask)] = (
+        #     self.result_code + 1
+        # )  # false positive
+        # las_data.points[self.result_column][np.logical_and(~truth_mask, threshold_mask)] = (
+        #     self.result_code + 2
+        # )  # false negative
+        # print(
+        #     "true positive: ",
+        #     np.count_nonzero(np.logical_and(truth_mask, threshold_mask)),
+        #     "False positive: ",
+        #     np.count_nonzero(np.logical_and(truth_mask, ~threshold_mask)),
+        #     "False negative: ",
+        #     np.count_nonzero(np.logical_and(~truth_mask, threshold_mask)),
         # )

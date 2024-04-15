@@ -5,7 +5,9 @@ from omegaconf import DictConfig
 
 from lidar_prod.commons import commons
 from lidar_prod.tasks.basic_identification_optimization import BasicIdentifierOptimizer
-from lidar_prod.tasks.building_validation_optimization import BuildingValidationOptimizer
+from lidar_prod.tasks.building_validation_optimization import (
+    BuildingValidationOptimizer,
+)
 from lidar_prod.tasks.utils import BDUniConnectionParams
 
 log = logging.getLogger(__name__)

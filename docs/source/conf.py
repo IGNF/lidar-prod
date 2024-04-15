@@ -13,8 +13,8 @@
 import os
 import sys
 
-import yaml
-from hydra.experimental import compose, initialize
+import tomli
+from hydra import compose, initialize
 from omegaconf import OmegaConf
 
 # from unittest import mock
@@ -24,15 +24,17 @@ rel_root_path = "./../../"
 abs_root_path = os.path.abspath(rel_root_path)
 sys.path.insert(0, abs_root_path)
 
+from lidar_prod.version import __version__  # noqa: E402
 
 # -- Project information -----------------------------------------------------
-with open(os.path.join(abs_root_path, "package_metadata.yaml"), "r") as f:
-    pm = yaml.safe_load(f)
+with open(os.path.join(abs_root_path, "pyproject.toml"), "rb") as f:
+    data = tomli.load(f)
 
-release = pm["__version__"]
-project = pm["__name__"]
-author = pm["__author__"]
-copyright = pm["__copyright__"]
+
+release = __version__
+project = data["project"]["name"]
+author = ", ".join([a["name"] for a in data["project"]["authors"]])
+copyright = data["metadata"]["copyright"]
 
 # -- YAML main to print the config into  ---------------------------------------------------
 # We need to concatenate configs into a single file using hydra
@@ -55,7 +57,7 @@ autosummary_generate = True
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-needs_sphinx = "4.5"
+needs_sphinx = "7.2"
 extensions = [
     "sphinx.ext.napoleon",  # Supports google-style docstrings
     "sphinx.ext.autodoc",  # auto-generates doc fgrom docstrings
@@ -64,7 +66,8 @@ extensions = [
     "sphinx.ext.githubpages",  # creates .nojekyll file to publish the doc on GitHub Pages.
     "myst_parser",  # supports markdown syntax for doc pages, and link to markdown pages
     "sphinx_paramlinks",  # allow to reference params, which is done in pytorch_lightning
-    "sphinxnotes.mock",  # ignore third-parties directive suche as "testcode" - see "mock_directive" args below
+    "sphinxnotes.mock",  # ignore third-parties directive suche as "testcode" -
+    # see "mock_directive" args below
     "sphinxcontrib.mermaid",  # enable mermaid schema
 ]
 

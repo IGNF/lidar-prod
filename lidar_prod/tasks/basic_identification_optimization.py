@@ -33,8 +33,8 @@ class BasicIdentifierOptimizer:
             target_column: the column with the target results to compare againt
             n_trials: number of trials to get the best IoU
             target_result_code: the code(s) defining the points with the target results.
-                                Can be an int of a list of int, if we want an IoU but target_result_code
-                                is not provided then result_code is used instead.
+                Can be an int of a list of int, if we want an IoU but
+                target_result_code is not provided then result_code is used instead.
         """
 
         self.study = optuna.create_study(

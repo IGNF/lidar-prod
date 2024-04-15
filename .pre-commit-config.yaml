@@ -15,7 +15,6 @@ repos:
     rev: 24.3.0
     hooks:
       - id: black
-        args: [--line-length, "99"]
 
   # python code analysis
   - repo: https://github.com/PyCQA/flake8
@@ -28,7 +27,6 @@ repos:
     rev: 5.13.2
     hooks:
       - id: isort
-        args: ["--profile", "black", --line-length, "99"]
 
   # yaml formatting
   - repo: https://github.com/pre-commit/mirrors-prettier

@@ -9,13 +9,15 @@ dependencies:
   - black # code formatting
   - isort # import sorting
   - flake8 # code analysis
+  - rstcheck==3.3.*
   # --------- geo --------- #
   - conda-forge:python-pdal==3.2.*
-  - conda-forge:pdal==2.5.*
+  - conda-forge:pdal==2.6.*
   - numpy
   - scikit-learn
   - geopandas
   - pyproj
+  - laspy
   # --------- others --------- #
   - psycopg2 # database interaction
   - jupyterlab # better jupyter notebooks
@@ -23,6 +25,21 @@ dependencies:
   - rich==11.2.* # rich text formatting
   - pytest>=7.1.2 # tests
   - pytest-cov==3.0.*
-  # --------- torch --------- #
+    # --------- documentation --------- #
+  - sphinx==7.2.*
+  - recommonmark==0.7.*
+  - sphinx_rtd_theme==2.0.*
+  - docutils==0.20.*
   - pip:
-      - -r requirements.txt
+      # --------- postgis-toolkit --------- #
+      # - postgis-toolkit
+      # --------- hydra --------- #
+      - hydra-core==1.1.*
+      - hydra-colorlog==1.1.*
+      - optuna==2.10.*
+      # --------- Documentation --------- #
+      - myst_parser==2.0.*
+      - sphinx_paramlinks==0.6.*
+      - sphinxnotes-mock==1.0.*
+      - sphinx-argparse==0.4.*
+      - sphinxcontrib-mermaid==0.9.*
