@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.utils &mdash; lidar_prod V1.10.0 documentation</title>
+  <title>lidar_prod.tasks.utils &mdash; lidar_prod V1.10.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_paramlinks.css" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=d33a2b6c"></script>
+        <script src="../../../_static/documentation_options.js?v=7742af75"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
@@ -472,7 +472,7 @@
     <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="c1"># In empty zones, pgsql2shp does not create a shapefile</span>
         <span class="k">if</span> <span class="p">(</span>
-            <span class="sa">b</span><span class="s2">&quot;Initializing... </span><span class="se">\n</span><span class="s2">ERROR: Could not determine table metadata (empty table)</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Initializing... </span><span class="se">\n</span><span class="s2">ERROR: Could not determine table metadata (empty table)</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">output</span>
         <span class="p">):</span>
             <span class="c1"># write empty shapefile</span>
