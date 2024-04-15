@@ -85,7 +85,7 @@ jobs:
       - name: Get version number
         id: tag
         run: |
-          echo "VERSION=$(python -m lidar_prod.version)" >> $GITHUB_ENV
+          echo "VERSION=$(docker run lidar_prod python -m lidar_prod.version)" >> $GITHUB_ENV
           echo "DATE=$(date '+%Y.%m.%d')" >> $GITHUB_ENV
 
       # show possible tags, for debugging purpose
