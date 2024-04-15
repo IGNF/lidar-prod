@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.run &mdash; lidar_prod V1.9.14 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sphinx_paramlinks.css" type="text/css" />
+  <title>lidar_prod.run &mdash; lidar_prod V1.10.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx_paramlinks.css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=d33a2b6c"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
         <script>mermaid.initialize({startOnLoad:true});</script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -27,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> lidar_prod
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            lidar_prod
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -91,7 +98,11 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../apidoc/lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../apidoc/lidar_prod.html">lidar_prod.run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../apidoc/lidar_prod.html#lidar_prod.run.POSSIBLE_TASK"><code class="docutils literal notranslate"><span class="pre">POSSIBLE_TASK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../apidoc/lidar_prod.html#lidar_prod.run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../apidoc/lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
@@ -121,9 +132,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>lidar_prod.run</li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lidar_prod.run</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -142,7 +153,9 @@
 <span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span>
 
 
-<div class="viewcode-block" id="POSSIBLE_TASK"><a class="viewcode-back" href="../../apidoc/lidar_prod.html#lidar_prod.run.POSSIBLE_TASK">[docs]</a><span class="k">class</span> <span class="nc">POSSIBLE_TASK</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<div class="viewcode-block" id="POSSIBLE_TASK">
+<a class="viewcode-back" href="../../apidoc/lidar_prod.html#lidar_prod.run.POSSIBLE_TASK">[docs]</a>
+<span class="k">class</span> <span class="nc">POSSIBLE_TASK</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">CLEANING</span> <span class="o">=</span> <span class="s2">&quot;cleaning&quot;</span>
     <span class="n">ID_VEGETATION_UNCLASSIFIED</span> <span class="o">=</span> <span class="s2">&quot;identify_vegetation_unclassified&quot;</span>
     <span class="n">OPT_VEGETATION</span> <span class="o">=</span> <span class="s2">&quot;optimize_veg_id&quot;</span>
@@ -152,7 +165,10 @@
     <span class="n">GET_SHAPEFILE</span> <span class="o">=</span> <span class="s2">&quot;get_shapefile&quot;</span></div>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../apidoc/lidar_prod.html#lidar_prod.run.main">[docs]</a><span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../configs/&quot;</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../apidoc/lidar_prod.html#lidar_prod.run.main">[docs]</a>
+<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../configs/&quot;</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config.yaml&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Main entry point to either apply or optimize thresholds.</span>
 
@@ -204,6 +220,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting applying the default process&quot;</span><span class="p">)</span>
         <span class="n">apply</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">apply_building_module</span><span class="p">)</span></div>
+
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>

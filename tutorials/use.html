@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Using the app &mdash; lidar_prod V1.9.14 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+  <title>Using the app &mdash; lidar_prod V1.10.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
-        <script>mermaid.initialize({startOnLoad:true});</script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=d33a2b6c"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -30,11 +31,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> lidar_prod
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            lidar_prod
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -94,7 +99,11 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.html">lidar_prod.run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.html#lidar_prod.run.POSSIBLE_TASK"><code class="docutils literal notranslate"><span class="pre">POSSIBLE_TASK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.html#lidar_prod.run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
@@ -124,8 +133,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Using the app</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Using the app</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/tutorials/use.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -136,10 +145,10 @@
            <div itemprop="articleBody">
              
   <section id="using-the-app">
-<h1>Using the app<a class="headerlink" href="#using-the-app" title="Permalink to this headline"></a></h1>
+<h1>Using the app<a class="headerlink" href="#using-the-app" title="Link to this heading"></a></h1>
 <section id="run-within-a-docker-container">
-<h2>Run within a docker container<a class="headerlink" href="#run-within-a-docker-container" title="Permalink to this headline"></a></h2>
-<p>Up to date docker images (named <code class="docutils literal notranslate"><span class="pre">lidar_prod</span></code>) are created via Github integration actions (see <a class="reference internal" href="../guides/development.html"><span class="doc std std-doc">Developer’s guide</span></a>).</p>
+<h2>Run within a docker container<a class="headerlink" href="#run-within-a-docker-container" title="Link to this heading"></a></h2>
+<p>Up to date docker images (named <code class="docutils literal notranslate"><span class="pre">lidar_prod</span></code>) are created via Github integration actions (see <a class="reference internal" href="../guides/development.html"><span class="std std-doc">Developer’s guide</span></a>).</p>
 <p>To run the app, use</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
 -v<span class="w"> </span><span class="o">{</span>local_src_las_dir<span class="o">}</span>:/inputs/<span class="w"> </span><span class="se">\</span>
@@ -155,7 +164,7 @@ paths.output_dir<span class="o">=</span>/outputs/
 <p><em>Note: during our tests, we needed to add the docker option <code class="docutils literal notranslate"><span class="pre">--network</span> <span class="pre">host</span></code> to manage the connexion with the bduni_france_consultation database.</em></p>
 </section>
 <section id="run-as-a-python-module">
-<h2>Run as a python module<a class="headerlink" href="#run-as-a-python-module" title="Permalink to this headline"></a></h2>
+<h2>Run as a python module<a class="headerlink" href="#run-as-a-python-module" title="Link to this heading"></a></h2>
 <p>To run the module as a module, you will need a source cloud point in LAS format with an additional channel containing predicted building probabilities (<code class="docutils literal notranslate"><span class="pre">ai_building_proba</span></code>) and another one containing predictions entropy (<code class="docutils literal notranslate"><span class="pre">entropy</span></code>). The names of thes channel can be specified via hydra config <code class="docutils literal notranslate"><span class="pre">config.data_format.las_dimensions</span></code>.</p>
 <p>To run using default configurations of the installed module, use</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>lidar_prod.run<span class="w"> </span>paths.src_las<span class="o">=</span>&lt;/path/to/file.las&gt;
@@ -165,7 +174,7 @@ paths.output_dir<span class="o">=</span>/outputs/
 <p>To print default configuration run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">lidar_prod.run</span> <span class="pre">-h</span></code>. For pretty colors, run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">lidar_prod.run</span> <span class="pre">print_config=true</span></code>.</p>
 </section>
 <section id="run-from-source-directly">
-<h2>Run from source directly<a class="headerlink" href="#run-from-source-directly" title="Permalink to this headline"></a></h2>
+<h2>Run from source directly<a class="headerlink" href="#run-from-source-directly" title="Link to this heading"></a></h2>
 <p>For developments and debugging, you can run the package directly from python sources instead:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate an env matching ./bash/setup_env.sh requirements.</span>
 conda<span class="w"> </span>activate<span class="w"> </span>lidar_prod
@@ -174,7 +183,7 @@ python<span class="w"> </span>lidar_prod/run.py<span class="w"> </span>paths.src
 </div>
 </section>
 <section id="run-different-tasks">
-<h2>Run Different tasks<a class="headerlink" href="#run-different-tasks" title="Permalink to this headline"></a></h2>
+<h2>Run Different tasks<a class="headerlink" href="#run-different-tasks" title="Link to this heading"></a></h2>
 <p>Different tasks can be runned from the application. Currently, they are:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">apply_on_building</span></code> to identify building</p></li>

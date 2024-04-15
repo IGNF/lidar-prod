@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; lidar_prod V1.9.14 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+  <title>Installation &mdash; lidar_prod V1.10.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
-        <script>mermaid.initialize({startOnLoad:true});</script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=d33a2b6c"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -30,11 +31,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> lidar_prod
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            lidar_prod
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -94,7 +99,11 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.html">lidar_prod.run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.html#lidar_prod.run.POSSIBLE_TASK"><code class="docutils literal notranslate"><span class="pre">POSSIBLE_TASK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.html#lidar_prod.run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
@@ -124,8 +133,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Installation</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/tutorials/install.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -136,9 +145,9 @@
            <div itemprop="articleBody">
              
   <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h1>
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <section id="set-up-a-virtual-environment">
-<h2>Set up a virtual environment<a class="headerlink" href="#set-up-a-virtual-environment" title="Permalink to this headline"></a></h2>
+<h2>Set up a virtual environment<a class="headerlink" href="#set-up-a-virtual-environment" title="Link to this heading"></a></h2>
 <p>We use <a class="reference external" href="https://anaconda.org/">Anaconda</a>] to manage and isolate dependencies.
 The provided environment setup script also installs <a class="reference external" href="https://mamba.readthedocs.io/en/latest/index.html">Mamba</a>,
 which gets on top of conda for faster environment installs.</p>
@@ -161,7 +170,7 @@ which gets on top of conda for faster environment installs.</p>
 </div>
 </section>
 <section id="install-the-app-as-a-python-module">
-<h2>Install the app as a python module<a class="headerlink" href="#install-the-app-as-a-python-module" title="Permalink to this headline"></a></h2>
+<h2>Install the app as a python module<a class="headerlink" href="#install-the-app-as-a-python-module" title="Link to this heading"></a></h2>
 <p>To run the application from anywhere, you can install as a module in a your virtual environment.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># activate your env</span>
 conda<span class="w"> </span>activate<span class="w"> </span>lidar_prod
@@ -174,10 +183,10 @@ pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--editable<span class="w"> </span>.
 </pre></div>
 </div>
-<p>Then, refert to the <a class="reference internal" href="use.html"><span class="doc std std-doc">usage page</span></a>.</p>
+<p>Then, refert to the <a class="reference internal" href="use.html"><span class="std std-doc">usage page</span></a>.</p>
 </section>
 <section id="provide-credentials">
-<h2>Provide credentials<a class="headerlink" href="#provide-credentials" title="Permalink to this headline"></a></h2>
+<h2>Provide credentials<a class="headerlink" href="#provide-credentials" title="Link to this heading"></a></h2>
 <p>To help identify buildings, the BD_UNI database is used. To provide credentials, copy bd_uni_connection_params/credentials_template.yaml to bd_uni_connection_params/credentials.yaml
 <code class="docutils literal notranslate"><span class="pre">cp</span> <span class="pre">bd_uni_connection_params/credentials_template.yaml</span> <span class="pre">bd_uni_connection_params/credentials.yaml</span></code>
 Then fill the blanks in the file, specifically “user” and “pwd”.</p>

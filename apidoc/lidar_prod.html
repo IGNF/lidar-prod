@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.run &mdash; lidar_prod V1.9.14 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+  <title>lidar_prod.run &mdash; lidar_prod V1.10.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
-        <script>mermaid.initialize({startOnLoad:true});</script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=d33a2b6c"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -30,11 +31,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> lidar_prod
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            lidar_prod
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -94,7 +99,11 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">lidar_prod.run</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">lidar_prod.run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#lidar_prod.run.POSSIBLE_TASK"><code class="docutils literal notranslate"><span class="pre">POSSIBLE_TASK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lidar_prod.run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
@@ -124,8 +133,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>lidar_prod.run</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">lidar_prod.run</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/apidoc/lidar_prod.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -136,52 +145,52 @@
            <div itemprop="articleBody">
              
   <section id="module-lidar_prod.run">
-<span id="lidar-prod-run"></span><h1>lidar_prod.run<a class="headerlink" href="#module-lidar_prod.run" title="Permalink to this headline"></a></h1>
+<span id="lidar-prod-run"></span><h1>lidar_prod.run<a class="headerlink" href="#module-lidar_prod.run" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lidar_prod.run.</span></span><span class="sig-name descname"><span class="pre">POSSIBLE_TASK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/run.html#POSSIBLE_TASK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lidar_prod.run.</span></span><span class="sig-name descname"><span class="pre">POSSIBLE_TASK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/run.html#POSSIBLE_TASK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>An enumeration.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.APPLY_BUILDING">
-<span class="sig-name descname"><span class="pre">APPLY_BUILDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'apply_on_building'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.APPLY_BUILDING" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">APPLY_BUILDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'apply_on_building'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.APPLY_BUILDING" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.CLEANING">
-<span class="sig-name descname"><span class="pre">CLEANING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cleaning'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.CLEANING" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">CLEANING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cleaning'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.CLEANING" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.GET_SHAPEFILE">
-<span class="sig-name descname"><span class="pre">GET_SHAPEFILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'get_shapefile'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.GET_SHAPEFILE" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">GET_SHAPEFILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'get_shapefile'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.GET_SHAPEFILE" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.ID_VEGETATION_UNCLASSIFIED">
-<span class="sig-name descname"><span class="pre">ID_VEGETATION_UNCLASSIFIED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'identify_vegetation_unclassified'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.ID_VEGETATION_UNCLASSIFIED" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ID_VEGETATION_UNCLASSIFIED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'identify_vegetation_unclassified'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.ID_VEGETATION_UNCLASSIFIED" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.OPT_BUIlDING">
-<span class="sig-name descname"><span class="pre">OPT_BUIlDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_building'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_BUIlDING" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">OPT_BUIlDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_building'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_BUIlDING" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.OPT_UNCLASSIFIED">
-<span class="sig-name descname"><span class="pre">OPT_UNCLASSIFIED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_unc_id'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_UNCLASSIFIED" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">OPT_UNCLASSIFIED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_unc_id'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_UNCLASSIFIED" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.OPT_VEGETATION">
-<span class="sig-name descname"><span class="pre">OPT_VEGETATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_veg_id'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_VEGETATION" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">OPT_VEGETATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_veg_id'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_VEGETATION" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lidar_prod.run.main">
-<span class="sig-prename descclassname"><span class="pre">lidar_prod.run.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/run.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.run.main" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.run.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/run.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.run.main" title="Link to this definition"></a></dt>
 <dd><p>Main entry point to either apply or optimize thresholds.</p>
 <p>Check the configurations files for usage.</p>
 </dd></dl>

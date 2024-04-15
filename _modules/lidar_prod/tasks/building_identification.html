@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_identification &mdash; lidar_prod V1.9.14 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+  <title>lidar_prod.tasks.building_identification &mdash; lidar_prod V1.10.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_paramlinks.css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=d33a2b6c"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
         <script>mermaid.initialize({startOnLoad:true});</script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -27,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> lidar_prod
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            lidar_prod
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -91,7 +98,11 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.html">lidar_prod.run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.html#lidar_prod.run.POSSIBLE_TASK"><code class="docutils literal notranslate"><span class="pre">POSSIBLE_TASK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.html#lidar_prod.run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
@@ -121,9 +132,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>lidar_prod.tasks.building_identification</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lidar_prod.tasks.building_identification</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -145,7 +156,9 @@
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="BuildingIdentifier"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_identification.BuildingIdentifier">[docs]</a><span class="k">class</span> <span class="nc">BuildingIdentifier</span><span class="p">:</span>
+<div class="viewcode-block" id="BuildingIdentifier">
+<a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_identification.BuildingIdentifier">[docs]</a>
+<span class="k">class</span> <span class="nc">BuildingIdentifier</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Logic of building validation.</span>
 
 <span class="sd">    Points that were not found by rule-based algorithms but which have a high-enough probability of</span>
@@ -165,16 +178,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">min_building_proba</span> <span class="o">=</span> <span class="n">min_building_proba</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="BuildingIdentifier.run"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_identification.BuildingIdentifier.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+<div class="viewcode-block" id="BuildingIdentifier.run">
+<a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_identification.BuildingIdentifier.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">],</span>
         <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identify potential buildings in a new channel, excluding former candidates as well as already</span>
-<span class="sd">        confirmed building (confirmed by either Validation or Completion).</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identify potential buildings in a new channel, excluding former candidates as well as</span>
+<span class="sd">        already confirmed building (confirmed by either Validation or Completion).</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            input_values (str | pdal.pipeline.Pipeline): path or pipeline to input LAS file with a building probability channel</span>
+<span class="sd">            input_values (str | pdal.pipeline.Pipeline): path or pipeline to input LAS file with</span>
+<span class="sd">            a building probability channel</span>
 <span class="sd">            target_las_path (str): output LAS</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -183,14 +199,20 @@
         <span class="n">_completion_flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">completion_non_candidate_flag</span>
 
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Clustering of points with high building proba.&quot;</span><span class="p">)</span>
-        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">input_values</span><span class="p">)</span>
+        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">input_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
 
         <span class="c1"># Considered for identification:</span>
         <span class="n">non_candidates</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">candidate_buildings_flag</span><span class="si">}</span><span class="s2"> == 0)&quot;</span>
-        <span class="n">not_already_confirmed</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">classification</span><span class="si">}</span><span class="s2"> != </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">building</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="n">not_already_confirmed</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">classification</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;!= </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">building</span><span class="o">.</span><span class="n">final</span><span class="o">.</span><span class="n">building</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
         <span class="n">not_a_potential_completion</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">_completion_flag</span><span class="si">}</span><span class="s2"> != 1)&quot;</span>
         <span class="n">p_heq_threshold</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(building&gt;=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min_building_proba</span><span class="si">}</span><span class="s2">)&quot;</span>
-        <span class="n">where</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">non_candidates</span><span class="si">}</span><span class="s2"> &amp;&amp; </span><span class="si">{</span><span class="n">not_already_confirmed</span><span class="si">}</span><span class="s2"> &amp;&amp; </span><span class="si">{</span><span class="n">not_a_potential_completion</span><span class="si">}</span><span class="s2"> &amp;&amp; </span><span class="si">{</span><span class="n">p_heq_threshold</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="n">where</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">non_candidates</span><span class="si">}</span><span class="s2"> &amp;&amp; </span><span class="si">{</span><span class="n">not_already_confirmed</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;&amp;&amp; </span><span class="si">{</span><span class="n">not_a_potential_completion</span><span class="si">}</span><span class="s2"> &amp;&amp; </span><span class="si">{</span><span class="n">p_heq_threshold</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
         <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">cluster</span><span class="p">(</span>
             <span class="n">min_points</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">min_points</span><span class="p">,</span>
             <span class="n">tolerance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span>
@@ -202,7 +224,9 @@
         <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_cid</span><span class="si">}</span><span class="s2"> = 1&quot;</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_completion_flag</span><span class="si">}</span><span class="s2"> == 1&quot;</span><span class="p">)</span>
         <span class="c1"># Duplicate ClusterID to have an explicit name for it for inspection.</span>
         <span class="c1"># Do not reset it to zero to have access to it at human inspection stage.</span>
-        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_cid</span><span class="si">}</span><span class="s2">=&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ai_building_identified</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span>
+            <span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_cid</span><span class="si">}</span><span class="s2">=&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ai_building_identified</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">target_las_path</span><span class="p">:</span>
             <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">get_pdal_writer</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -210,7 +234,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline</span>
 
-        <span class="k">return</span> <span class="n">target_las_path</span></div></div>
+        <span class="k">return</span> <span class="n">target_las_path</span></div>
+</div>
+
 </pre></div>
 
            </div>

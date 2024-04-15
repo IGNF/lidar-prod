@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_completion &mdash; lidar_prod V1.9.14 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+  <title>lidar_prod.tasks.building_completion &mdash; lidar_prod V1.10.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_paramlinks.css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=d33a2b6c"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
         <script>mermaid.initialize({startOnLoad:true});</script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -27,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> lidar_prod
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            lidar_prod
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -91,7 +98,11 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.html">lidar_prod.run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.html#lidar_prod.run.POSSIBLE_TASK"><code class="docutils literal notranslate"><span class="pre">POSSIBLE_TASK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.html#lidar_prod.run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
@@ -121,9 +132,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>lidar_prod.tasks.building_completion</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lidar_prod.tasks.building_completion</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -144,15 +155,18 @@
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="BuildingCompletor"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor">[docs]</a><span class="k">class</span> <span class="nc">BuildingCompletor</span><span class="p">:</span>
+<div class="viewcode-block" id="BuildingCompletor">
+<a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor">[docs]</a>
+<span class="k">class</span> <span class="nc">BuildingCompletor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Logic of building completion.</span>
 
-<span class="sd">    The BuildingValidator only considered points that were 1) candidate, and 2) formed clusers of sufficient size.</span>
+<span class="sd">    The BuildingValidator only considered points that were 1) candidate, and 2) formed clusters</span>
+<span class="sd">    of sufficient size.</span>
 
 <span class="sd">    Some points were too isolated, or where not clustered, even though they might have a</span>
 <span class="sd">    high predicted building probabiliy.</span>
-<span class="sd">    We assume that we can trust AI probabilities (if high enough) in the neigborhood of large groups (clusters)</span>
-<span class="sd">    of candidate points already confirmed by the BuildingValidator.</span>
+<span class="sd">    We assume that we can trust AI probabilities (if high enough) in the neigborhood</span>
+<span class="sd">    of large groups (clusters) of candidate points already confirmed by the BuildingValidator.</span>
 
 <span class="sd">    We will update points classification based on their probability as well as their surrounding:</span>
 <span class="sd">    - We select points that have p&gt;=0.5 (+ a BDUni factor when applicable)</span>
@@ -173,7 +187,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span> <span class="o">=</span> <span class="n">data_format</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="BuildingCompletor.run"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">]):</span>
+<div class="viewcode-block" id="BuildingCompletor.run">
+<a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Application.</span>
 
 <span class="sd">        Transform cloud at `src_las_path` following building completion logic</span>
@@ -186,18 +202,25 @@
 <span class="sd">            str: returns `target_las_path` for potential terminal piping.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completion of building with relatively distant points that have high enough probability&quot;</span><span class="p">)</span>
-        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">input_values</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Completion of building with relatively distant points that have high enough &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;probability&quot;</span>
+        <span class="p">)</span>
+        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">input_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prepare_for_building_completion</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_classification</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="BuildingCompletor.prepare_for_building_completion"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_for_building_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="BuildingCompletor.prepare_for_building_completion">
+<a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion">[docs]</a>
+    <span class="k">def</span> <span class="nf">prepare_for_building_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare for building completion.</span>
 
-<span class="sd">        Identify candidates that have high enough probability. Then, cluster them together with previously confirmed buildings.</span>
+<span class="sd">        Identify candidates that have high enough probability. Then, cluster them together with</span>
+<span class="sd">        previously confirmed buildings.</span>
 <span class="sd">        Cluster parameters are relaxed (2D, with high tolerance).</span>
-<span class="sd">        If a cluster contains some confirmed points, the others are considered to belong to the same building</span>
-<span class="sd">        and they will be confirmed as well.</span>
+<span class="sd">        If a cluster contains some confirmed points, the others are considered to belong to</span>
+<span class="sd">        the same building and they will be confirmed as well.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            src_las_path (pdal.pipeline.Pipeline): input LAS pipeline</span>
@@ -221,19 +244,28 @@
         <span class="p">)</span>
         <span class="c1"># Always move then reset ClusterID to avoid conflict with later tasks.</span>
         <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span>
-            <span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2">=&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_confirmed_or_high_proba</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">dimensions</span><span class="o">=</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;=&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_confirmed_or_high_proba</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
         <span class="p">)</span>
         <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2"> = 0&quot;</span><span class="p">)</span>
-        <span class="c1"># Create a placeholder dimension that will hold non-candidate points with high enough probas</span>
-        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span><span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;=&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">completion_non_candidate_flag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Create a placeholder dimension that will hold non-candidate points with high enough</span>
+        <span class="c1"># probas</span>
+        <span class="n">pipeline</span> <span class="o">|=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">ferry</span><span class="p">(</span>
+            <span class="n">dimensions</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;=&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">completion_non_candidate_flag</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
         <span class="c1"># Run</span>
         <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 
         <span class="c1"># set pipeline for access in next operations/tasks.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pipeline</span></div>
 
-<div class="viewcode-block" id="BuildingCompletor.update_classification"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.update_classification">[docs]</a>    <span class="k">def</span> <span class="nf">update_classification</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates Classification dimension by completing buildings with high probability points.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BuildingCompletor.update_classification">
+<a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.update_classification">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_classification</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update Classification dimension by completing buildings with high probability points.&quot;&quot;&quot;</span>
 
         <span class="n">points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">arrays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -259,7 +291,9 @@
                 <span class="c1"># identify it as a potential completion, for future human inspection.</span>
                 <span class="n">non_candidates_idx</span> <span class="o">=</span> <span class="n">pts_idx</span><span class="p">[</span><span class="o">~</span><span class="n">candidates_mask</span><span class="p">]</span>
                 <span class="n">points</span><span class="p">[</span><span class="n">_completion_flag</span><span class="p">][</span><span class="n">non_candidates_idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">arrays</span><span class="o">=</span><span class="p">[</span><span class="n">points</span><span class="p">])</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">arrays</span><span class="o">=</span><span class="p">[</span><span class="n">points</span><span class="p">])</span></div>
+</div>
+
 </pre></div>
 
            </div>

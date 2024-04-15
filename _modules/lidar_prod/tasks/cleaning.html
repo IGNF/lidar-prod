@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.cleaning &mdash; lidar_prod V1.9.14 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/sphinx_paramlinks.css" type="text/css" />
+  <title>lidar_prod.tasks.cleaning &mdash; lidar_prod V1.10.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_paramlinks.css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=d33a2b6c"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
         <script>mermaid.initialize({startOnLoad:true});</script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -27,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> lidar_prod
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            lidar_prod
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -91,7 +98,11 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.html">lidar_prod.run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.html#lidar_prod.run.POSSIBLE_TASK"><code class="docutils literal notranslate"><span class="pre">POSSIBLE_TASK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.html#lidar_prod.run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
@@ -121,9 +132,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>lidar_prod.tasks.cleaning</li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lidar_prod.tasks.cleaning</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -146,19 +157,26 @@
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="Cleaner"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner">[docs]</a><span class="k">class</span> <span class="nc">Cleaner</span><span class="p">:</span>
+<div class="viewcode-block" id="Cleaner">
+<a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner">[docs]</a>
+<span class="k">class</span> <span class="nc">Cleaner</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep only necessary extra dimensions channels.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extra_dims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Format extra_dims parameter from config.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            extra_dims (Optional[Union[Iterable[str], str]]): each dim should have format dim_name:pdal_type.</span>
+<span class="sd">            extra_dims (Optional[Union[Iterable[str], str]]): each dim should have format</span>
+<span class="sd">            dim_name:pdal_type.</span>
 <span class="sd">            If a string, used directly; if an iterable, dimensions are joined together.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># turn a listconfig into a &#39;normal&#39; list</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">extra_dims</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">extra_dims</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">dimension</span> <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">extra_dims</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="n">extra_dims</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">extra_dims</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="k">else</span> <span class="p">[</span><span class="n">dimension</span> <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">extra_dims</span><span class="p">]</span>
+        <span class="p">)</span>
 
         <span class="c1"># creating a dict where key = dimension&#39;s name and value = diemnsion&#39;s type</span>
         <span class="c1">#  if no &quot;=type&quot; in extra_dims then value = None</span>
@@ -173,30 +191,46 @@
                 <span class="c1"># empty string</span>
                 <span class="k">pass</span>
 
-<div class="viewcode-block" id="Cleaner.get_extra_dims_as_str"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.get_extra_dims_as_str">[docs]</a>    <span class="k">def</span> <span class="nf">get_extra_dims_as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;&#39;stringify&#39; the extra_dims list and return it, or an empty list if there is no extra dims&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Cleaner.get_extra_dims_as_str">
+<a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.get_extra_dims_as_str">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_extra_dims_as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;&#39;stringify&#39; the extra_dims list and return it, or an empty list if there is</span>
+<span class="sd">        no extra dims&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span>
         <span class="n">return_str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
         <span class="k">return</span> <span class="n">return_str</span> <span class="k">if</span> <span class="n">return_str</span> <span class="k">else</span> <span class="p">[]</span></div>
 
-<div class="viewcode-block" id="Cleaner.run"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Cleaner.run">
+<a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Clean out LAS extra dimensions.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            src_las_path (str): input LAS path</span>
 <span class="sd">            target_las_path (str): output LAS path, with specified extra dims.</span>
+<span class="sd">            epsg (int | str): epsg code for the input file (if empty or None: infer</span>
+<span class="sd">        it from the las metadata)</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">points</span> <span class="o">=</span> <span class="n">pdal_read_las_array</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">)</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">pdal_read_las_array</span><span class="p">(</span><span class="n">src_las_path</span><span class="p">,</span> <span class="n">epsg</span><span class="p">)</span>
         <span class="c1"># Check input dims to see what we can keep.</span>
         <span class="n">input_dims</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">input_dims</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">input_dims</span>
+        <span class="p">}</span>
 
-        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">arrays</span><span class="o">=</span><span class="p">[</span><span class="n">points</span><span class="p">])</span> <span class="o">|</span> <span class="n">get_pdal_writer</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">,</span> <span class="n">extra_dims</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_extra_dims_as_str</span><span class="p">())</span>
+        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">(</span><span class="n">arrays</span><span class="o">=</span><span class="p">[</span><span class="n">points</span><span class="p">])</span> <span class="o">|</span> <span class="n">get_pdal_writer</span><span class="p">(</span>
+            <span class="n">target_las_path</span><span class="p">,</span> <span class="n">extra_dims</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_extra_dims_as_str</span><span class="p">()</span>
+        <span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">osp</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">target_las_path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved to </span><span class="si">{</span><span class="n">target_las_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Cleaner.remove_dimensions"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.remove_dimensions">[docs]</a>    <span class="k">def</span> <span class="nf">remove_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">las_data</span><span class="p">:</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Cleaner.remove_dimensions">
+<a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.remove_dimensions">[docs]</a>
+    <span class="k">def</span> <span class="nf">remove_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">las_data</span><span class="p">:</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;remove dimension from (laspy) data&quot;&quot;&quot;</span>
         <span class="c1"># if we want to keep all dimension, we do nothing</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_dims</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">]:</span>
@@ -220,7 +254,10 @@
         <span class="c1"># case: 2+ dimensions to remove</span>
         <span class="n">las_data</span><span class="o">.</span><span class="n">remove_extra_dims</span><span class="p">(</span><span class="n">dimension_to_remove</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Cleaner.add_dimensions"><a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.add_dimensions">[docs]</a>    <span class="k">def</span> <span class="nf">add_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">las_data</span><span class="p">:</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Cleaner.add_dimensions">
+<a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.add_dimensions">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">las_data</span><span class="p">:</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add the dimensions that exist in self.extra_dimensions but not in las data&quot;&quot;&quot;</span>
         <span class="c1"># selecting dimensions to add</span>
         <span class="n">dimensions_to_add</span> <span class="o">=</span> <span class="p">[]</span>
@@ -250,8 +287,12 @@
         <span class="c1"># case: 2+ dimensions to add</span>
         <span class="n">extra_bytes_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="n">dimensions_to_add</span><span class="p">:</span>
-            <span class="n">extra_bytes_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">laspy</span><span class="o">.</span><span class="n">ExtraBytesParams</span><span class="p">(</span><span class="n">dimension</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="p">[</span><span class="n">dimension</span><span class="p">]))</span>
-        <span class="n">las_data</span><span class="o">.</span><span class="n">add_extra_dims</span><span class="p">(</span><span class="n">extra_bytes_list</span><span class="p">)</span></div></div>
+            <span class="n">extra_bytes_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">laspy</span><span class="o">.</span><span class="n">ExtraBytesParams</span><span class="p">(</span><span class="n">dimension</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_dims_as_dict</span><span class="p">[</span><span class="n">dimension</span><span class="p">])</span>
+            <span class="p">)</span>
+        <span class="n">las_data</span><span class="o">.</span><span class="n">add_extra_dims</span><span class="p">(</span><span class="n">extra_bytes_list</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
            </div>

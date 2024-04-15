@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.commons &mdash; lidar_prod V1.9.14 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+  <title>lidar_prod.commons &mdash; lidar_prod V1.10.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
-        <script>mermaid.initialize({startOnLoad:true});</script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=d33a2b6c"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -30,11 +31,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> lidar_prod
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            lidar_prod
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -94,7 +99,11 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lidar_prod.html">lidar_prod.run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lidar_prod.html#lidar_prod.run.POSSIBLE_TASK"><code class="docutils literal notranslate"><span class="pre">POSSIBLE_TASK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="lidar_prod.html#lidar_prod.run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
@@ -124,8 +133,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>lidar_prod.commons</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">lidar_prod.commons</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/apidoc/lidar_prod.commons.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -136,31 +145,31 @@
            <div itemprop="articleBody">
              
   <section id="lidar-prod-commons">
-<h1>lidar_prod.commons<a class="headerlink" href="#lidar-prod-commons" title="Permalink to this headline"></a></h1>
+<h1>lidar_prod.commons<a class="headerlink" href="#lidar-prod-commons" title="Link to this heading"></a></h1>
 <section id="module-lidar_prod.commons.commons">
-<span id="lidar-prod-commons-commons-module"></span><h2>lidar_prod.commons.commons module<a class="headerlink" href="#module-lidar_prod.commons.commons" title="Permalink to this headline"></a></h2>
+<span id="lidar-prod-commons-commons-module"></span><h2>lidar_prod.commons.commons module<a class="headerlink" href="#module-lidar_prod.commons.commons" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="lidar_prod.commons.commons.eval_time">
-<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">eval_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><span class="pre">Callable</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#eval_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.eval_time" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">eval_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><span class="pre">Callable</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#eval_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.eval_time" title="Link to this definition"></a></dt>
 <dd><p>decorator to log the duration of the decorated method</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lidar_prod.commons.commons.extras">
-<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">extras</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#extras"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.extras" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">extras</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#extras"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.extras" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lidar_prod.commons.commons.ignore_warnings">
-<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">ignore_warnings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#ignore_warnings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.ignore_warnings" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">ignore_warnings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#ignore_warnings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.ignore_warnings" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lidar_prod.commons.commons.print_config">
-<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">print_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_print_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'config_tree.txt'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#print_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.print_config" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.commons.commons.</span></span><span class="sig-name descname"><span class="pre">print_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolve</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg_print_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'config_tree.txt'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/lidar_prod/commons/commons.html#print_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.commons.commons.print_config" title="Link to this definition"></a></dt>
 <dd><p>Prints content of DictConfig using Rich library and its tree structure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><span class="target" id="lidar_prod.commons.commons.print_config.params.config"></span><strong>config</strong><a class="paramlink headerlink reference internal" href="#lidar_prod.commons.commons.print_config.params.config">¶</a> (<em>DictConfig</em>) – Configuration composed by Hydra.</p></li>
 <li><p><span class="target" id="lidar_prod.commons.commons.print_config.params.resolve"></span><strong>resolve</strong><a class="paramlink headerlink reference internal" href="#lidar_prod.commons.commons.print_config.params.resolve">¶</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to resolve reference fields of DictConfig.</p></li>

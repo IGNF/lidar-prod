@@ -1,23 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Production process used to transform point clouds classification &mdash; lidar_prod V1.9.14 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sphinx_paramlinks.css" type="text/css" />
+  <title>Production process used to transform point clouds classification &mdash; lidar_prod V1.10.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
-        <script>mermaid.initialize({startOnLoad:true});</script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=d33a2b6c"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -30,11 +31,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> lidar_prod
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            lidar_prod
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -94,7 +99,11 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.html">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.html">lidar_prod.run</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.html#lidar_prod.run.POSSIBLE_TASK"><code class="docutils literal notranslate"><span class="pre">POSSIBLE_TASK</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.html#lidar_prod.run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
@@ -124,8 +133,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Production process used to transform point clouds classification</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Production process used to transform point clouds classification</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/background/production_process.md.txt" rel="nofollow"> View page source</a>
       </li>
@@ -136,25 +145,25 @@
            <div itemprop="articleBody">
              
   <section id="production-process-used-to-transform-point-clouds-classification">
-<h1>Production process used to transform point clouds classification<a class="headerlink" href="#production-process-used-to-transform-point-clouds-classification" title="Permalink to this headline"></a></h1>
+<h1>Production process used to transform point clouds classification<a class="headerlink" href="#production-process-used-to-transform-point-clouds-classification" title="Link to this heading"></a></h1>
 <p>The end goal of the tool is to edit the input (rule-based) classification as much as we confidently can, and to highlight remaining areas of uncertainty for human inspection.</p>
 <p><strong>Input</strong>: point cloud that went through a first geometric algorithm that identified <code class="docutils literal notranslate"><span class="pre">candidates</span> <span class="pre">building</span> <span class="pre">points</span></code> based on geometric rules (e.g. plane surfaces, above 1.5m of the ground, etc.), and for which a semantic segmentation model produced a point-level probability of being a building, vegetation and/or unclassified, and calculate the associated entropy. The default name for those extra dimensions are <code class="docutils literal notranslate"><span class="pre">building</span></code>, <code class="docutils literal notranslate"><span class="pre">vegetation</span></code>, <code class="docutils literal notranslate"><span class="pre">unclassified</span></code> and <code class="docutils literal notranslate"><span class="pre">entropy</span></code> respectively. You can leverage this <a class="reference external" href="https://github.com/IGNF/lidar-deep-segmentation">package for aerial lidar deep learning segmentation</a>.</p>
 <section id="a-1-vegetation-detection">
-<h2>A.1) Vegetation detection<a class="headerlink" href="#a-1-vegetation-detection" title="Permalink to this headline"></a></h2>
+<h2>A.1) Vegetation detection<a class="headerlink" href="#a-1-vegetation-detection" title="Link to this heading"></a></h2>
 <p><strong>Goal</strong>: Confirm or refute points as vegetation.</p>
 <p>The identification is done by comparing the vegetation probability  of a point against a <code class="docutils literal notranslate"><span class="pre">threshold</span></code>. That threshold has been previously established as the best on a test set of las files.</p>
 </section>
 <section id="a-2-unclassified-detection">
-<h2>A.2) Unclassified detection<a class="headerlink" href="#a-2-unclassified-detection" title="Permalink to this headline"></a></h2>
+<h2>A.2) Unclassified detection<a class="headerlink" href="#a-2-unclassified-detection" title="Link to this heading"></a></h2>
 <p><strong>Goal</strong>: Confirm or refute points as unclassified.</p>
 <p>Exactly as with vegetation detection, the identification is done by comparing the unclassified probability of a point against a <code class="docutils literal notranslate"><span class="pre">threshold</span></code>. That threshold has been previously established as the best on a test set of las files.</p>
 </section>
 <section id="b-building-module">
-<h2>B) Building Module<a class="headerlink" href="#b-building-module" title="Permalink to this headline"></a></h2>
+<h2>B) Building Module<a class="headerlink" href="#b-building-module" title="Link to this heading"></a></h2>
 <p><img alt="" src="../_images/lidar-prod-M11.1_BuildingModuleIllustration.png" /></p>
 </section>
 <section id="b-1-building-validation">
-<h2>B.1) Building Validation<a class="headerlink" href="#b-1-building-validation" title="Permalink to this headline"></a></h2>
+<h2>B.1) Building Validation<a class="headerlink" href="#b-1-building-validation" title="Link to this heading"></a></h2>
 <p><strong>Goal</strong>: Confirm or refute groups of candidate building points when possible, mark them as unsure elsewise.</p>
 <ol class="arabic simple">
 <li><p>Clustering of <em>candidate buildings points</em> into connected components.</p></li>
@@ -185,7 +194,7 @@
 </li>
 <li><p>Update of the point cloud classification</p></li>
 </ol>
-<p>Decision thresholds <code class="docutils literal notranslate"><span class="pre">E1</span></code>, <code class="docutils literal notranslate"><span class="pre">E2</span></code> , <code class="docutils literal notranslate"><span class="pre">C1</span></code>, <code class="docutils literal notranslate"><span class="pre">C2</span></code>, <code class="docutils literal notranslate"><span class="pre">R1</span></code>, <code class="docutils literal notranslate"><span class="pre">R2</span></code>, <code class="docutils literal notranslate"><span class="pre">O1</span></code> are chosen via a <a class="reference internal" href="thresholds_optimization_process.html"><span class="doc std std-doc">multi-objective hyperparameter optimization</span></a> that aims to maximize automation, precision, and recall of the decisions.
+<p>Decision thresholds <code class="docutils literal notranslate"><span class="pre">E1</span></code>, <code class="docutils literal notranslate"><span class="pre">E2</span></code> , <code class="docutils literal notranslate"><span class="pre">C1</span></code>, <code class="docutils literal notranslate"><span class="pre">C2</span></code>, <code class="docutils literal notranslate"><span class="pre">R1</span></code>, <code class="docutils literal notranslate"><span class="pre">R2</span></code>, <code class="docutils literal notranslate"><span class="pre">O1</span></code> are chosen via a <a class="reference internal" href="thresholds_optimization_process.html"><span class="std std-doc">multi-objective hyperparameter optimization</span></a> that aims to maximize automation, precision, and recall of the decisions.
 Current performances on a 15km² test dataset, expressed as percentages of clusters, are:</p>
 <ul class="simple">
 <li><p>Automation=86.5%</p></li>
@@ -194,7 +203,7 @@ Current performances on a 15km² test dataset, expressed as percentages of clust
 </ul>
 </section>
 <section id="b-2-building-completion">
-<h2>B.2) Building Completion<a class="headerlink" href="#b-2-building-completion" title="Permalink to this headline"></a></h2>
+<h2>B.2) Building Completion<a class="headerlink" href="#b-2-building-completion" title="Link to this heading"></a></h2>
 <p><strong>Goal</strong>: Confirm points that have high-enough probability, but where not confirmed because</p>
 <ul class="simple">
 <li><p>(a) they were too scattered for clustering during validation, or</p></li>
@@ -208,7 +217,7 @@ For each cluster that includes already confirmed points, the rest (i.e. high pro
 </ul>
 </section>
 <section id="b-3-building-identification">
-<h2>B.3) Building Identification<a class="headerlink" href="#b-3-building-identification" title="Permalink to this headline"></a></h2>
+<h2>B.3) Building Identification<a class="headerlink" href="#b-3-building-identification" title="Link to this heading"></a></h2>
 <p><strong>Goal</strong>: Highlight potential buildings that were missed by the rule-based algorithm, for human inspection.</p>
 <p>Among points that were <strong>not</strong> <em>candidate buildings points</em> and not already confirmed, identify those with high enough probabiltity (p &gt;= 0.5) and cluster.</p>
 <p>This clustering defines a LAS extra dimensions (<code class="docutils literal notranslate"><span class="pre">Group</span></code>) which indexes newly found cluster that may be buildings.</p>
