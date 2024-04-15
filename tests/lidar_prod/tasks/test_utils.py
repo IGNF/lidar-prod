@@ -108,23 +108,32 @@ def test_check_bbox_intersects_territoire_with_srid(hydra_cfg, bbox, srid, expec
 
 
 @pytest.mark.parametrize(
-    "bbox,epsg,out_shp",
+    "bbox,epsg,out_shp,is_empty",
     [
         (
             # Bbox in Metropolitan France, with correct epsg => output should not be empty
             dict(x_min=870150, y_min=6616950, x_max=870350, y_max=6617200),
             2154,
             "metropolitan_ok.shp",
+            False,
         ),
         (
             # Bbox in St Barthelemy with correct epsg => output should not be empty
             dict(x_min=515000, y_min=1981000, x_max=515100, y_max=1981100),
             5490,
             "st_barth_ok.shp",
+            False,
+        ),
+        (
+            # Bbox in Reunion with correct epsg with no building or reservoir
+            dict(x_min=378000, y_min=7654000, x_max=379000, y_max=7655000),
+            2975,
+            "reunion_empty_ok.shp",
+            True,
         ),
     ],
 )
-def test_request_bd_uni_for_building_shapefile(hydra_cfg, bbox, epsg, out_shp):
+def test_request_bd_uni_for_building_shapefile(hydra_cfg, bbox, epsg, out_shp, is_empty):
     out_path = TMP_DIR / out_shp
     request_bd_uni_for_building_shapefile(
         hydra_cfg.bd_uni_connection_params,
@@ -134,7 +143,7 @@ def test_request_bd_uni_for_building_shapefile(hydra_cfg, bbox, epsg, out_shp):
     )
     assert out_path.is_file()
     gdf = gdb.read_file(out_path)
-    assert bool(len(gdf.index))
+    assert bool(len(gdf.index)) != is_empty
 
 
 def test_request_bd_uni_for_building_shapefile_fail(hydra_cfg):
