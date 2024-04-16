@@ -10,6 +10,8 @@ import laspy
 import numpy as np
 import pdal
 import psycopg2
+import pyproj
+from pdaltools.las_info import get_writer_parameters_from_reader_metadata
 
 log = logging.getLogger(__name__)
 
@@ -35,25 +37,31 @@ def split_idx_by_dim(dim_array):
     return group_idx
 
 
-def get_pipeline(input_value: pdal.pipeline.Pipeline | str, epsg: int | str):
+def get_pipeline(
+    input_value: pdal.pipeline.Pipeline | str, epsg: int | str, las_metadata: dict = None
+):
     """If the input value is a pipeline, returns it, if it's a las path return the corresponding
-    pipeline
+    pipeline,
+    If the input is a las_path, pipeline_metadata is updated to the new pipeline metadata
 
     Args:
         input_value (pdal.pipeline.Pipeline | str): input value to get a pipeline from
         (las pipeline or path to a file to read with pdal)
         epsg (int | str): if input_value is a string, use the epsg value to override the crs from
         the las header
+        las_metadata (dict): current pipeline metadata, used to propagate input metadata to the
+        application output las (epsg, las version, etc)
 
     Returns:
-        pdal pipeline
+        pdal pipeline, updated pipeline_metadata dict
     """
     if isinstance(input_value, str):
         pipeline = pdal.Pipeline() | get_pdal_reader(input_value, epsg)
         pipeline.execute()
+        las_metadata = get_input_las_metadata(pipeline)
     else:
         pipeline = input_value
-    return pipeline
+    return pipeline, las_metadata
 
 
 def get_input_las_metadata(pipeline: pdal.pipeline.Pipeline):
@@ -108,12 +116,17 @@ def get_pdal_reader(las_path: str, epsg: int | str) -> pdal.Reader.las:
     return reader
 
 
-def get_las_data_from_las(las_path: str) -> laspy.lasdata.LasData:
+def get_las_data_from_las(las_path: str, epsg: str | int = None) -> laspy.lasdata.LasData:
     """Load las data from a las file"""
-    return laspy.read(las_path)
+    las = laspy.read(las_path)
+    if las.header.parse_crs() is None and epsg is not None:
+        las.header.add_crs(pyproj.crs.CRS(epsg))
+    return las
 
 
-def get_pdal_writer(target_las_path: str, extra_dims: str = "all") -> pdal.Writer.las:
+def get_pdal_writer(
+    target_las_path: str, reader_metadata=dict(), extra_dims: str = "all"
+) -> pdal.Writer.las:
     """Standard LAS Writer which imposes LAS 1.4 specification and dataformat 8.
 
     Args:
@@ -124,13 +137,15 @@ def get_pdal_writer(target_las_path: str, extra_dims: str = "all") -> pdal.Write
         pdal.Writer.las: writer to use in a pipeline.
 
     """
-    return pdal.Writer.las(
-        filename=target_las_path,
-        minor_version=4,
-        dataformat_id=8,
-        forward="all",
-        extra_dims=extra_dims,
-    )
+    if reader_metadata:
+        metadata = {"metadata": {"readers.las": reader_metadata}}
+        params = get_writer_parameters_from_reader_metadata(metadata)
+
+    else:
+        params = {"forward": "all", "minor_version": 4, "dataformat_id": 8}
+    params["extra_dims"] = extra_dims
+
+    return pdal.Writer.las(filename=target_las_path, **params)
 
 
 def save_las_data_to_las(las_path: str, las_data: laspy.lasdata.LasData):
@@ -159,7 +174,7 @@ def get_a_las_to_las_pdal_pipeline(
     return pipeline
 
 
-def pdal_read_las_array(las_path: str, epsg: int | str):
+def pdal_read_las_array(las_path: str, epsg: int | str = None):
     """Read LAS as a named array.
 
     Args:
@@ -170,10 +185,12 @@ def pdal_read_las_array(las_path: str, epsg: int | str):
     Returns:
         np.ndarray: named array with all LAS dimensions, including extra ones, with dict-like
         access.
+        las_metadata dict
     """
     p1 = pdal.Pipeline() | get_pdal_reader(las_path, epsg)
     p1.execute()
-    return p1.arrays[0]
+    metadata = p1.metadata["metadata"]["readers.las"]
+    return p1.arrays[0], metadata
 
 
 def check_bbox_intersects_territoire_with_srid(

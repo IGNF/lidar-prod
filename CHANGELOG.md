@@ -1,5 +1,9 @@
 # main
 
+### 1.10.2
+- Add support for metadata propagation through compound pdal pipelines:
+  - fix epsg propagation
+
 ### 1.10.1
 - Fix edge case when BD uni does not have data for the requested bbox
 

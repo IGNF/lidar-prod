@@ -34,7 +34,8 @@ class BuildingIdentifier:
         self,
         input_values: Union[str, pdal.pipeline.Pipeline],
         target_las_path: str = None,
-    ) -> str:
+        las_metadata: dict = None,
+    ) -> dict:
         """Identify potential buildings in a new channel, excluding former candidates as well as
         already confirmed building (confirmed by either Validation or Completion).
 
@@ -42,6 +43,10 @@ class BuildingIdentifier:
             input_values (str | pdal.pipeline.Pipeline): path or pipeline to input LAS file with
             a building probability channel
             target_las_path (str): output LAS
+            las_metadata (dict): current pipeline metadata, used to propagate input metadata to the
+        application output las (epsg, las version, etc)
+
+        Returns: updated las_metadata
 
         """
         # aliases
@@ -49,7 +54,7 @@ class BuildingIdentifier:
         _completion_flag = self.data_format.las_dimensions.completion_non_candidate_flag
 
         log.info("Clustering of points with high building proba.")
-        pipeline = get_pipeline(input_values, self.data_format.epsg)
+        pipeline, las_metadata = get_pipeline(input_values, self.data_format.epsg, las_metadata)
 
         # Considered for identification:
         non_candidates = f"({self.data_format.las_dimensions.candidate_buildings_flag} == 0)"
@@ -78,10 +83,10 @@ class BuildingIdentifier:
             dimensions=f"{_cid}=>{self.data_format.las_dimensions.ai_building_identified}"
         )
         if target_las_path:
-            pipeline |= get_pdal_writer(target_las_path)
+            pipeline |= get_pdal_writer(target_las_path, las_metadata)
             os.makedirs(osp.dirname(target_las_path), exist_ok=True)
         pipeline.execute()
 
         self.pipeline = pipeline
 
-        return target_las_path
+        return las_metadata

@@ -7,8 +7,13 @@ import pytest
 
 from lidar_prod.tasks.building_validation import BuildingValidator
 from lidar_prod.tasks.utils import BDUniConnectionParams, get_las_data_from_las
+from tests.conftest import (
+    check_expected_classification,
+    check_las_contains_dims,
+    check_las_format_versions_and_srs,
+)
 
-TMP_DIR = Path("tmp/lidar_prod/tasks/building_validation_preparation")
+TMP_DIR = Path("tmp/lidar_prod/tasks/building_validation")
 
 
 def setup_module(module):
@@ -121,3 +126,48 @@ def test_shapefile_overlay_in_building_module_invalid_overlay(hydra_cfg):
     )
 
     bv.prepare(invalid_overlay_laz_path, target_las_path)
+
+
+def test_run(hydra_cfg):
+    input_las_path = "tests/files/870000_6618000.subset.postIA.las"
+    shp_path = "tests/files/870000_6618000.subset.postIA.shp"
+    dest_dir = TMP_DIR / "run"
+    dest_dir.mkdir(parents=True)
+    dest_las_path = str(dest_dir / "output.laz")
+
+    _fc = hydra_cfg.data_format.codes.building.final
+    expected_codes = {
+        1,
+        2,
+        _fc.building,
+        _fc.not_building,
+        _fc.unsure,
+    }
+
+    # Validate buildings (unsure/confirmed/refuted) on a per-group basis.
+    bd_uni_connection_params: BDUniConnectionParams = hydra.utils.instantiate(
+        hydra_cfg.bd_uni_connection_params
+    )
+    bv_cfg = hydra_cfg.building_validation.application
+    bv = BuildingValidator(
+        shp_path=shp_path,
+        bd_uni_connection_params=bd_uni_connection_params,
+        cluster=bv_cfg.cluster,
+        bd_uni_request=bv_cfg.bd_uni_request,
+        data_format=bv_cfg.data_format,
+        thresholds=bv_cfg.thresholds,
+        use_final_classification_codes=bv_cfg.use_final_classification_codes,
+    )
+    bv.run(input_las_path, target_las_path=dest_las_path)
+    check_las_format_versions_and_srs(dest_las_path, hydra_cfg.data_format.epsg)
+    check_expected_classification(dest_las_path, expected_codes)
+    dims = hydra_cfg.data_format.las_dimensions
+    check_las_contains_dims(
+        dest_las_path,
+        None,
+        dims_to_check=[
+            dims.ClusterID_candidate_building,
+            dims.uni_db_overlay,
+            dims.candidate_buildings_flag,
+        ],
+    )

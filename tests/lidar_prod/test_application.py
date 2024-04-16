@@ -1,10 +1,11 @@
 import os
+import shutil
 import tempfile
+from pathlib import Path
 
 import geopandas
 import numpy as np
 import pdal
-import pyproj
 import pytest
 from omegaconf import open_dict
 
@@ -15,16 +16,12 @@ from lidar_prod.application import (
     identify_vegetation_unclassified,
     just_clean,
 )
-from lidar_prod.tasks.utils import (
-    get_a_las_to_las_pdal_pipeline,
-    get_input_las_metadata,
-    get_las_data_from_las,
-    get_pipeline,
-)
+from lidar_prod.tasks.utils import get_a_las_to_las_pdal_pipeline, get_las_data_from_las
 from tests.conftest import (
+    check_expected_classification,
     check_las_contains_dims,
+    check_las_format_versions_and_srs,
     check_las_invariance,
-    pdal_read_las_array,
 )
 
 LAS_SUBSET_FILE_BUILDING = "tests/files/870000_6618000.subset.postIA.las"
@@ -35,27 +32,42 @@ DUMMY_DIRECTORY_PATH = "tests/files/dummy_folder"
 DUMMY_FILE_PATH = "tests/files/dummy_folder/dummy_file1.las"
 LAS_FILE_BUILDING_5490 = "tests/files/St_Barth_RGAF09_UTM20N_IGN_1988_SB_subset_100m.laz"
 
+TMP_DIR = Path("tmp/lidar_prod/application")
+
+
+def setup_module(module):
+    try:
+        shutil.rmtree(TMP_DIR)
+    except FileNotFoundError:
+        pass
+    TMP_DIR.mkdir(parents=True, exist_ok=True)
+
 
 @pytest.mark.parametrize(
-    "las_mutation, query_db_Uni",
+    "las_mutation, query_db_Uni, test_name",
     [
-        ([], True),  # identity
+        ([], True, "identity"),  # identity
         (
             [pdal.Filter.assign(value="building = 0.0")],
             True,
+            "low_probas",
         ),  # low proba everywhere
         (
             [pdal.Filter.assign(value="Classification = 1")],
             False,
+            "no_candidate",
         ),  # no candidate buildings
         (
             [pdal.Filter.assign(value="Classification = 202")],
             False,
+            "only_candidate",
         ),  # only candidate buildings
     ],
     # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
 )
-def test_application_data_invariance_and_data_format(hydra_cfg, las_mutation, query_db_Uni):
+def test_application_data_invariance_and_data_format(
+    hydra_cfg, las_mutation, query_db_Uni, test_name
+):
     """We test the application against a LAS subset (~2500m²).
 
     Data contains a few buildings, a few classification mistakes, and necessary fields
@@ -75,26 +87,28 @@ def test_application_data_invariance_and_data_format(hydra_cfg, las_mutation, qu
         _fc.not_building,
         _fc.unsure,
     }
+    out_dir = TMP_DIR / "application_data_invariance_and_data_format" / test_name
+    out_dir.mkdir(parents=True)
+    hydra_cfg.paths.output_dir = str(out_dir)
     # Run application on the data subset
-    with tempfile.TemporaryDirectory() as hydra_cfg.paths.output_dir:
-        # Copy the data and apply the "mutation"
-        mutated_copy: str = tempfile.NamedTemporaryFile().name
-        pipeline = get_a_las_to_las_pdal_pipeline(
-            LAS_SUBSET_FILE_BUILDING,
-            mutated_copy,
-            las_mutation,
-            hydra_cfg.data_format.epsg,
-        )
-        pipeline.execute()
-        hydra_cfg.paths.src_las = mutated_copy
-        if not query_db_Uni:  # we don't request db_uni, we use a shapefile instead
-            hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
-        updated_las_path_list = apply(hydra_cfg, apply_building_module)
-        # Check output
-        check_las_invariance(mutated_copy, updated_las_path_list[0], hydra_cfg.data_format.epsg)
-        check_format_of_application_output_las(
-            updated_las_path_list[0], hydra_cfg.data_format.epsg, expected_codes
-        )
+    # Copy the data and apply the "mutation"
+    mutated_copy = str(out_dir / "input_mutated_copy.las")
+    pipeline = get_a_las_to_las_pdal_pipeline(
+        LAS_SUBSET_FILE_BUILDING,
+        mutated_copy,
+        las_mutation,
+        hydra_cfg.data_format.epsg,
+    )
+    pipeline.execute()
+    hydra_cfg.paths.src_las = mutated_copy
+    if not query_db_Uni:  # we don't request db_uni, we use a shapefile instead
+        hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
+    updated_las_path_list = apply(hydra_cfg, apply_building_module)
+    # Check output
+    check_las_invariance(mutated_copy, updated_las_path_list[0], hydra_cfg.data_format.epsg)
+    check_format_of_application_output_las(
+        updated_las_path_list[0], hydra_cfg.data_format.epsg, expected_codes
+    )
 
 
 def check_format_of_application_output_las(
@@ -117,22 +131,7 @@ def check_format_of_application_output_las(
 
     # Check that we have either 1/2 (ground/unclassified),
     # or one of the three final classification code of the module
-    arr1 = pdal_read_las_array(output_las_path, epsg)
-    actual_codes = {*np.unique(arr1["Classification"])}
-    assert actual_codes.issubset(expected_codes)
-
-
-def check_las_format_versions_and_srs(input_path: str, epsg: int | str):
-    pipeline = get_pipeline(input_path, epsg)
-    metadata = get_input_las_metadata(pipeline)
-    assert metadata["minor_version"] == 4
-    assert metadata["dataformat_id"] == 8
-    # Ensure that the final spatial reference is the same as in the config (if provided)
-    metadata_crs = metadata["srs"]["compoundwkt"]
-    assert metadata_crs
-    if epsg:
-        expected_crs = pyproj.crs.CRS(epsg)
-        assert expected_crs.equals(metadata_crs)
+    check_expected_classification(output_las_path, expected_codes)
 
 
 @pytest.mark.parametrize(
@@ -140,6 +139,7 @@ def check_las_format_versions_and_srs(input_path: str, epsg: int | str):
     [LAS_SUBSET_FILE_VEGETATION, LAZ_SUBSET_FILE_VEGETATION],
 )
 def test_just_clean(vegetation_unclassifed_hydra_cfg, las_file):
+    epsg = vegetation_unclassifed_hydra_cfg.data_format.epsg
     destination_path = tempfile.NamedTemporaryFile().name
     just_clean(vegetation_unclassifed_hydra_cfg, las_file, destination_path)
     las_data = get_las_data_from_las(destination_path)
@@ -148,16 +148,19 @@ def test_just_clean(vegetation_unclassifed_hydra_cfg, las_file):
         "vegetation",
         "unclassified",
     ]
+    # Ensure that the format versions are as expected
+    check_las_format_versions_and_srs(destination_path, epsg)
 
 
 def test_detect_vegetation_unclassified(vegetation_unclassifed_hydra_cfg):
     destination_path = tempfile.NamedTemporaryFile().name
+    epsg = vegetation_unclassifed_hydra_cfg.data_format.epsg
     identify_vegetation_unclassified(
         vegetation_unclassifed_hydra_cfg,
         LAS_SUBSET_FILE_VEGETATION,
         destination_path,
     )
-    las_data = get_las_data_from_las(destination_path)
+    las_data = get_las_data_from_las(destination_path, epsg)
     vegetation_count = np.count_nonzero(
         las_data.points.classification
         == vegetation_unclassifed_hydra_cfg.data_format.codes.vegetation
@@ -168,6 +171,7 @@ def test_detect_vegetation_unclassified(vegetation_unclassifed_hydra_cfg):
     )
     assert vegetation_count == 17
     assert unclassified_count == 23222
+    check_las_format_versions_and_srs(destination_path, epsg)
 
 
 @pytest.mark.parametrize(
