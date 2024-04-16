@@ -236,7 +236,7 @@ class BuildingValidationOptimizer:
             candidate buildings
 
         """
-        las = pdal_read_las_array(prepared_las_path, self.bv.data_format.epsg)
+        las, _ = pdal_read_las_array(prepared_las_path, self.bv.data_format.epsg)
         # las: laspy.LasData = laspy.read(prepared_las_path)
         dim_cluster_id = las[self.bv.data_format.las_dimensions.ClusterID_candidate_building]
         dim_classification = las[self.bv.data_format.las_dimensions.classification]

@@ -54,7 +54,7 @@ def get_list_las_path_from_src(src_path: str):
 def identify_vegetation_unclassified(config, src_las_path: str, dest_las_path: str):
     log.info(f"Identifying on {src_las_path}")
     data_format = config["data_format"]
-    las_data = get_las_data_from_las(src_las_path)
+    las_data = get_las_data_from_las(src_las_path, config.data_format.epsg)
 
     # add the necessary dimension to store the results
     cleaner: Cleaner = hydra.utils.instantiate(data_format.cleaning.input_vegetation_unclassified)
@@ -91,7 +91,7 @@ def just_clean(config, src_las_path: str, dest_las_path: str):
     avoid delays when doing the same operations over and over again )"""
     log.info(f"Cleaning {src_las_path}")
     data_format = config["data_format"]
-    las_data = get_las_data_from_las(src_las_path)
+    las_data = get_las_data_from_las(src_las_path, config.data_format.epsg)
 
     # remove unwanted dimensions
     cleaner = hydra.utils.instantiate(data_format.cleaning.input)
@@ -131,15 +131,15 @@ def apply_building_module(config: DictConfig, src_las_path: str, dest_las_path: 
             thresholds=bv_cfg.thresholds,
             use_final_classification_codes=bv_cfg.use_final_classification_codes,
         )
-        bv.run(tmp_las_path)
+        las_metadata = bv.run(tmp_las_path)
 
         # Complete buildings with non-candidates that were nevertheless confirmed
         bc: BuildingCompletor = hydra.utils.instantiate(config.building_completion)
-        bc.run(bv.pipeline)
+        las_metadata = bc.run(bv.pipeline, las_metadata)
 
         # Define groups of confirmed building points among non-candidates
         bi: BuildingIdentifier = hydra.utils.instantiate(config.building_identification)
-        bi.run(bc.pipeline, tmp_las_path)
+        bi.run(bc.pipeline, tmp_las_path, las_metadata=las_metadata)
 
         # Remove unnecessary intermediary dimensions
         cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.output_building)
@@ -166,7 +166,7 @@ def get_shapefile(config: DictConfig, src_las_path: str, dest_las_path: str):
             get_pipeline(
                 src_las_path,
                 config.data_format.epsg,
-            ),
+            )[0],
             buffer=config.building_validation.application.bd_uni_request.buffer,
         ),  # bbox
         config.data_format.epsg,

@@ -43,3 +43,4 @@ dependencies:
       - sphinxnotes-mock==1.0.*
       - sphinx-argparse==0.4.*
       - sphinxcontrib-mermaid==0.9.*
+      - ign-pdal-tools>=1.5.2

@@ -81,7 +81,8 @@ class BuildingValidator:
         self,
         input_values: Union[str, pdal.pipeline.Pipeline],
         target_las_path: str = None,
-    ) -> str:
+        las_metadata: dict = None,
+    ) -> dict:
         """Runs application.
 
         Transforms cloud at `input_values` following building validation logic,
@@ -91,12 +92,16 @@ class BuildingValidator:
             input_values (str| pdal.pipeline.Pipeline): path or pipeline to input LAS file with
             a building probability channel
             target_las_path (str): path for saving updated LAS file.
+            las_metadata (dict): current pipeline metadata, used to propagate input metadata to the
+        application output las (epsg, las version, etc)
 
         Returns:
-            str: returns `target_las_path`
+            str: returns `las_metadata`: metadata of the input las, which contain
+            information to pass to the writer in order for the application to have an output
+            with the same header (las version, srs, ...) as the input
 
         """
-        self.pipeline = get_pipeline(input_values, self.data_format.epsg)
+        self.pipeline, las_metadata = get_pipeline(input_values, self.data_format.epsg)
         with TemporaryDirectory() as td:
             log.info("Preparation : Clustering of candidates buildings & Import vectors")
             if isinstance(input_values, str):
@@ -104,17 +109,18 @@ class BuildingValidator:
                 temp_f = osp.join(td, osp.basename(input_values))
             else:
                 temp_f = ""
-            self.prepare(input_values, temp_f)
+            las_metadata = self.prepare(input_values, temp_f, las_metadata)
             log.info("Using AI and Databases to update cloud Classification")
-            self.update()
-        return target_las_path
+            las_metadata = self.update(target_las_path=target_las_path, las_metadata=las_metadata)
+        return las_metadata
 
     def prepare(
         self,
         input_values: Union[str, pdal.pipeline.Pipeline],
         prepared_las_path: str,
         save_result: bool = False,
-    ) -> None:
+        las_metadata: dict = None,
+    ) -> dict:
         f"""
         Prepare las for later decision process. .
         1. Cluster candidates points, in a new
@@ -135,6 +141,11 @@ class BuildingValidator:
             a building probability channel
             target_las_path (str): path for saving prepared LAS file.
             save_result (bool): True to save a las instead of propagating a pipeline
+            las_metadata (dict): current pipeline metadata, used to propagate input metadata to the
+        application output las (epsg, las version, etc)
+
+        Returns:
+            updated las metadata
 
         """
 
@@ -143,7 +154,7 @@ class BuildingValidator:
         dim_cluster_id_candidates = self.data_format.las_dimensions.ClusterID_candidate_building
         dim_overlay = self.data_format.las_dimensions.uni_db_overlay
 
-        self.pipeline = get_pipeline(input_values, self.data_format.epsg)
+        self.pipeline, las_metadata = get_pipeline(input_values, self.data_format.epsg)
         # Identify candidates buildings points with a boolean flag
         self.pipeline |= pdal.Filter.ferry(dimensions=f"=>{dim_candidate_flag}")
         _is_candidate_building = (
@@ -204,17 +215,21 @@ class BuildingValidator:
             )
 
         if save_result:
-            self.pipeline |= get_pdal_writer(prepared_las_path)
+            self.pipeline |= get_pdal_writer(prepared_las_path, las_metadata)
             os.makedirs(osp.dirname(prepared_las_path), exist_ok=True)
         self.pipeline.execute()
 
         if temp_dirpath:
             shutil.rmtree(temp_dirpath)
 
-    def update(self, src_las_path: str = None, target_las_path: str = None) -> None:
+        return las_metadata
+
+    def update(
+        self, src_las_path: str = None, target_las_path: str = None, las_metadata: dict = None
+    ) -> dict:
         """Updates point cloud classification channel."""
         if src_las_path:
-            self.pipeline = get_pipeline(src_las_path, self.data_format.epsg)
+            self.pipeline, las_metadata = get_pipeline(src_las_path, self.data_format.epsg)
 
         points = self.pipeline.arrays[0]
 
@@ -250,9 +265,11 @@ class BuildingValidator:
         self.pipeline = pdal.Pipeline(arrays=[points])
 
         if target_las_path:
-            self.pipeline = get_pdal_writer(target_las_path).pipeline(points)
+            self.pipeline = get_pdal_writer(target_las_path, las_metadata).pipeline(points)
             os.makedirs(osp.dirname(target_las_path), exist_ok=True)
             self.pipeline.execute()
+
+        return las_metadata
 
     def _extract_cluster_info_by_idx(
         self, las: np.ndarray, pts_idx: np.ndarray

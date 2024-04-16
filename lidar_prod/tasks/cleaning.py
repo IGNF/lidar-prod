@@ -60,7 +60,8 @@ class Cleaner:
         it from the las metadata)
 
         """
-        points = pdal_read_las_array(src_las_path, epsg)
+        points, metadata = pdal_read_las_array(src_las_path, epsg)
+
         # Check input dims to see what we can keep.
         input_dims = points.dtype.fields.keys()
         self.extra_dims_as_dict = {
@@ -68,7 +69,7 @@ class Cleaner:
         }
 
         pipeline = pdal.Pipeline(arrays=[points]) | get_pdal_writer(
-            target_las_path, extra_dims=self.get_extra_dims_as_str()
+            target_las_path, reader_metadata=metadata, extra_dims=self.get_extra_dims_as_str()
         )
         os.makedirs(osp.dirname(target_las_path), exist_ok=True)
         pipeline.execute()

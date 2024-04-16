@@ -39,7 +39,9 @@ class BuildingCompletor:
         self.data_format = data_format
         self.pipeline: pdal.pipeline.Pipeline = None
 
-    def run(self, input_values: Union[str, pdal.pipeline.Pipeline]):
+    def run(
+        self, input_values: Union[str, pdal.pipeline.Pipeline], las_metadata: dict = None
+    ) -> dict:
         """Application.
 
         Transform cloud at `src_las_path` following building completion logic
@@ -47,18 +49,23 @@ class BuildingCompletor:
         Args:
             input_values (str|pdal.pipeline.Pipeline): path to either input LAS file or a pipeline
             target_las_path (str): path for saving updated LAS file.
+            las_metadata (dict): current pipeline metadata, used to propagate input metadata to the
+        application output las (epsg, las version, etc)
 
         Returns:
-            str: returns `target_las_path` for potential terminal piping.
-
+            str: returns `las_metadata`: metadata of the initial las, which contain
+            information to pass to the writer in order for the application to have an output
+            with the same header (las version, srs, ...) as the input
         """
         log.info(
             "Completion of building with relatively distant points that have high enough "
             + "probability"
         )
-        pipeline = get_pipeline(input_values, self.data_format.epsg)
+        pipeline, las_metadata = get_pipeline(input_values, self.data_format.epsg, las_metadata)
         self.prepare_for_building_completion(pipeline)
         self.update_classification()
+
+        return las_metadata
 
     def prepare_for_building_completion(self, pipeline: pdal.pipeline.Pipeline) -> None:
         """Prepare for building completion.
@@ -70,9 +77,7 @@ class BuildingCompletor:
         the same building and they will be confirmed as well.
 
         Args:
-            src_las_path (pdal.pipeline.Pipeline): input LAS pipeline
-            target_las_path (str): output, prepared LAS.
-
+            pipeline (pdal.pipeline.Pipeline): input LAS pipeline
         """
 
         # Reset Cluster dim out of safety
