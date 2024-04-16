@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_validation_optimization &mdash; lidar_prod V1.10.1 documentation</title>
+  <title>lidar_prod.tasks.building_validation_optimization &mdash; lidar_prod V1.10.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_paramlinks.css" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=7742af75"></script>
+        <script src="../../../_static/documentation_options.js?v=40ba251f"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
@@ -405,7 +405,7 @@
 <span class="sd">            candidate buildings</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">las</span> <span class="o">=</span> <span class="n">pdal_read_las_array</span><span class="p">(</span><span class="n">prepared_las_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
+        <span class="n">las</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pdal_read_las_array</span><span class="p">(</span><span class="n">prepared_las_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
         <span class="c1"># las: laspy.LasData = laspy.read(prepared_las_path)</span>
         <span class="n">dim_cluster_id</span> <span class="o">=</span> <span class="n">las</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">ClusterID_candidate_building</span><span class="p">]</span>
         <span class="n">dim_classification</span> <span class="o">=</span> <span class="n">las</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">classification</span><span class="p">]</span>

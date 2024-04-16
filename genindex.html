@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; lidar_prod V1.10.1 documentation</title>
+  <title>Index &mdash; lidar_prod V1.10.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/sphinx_paramlinks.css" />
@@ -15,7 +15,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=7742af75"></script>
+        <script src="_static/documentation_options.js?v=40ba251f"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
@@ -329,6 +329,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pipeline.params.las header">las header (lidar_prod.tasks.utils.get_pipeline parameter)</a>
 </li>
+      <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.run.params.las_metadata">las_metadata (lidar_prod.tasks.building_completion.BuildingCompletor.run parameter)</a>
+
+      <ul>
+        <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_identification.BuildingIdentifier.run.params.las_metadata">(lidar_prod.tasks.building_identification.BuildingIdentifier.run parameter)</a>
+</li>
+        <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidator.run.params.las_metadata">(lidar_prod.tasks.building_validation.BuildingValidator.run parameter)</a>
+</li>
+        <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pipeline.params.las_metadata">(lidar_prod.tasks.utils.get_pipeline parameter)</a>
+</li>
+      </ul></li>
       <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pdal_reader.params.las_path">las_path (lidar_prod.tasks.utils.get_pdal_reader parameter)</a>
 
       <ul>
@@ -349,6 +359,8 @@
         <li><a href="apidoc/lidar_prod.html#module-lidar_prod.run">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     lidar_prod.tasks.building_completion
 
@@ -356,8 +368,6 @@
         <li><a href="apidoc/lidar_prod.tasks.html#module-lidar_prod.tasks.building_completion">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     lidar_prod.tasks.building_identification
 
@@ -466,6 +476,8 @@
 </li>
       <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.optimize">optimize() (lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer method)</a>
 </li>
+      <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pipeline.params.output las">output las (lidar_prod.tasks.utils.get_pipeline parameter)</a>
+</li>
       <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidationClusterInfo.overlays">overlays (lidar_prod.tasks.building_validation.BuildingValidationClusterInfo attribute)</a>
 </li>
   </ul></td>
@@ -476,20 +488,24 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.pdal_read_las_array">pdal_read_las_array() (in module lidar_prod.tasks.utils)</a>
 </li>
-      <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_integer_bbox.params.pipeline">pipeline (lidar_prod.tasks.utils.get_integer_bbox parameter)</a>
+      <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion.params.pipeline">pipeline (lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion parameter)</a>
+
+      <ul>
+        <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_integer_bbox.params.pipeline">(lidar_prod.tasks.utils.get_integer_bbox parameter)</a>
 </li>
+      </ul></li>
       <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pipeline.params.pipeline or path to a file to read with pdal)">pipeline or path to a file to read with pdal) (lidar_prod.tasks.utils.get_pipeline parameter)</a>
 </li>
       <li><a href="apidoc/lidar_prod.html#lidar_prod.run.POSSIBLE_TASK">POSSIBLE_TASK (class in lidar_prod.run)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidator.prepare">prepare() (lidar_prod.tasks.building_validation.BuildingValidator method)</a>
 
       <ul>
         <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer.prepare">(lidar_prod.tasks.building_validation_optimization.BuildingValidationOptimizer method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion">prepare_for_building_completion() (lidar_prod.tasks.building_completion.BuildingCompletor method)</a>
 </li>
       <li><a href="apidoc/lidar_prod.commons.html#lidar_prod.commons.commons.print_config">print_config() (in module lidar_prod.commons.commons)</a>
@@ -540,11 +556,9 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.split_idx_by_dim">split_idx_by_dim() (in module lidar_prod.tasks.utils)</a>
 </li>
-      <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion.params.src_las_path">src_las_path (lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion parameter)</a>
+      <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.run.params.src_las_path">src_las_path (lidar_prod.tasks.cleaning.Cleaner.run parameter)</a>
 
       <ul>
-        <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.cleaning.Cleaner.run.params.src_las_path">(lidar_prod.tasks.cleaning.Cleaner.run parameter)</a>
-</li>
         <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_a_las_to_las_pdal_pipeline.params.src_las_path">(lidar_prod.tasks.utils.get_a_las_to_las_pdal_pipeline parameter)</a>
 </li>
       </ul></li>
@@ -556,11 +570,9 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidationClusterInfo.target">target (lidar_prod.tasks.building_validation.BuildingValidationClusterInfo attribute)</a>
 </li>
-      <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion.params.target_las_path">target_las_path (lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion parameter)</a>
+      <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.run.params.target_las_path">target_las_path (lidar_prod.tasks.building_completion.BuildingCompletor.run parameter)</a>
 
       <ul>
-        <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.run.params.target_las_path">(lidar_prod.tasks.building_completion.BuildingCompletor.run parameter)</a>
-</li>
         <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_identification.BuildingIdentifier.run.params.target_las_path">(lidar_prod.tasks.building_identification.BuildingIdentifier.run parameter)</a>
 </li>
         <li><a href="apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidator.run.params.target_las_path">(lidar_prod.tasks.building_validation.BuildingValidator.run parameter)</a>

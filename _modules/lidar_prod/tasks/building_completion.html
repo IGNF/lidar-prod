@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_completion &mdash; lidar_prod V1.10.1 documentation</title>
+  <title>lidar_prod.tasks.building_completion &mdash; lidar_prod V1.10.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_paramlinks.css" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=7742af75"></script>
+        <script src="../../../_static/documentation_options.js?v=40ba251f"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
@@ -189,7 +189,9 @@
 
 <div class="viewcode-block" id="BuildingCompletor.run">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.run">[docs]</a>
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">input_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">],</span> <span class="n">las_metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Application.</span>
 
 <span class="sd">        Transform cloud at `src_las_path` following building completion logic</span>
@@ -197,18 +199,23 @@
 <span class="sd">        Args:</span>
 <span class="sd">            input_values (str|pdal.pipeline.Pipeline): path to either input LAS file or a pipeline</span>
 <span class="sd">            target_las_path (str): path for saving updated LAS file.</span>
+<span class="sd">            las_metadata (dict): current pipeline metadata, used to propagate input metadata to the</span>
+<span class="sd">        application output las (epsg, las version, etc)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            str: returns `target_las_path` for potential terminal piping.</span>
-
+<span class="sd">            str: returns `las_metadata`: metadata of the initial las, which contain</span>
+<span class="sd">            information to pass to the writer in order for the application to have an output</span>
+<span class="sd">            with the same header (las version, srs, ...) as the input</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="s2">&quot;Completion of building with relatively distant points that have high enough &quot;</span>
             <span class="o">+</span> <span class="s2">&quot;probability&quot;</span>
         <span class="p">)</span>
-        <span class="n">pipeline</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">input_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">epsg</span><span class="p">)</span>
+        <span class="n">pipeline</span><span class="p">,</span> <span class="n">las_metadata</span> <span class="o">=</span> <span class="n">get_pipeline</span><span class="p">(</span><span class="n">input_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">epsg</span><span class="p">,</span> <span class="n">las_metadata</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prepare_for_building_completion</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_classification</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_classification</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">las_metadata</span></div>
 
 
 <div class="viewcode-block" id="BuildingCompletor.prepare_for_building_completion">
@@ -223,9 +230,7 @@
 <span class="sd">        the same building and they will be confirmed as well.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            src_las_path (pdal.pipeline.Pipeline): input LAS pipeline</span>
-<span class="sd">            target_las_path (str): output, prepared LAS.</span>
-
+<span class="sd">            pipeline (pdal.pipeline.Pipeline): input LAS pipeline</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Reset Cluster dim out of safety</span>
