@@ -37,7 +37,7 @@ building_validation.optimization.paths.results_output_dir=[path/to/save/results]
 
 ### Evaluation of optimized thresholds on a test set
 
-Once an optimal solution was found, you may want to evaluate the decision process on unseen data to evaluate generalization capability. For that, you will need another test folder of corrected data in the same format as before (a different `input_las_dir`). You need to specify that no optimization is required using the `todo` params. You also need to give the path to the pickled decision thresholds from the previous step, and specify a different `results_output_dir` so that prepared data of test and val test are not pooled together.
+Once an optimal solution was found, you may want to evaluate the decision process on unseen data to evaluate generalization capability. For that, you will need another test folder of corrected data in the same format as before (a different `input_las_dir`). You need to specify that no optimization is required using the `todo` params. You also need to give the path to the decision thresholds file (yaml file) from the previous step, and specify a different `results_output_dir` so that prepared data of test and val test are not pooled together.
 
 
 ```bash
@@ -48,7 +48,7 @@ python lidar_prod/run.py \
 building_validation.optimization.todo='prepare+evaluate+update' \
 building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] \
 building_validation.optimization.paths.results_output_dir=[path/to/save/results] \
-building_validation.optimization.paths.building_validation_thresholds_pickle=[path/to/optimized_thresholds.pickle]
+building_validation.optimization.paths.building_validation_thresholds=[path/to/optimized_thresholds.yaml]
 ```
 
 ### Utils
@@ -57,4 +57,4 @@ Debug mode: to run on a single file during development, add a `+building_validat
 
 
 Reference:
-- [Deb et al. (2002) - A fast and elitist multiobjective genetic algorithm\: NSGA-II](https://ieeexplore.ieee.org/document/996017)).
+- [Deb et al. (2002) - A fast and elitist multiobjective genetic algorithm\: NSGA-II](https://ieeexplore.ieee.org/document/996017).
