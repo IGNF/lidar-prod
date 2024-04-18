@@ -185,22 +185,22 @@ class BuildingValidationOptimizer:
 
         """
         clusters = self._load_clusters()
-        self._set_thresholds_from_pickle_if_available()
+        self._set_thresholds_from_file_if_available()
         decisions = np.array([self.bv._make_group_decision(c) for c in clusters])
         mts_gt = np.array([c.target for c in clusters])
         metrics_dict = self.evaluate_decisions(mts_gt, decisions)
         log.info(f"\n Results:\n{self._get_results_logs_str(metrics_dict)}")
         return metrics_dict
 
-    def _set_thresholds_from_pickle_if_available(self):
+    def _set_thresholds_from_file_if_available(self):
         try:
-            with open(self.paths.building_validation_thresholds_pickle, "rb") as f:
-                self.bv.thresholds = pickle.load(f)
+            self.bv.thresholds = thresholds.load(self.paths.building_validation_thresholds)
+
         except FileNotFoundError:
             warnings.warn(
                 "Using default thresholds from hydra config to perform decisions. "
-                "You may want to specify different thresholds via a pickled object by specifying "
-                "building_validation.optimization.paths.building_validation_thresholds_pickle",
+                "You may want to specify different thresholds via a yaml file by specifying "
+                "building_validation.optimization.paths.building_validation_thresholds",
                 UserWarning,
             )
 
@@ -213,7 +213,7 @@ class BuildingValidationOptimizer:
 
         """
         log.info(f"Updated las will be saved in {self.paths.results_output_dir}")
-        self._set_thresholds_from_pickle_if_available()
+        self._set_thresholds_from_file_if_available()
         for prepared_las_path, target_las_path in tqdm(
             zip(self.prepared_las_filepaths, self.out_las_filepaths),
             total=len(self.prepared_las_filepaths),
@@ -354,11 +354,10 @@ class BuildingValidationOptimizer:
         best_rules = thresholds(**best.params)
         return best_rules
 
-    def _dump_best_rules(self, best_trial_params):
-        """Serializes best thresholds."""
-        with open(self.paths.building_validation_thresholds_pickle, "wb") as f:
-            pickle.dump(best_trial_params, f)
-            log.info(f"Pickled best params to {self.paths.building_validation_thresholds_pickle}")
+    def _dump_best_rules(self, best_trial_params: thresholds):
+        """Saves best thresholds to a yaml file."""
+        best_trial_params.dump(self.paths.building_validation_thresholds)
+        log.info(f"Saved best params to {self.paths.building_validation_thresholds}")
 
     def _dump_clusters(self, clusters):
         """Serializes the list of cluster-level information objects."""

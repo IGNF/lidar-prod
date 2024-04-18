@@ -5,7 +5,7 @@ import hydra
 import numpy as np
 import pytest
 
-from lidar_prod.tasks.building_validation import BuildingValidator
+from lidar_prod.tasks.building_validation import BuildingValidator, thresholds
 from lidar_prod.tasks.utils import BDUniConnectionParams, get_las_data_from_las
 from tests.conftest import (
     check_expected_classification,
@@ -171,3 +171,24 @@ def test_run(hydra_cfg):
             dims.candidate_buildings_flag,
         ],
     )
+
+
+def test_thresholds():
+    dump_file = str(TMP_DIR / "threshold_dump.yml")
+
+    th = thresholds(
+        min_confidence_confirmation=0.1,
+        min_frac_confirmation=0.2,
+        min_frac_confirmation_factor_if_bd_uni_overlay=0.3,
+        min_uni_db_overlay_frac=0.4,
+        min_confidence_refutation=0.5,
+        min_frac_refutation=0.6,
+        min_entropy_uncertainty=0.7,
+        min_frac_entropy_uncertain=0.8,
+    )
+
+    th.dump(dump_file)
+
+    th1 = th.load(dump_file)
+
+    assert th1 == th

@@ -9,6 +9,7 @@ from typing import Optional, Union
 import geopandas
 import numpy as np
 import pdal
+import yaml
 from tqdm import tqdm
 
 from lidar_prod.tasks.utils import (
@@ -378,3 +379,14 @@ class thresholds:
     min_frac_refutation: float
     min_entropy_uncertainty: float
     min_frac_entropy_uncertain: float
+
+    def dump(self, filename: str):
+        with open(filename, "w") as f:
+            yaml.safe_dump(self.__dict__, f)
+
+    @staticmethod
+    def load(filename: str):
+        with open(filename, "r") as f:
+            data = yaml.safe_load(f)
+
+        return thresholds(**data)
