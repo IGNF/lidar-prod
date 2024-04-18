@@ -350,7 +350,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_clusters</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_thresholds_from_pickle_if_available</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_thresholds_from_file_if_available</span><span class="p">()</span>
         <span class="n">decisions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">_make_group_decision</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">])</span>
         <span class="n">mts_gt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">target</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">clusters</span><span class="p">])</span>
         <span class="n">metrics_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_decisions</span><span class="p">(</span><span class="n">mts_gt</span><span class="p">,</span> <span class="n">decisions</span><span class="p">)</span>
@@ -358,15 +358,15 @@
         <span class="k">return</span> <span class="n">metrics_dict</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_set_thresholds_from_pickle_if_available</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_set_thresholds_from_file_if_available</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">building_validation_thresholds_pickle</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bv</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="n">thresholds</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">building_validation_thresholds</span><span class="p">)</span>
+
         <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Using default thresholds from hydra config to perform decisions. &quot;</span>
-                <span class="s2">&quot;You may want to specify different thresholds via a pickled object by specifying &quot;</span>
-                <span class="s2">&quot;building_validation.optimization.paths.building_validation_thresholds_pickle&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;You may want to specify different thresholds via a yaml file by specifying &quot;</span>
+                <span class="s2">&quot;building_validation.optimization.paths.building_validation_thresholds&quot;</span><span class="p">,</span>
                 <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -381,7 +381,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated las will be saved in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">results_output_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_thresholds_from_pickle_if_available</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_thresholds_from_file_if_available</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">prepared_las_path</span><span class="p">,</span> <span class="n">target_las_path</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
             <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prepared_las_filepaths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_las_filepaths</span><span class="p">),</span>
             <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prepared_las_filepaths</span><span class="p">),</span>
@@ -523,11 +523,10 @@
         <span class="n">best_rules</span> <span class="o">=</span> <span class="n">thresholds</span><span class="p">(</span><span class="o">**</span><span class="n">best</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">best_rules</span>
 
-    <span class="k">def</span> <span class="nf">_dump_best_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">best_trial_params</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serializes best thresholds.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">building_validation_thresholds_pickle</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">best_trial_params</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pickled best params to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">building_validation_thresholds_pickle</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_dump_best_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">best_trial_params</span><span class="p">:</span> <span class="n">thresholds</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Saves best thresholds to a yaml file.&quot;&quot;&quot;</span>
+        <span class="n">best_trial_params</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">building_validation_thresholds</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved best params to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">building_validation_thresholds</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_dump_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clusters</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Serializes the list of cluster-level information objects.&quot;&quot;&quot;</span>
