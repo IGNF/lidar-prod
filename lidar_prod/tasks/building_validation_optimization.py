@@ -10,6 +10,7 @@ from typing import Any, Dict, List
 
 import numpy as np
 import optuna
+from omegaconf import DictConfig, OmegaConf
 from sklearn.metrics import confusion_matrix
 from tqdm import tqdm
 
@@ -526,3 +527,12 @@ class BuildingValidationOptimizer:
             + str(metrics_dict[self.design.metrics.confusion_matrix_norm].round(3))
         )
         return results_logs
+
+    def save_config_with_optimized_thresolds(self, config: DictConfig):
+        """Save config the thresholds in the building_validation.application
+        part replaced by optimized thresholds"""
+        if "optimize" in self.todo:
+            optimized_cfg = config.copy()
+            optimized_cfg.building_validation.application.thresholds = self.thresholds
+            out_path = config.building_validation.optimization.paths.output_optimized_config
+            OmegaConf.save(config=optimized_cfg, f=out_path, resolve=False)

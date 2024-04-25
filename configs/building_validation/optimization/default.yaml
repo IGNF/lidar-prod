@@ -13,7 +13,8 @@ paths:
   group_info_pickle_path: ${.results_output_dir}/group_info.pickle
   prepared_las_dir: ${.results_output_dir}/prepared/
   updated_las_dir: ${.results_output_dir}/updated/
-  building_validation_thresholds: ${.results_output_dir}/optimized_thresholds.yaml # Wher
+  building_validation_thresholds: ${.results_output_dir}/optimized_thresholds.yaml
+  output_optimized_config: ${.results_output_dir}/config_with_optimized_thresholds.yaml
 
 # CLASSIFICATION CODES of a dataset which was inspected
 # and labeled post TerraSolid macro
