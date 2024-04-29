@@ -1,0 +1,83 @@
+# Workflow name
+name: "Building validation thresholds optimization"
+
+on:
+  # Run workflow on user request
+  workflow_dispatch:
+    inputs:
+      sampling_name:
+        description: |
+          Sampling name :
+          Nom du dataset sur lequel le modèle a été entraîné.
+          Utilisé pour générer un chemin standard pour les entrées et sorties dans le
+          dossier IA du store (projet-LHD/IA/LIDAR-PROD-OPTIMIZATION/$SAMPLING_NAME/$MODEL_ID)
+          Eg. YYYYMMDD_MonBeauDataset
+        required: true
+      model_id:
+        description: |
+          Identifiant du modèle :
+          Utilisé pour générer un chemin standard pour les entrées et sorties dans le
+          dossier IA du store (projet-LHD/IA/LIDAR-PROD-OPTIMIZATION/$SAMPLING_NAME/$MODEL_ID)
+          Exemple : YYYMMDD_MonBeauSampling_epochXXX_Myria3Dx.y.z
+        required: true
+
+jobs:
+  optimize-building-validation-thresholds:
+    runs-on: self-hosted
+    env:
+      WORKDIR: /var/data/LIDAR-PROD-OPTIMIZATION/
+      IO_DIR: /var/data/LIDAR-PROD-OPTIMIZATION/${{ github.event.inputs.sampling_name }}/${{ github.event.inputs.model_id }}/
+      DATA: /var/data/LIDAR-PROD-OPTIMIZATION/20221018_lidar-prod-optimization-on-151-proto/Comparison/
+      THRESHOLDS_FILE: valset-opti-results/optimized_thresholds.yaml
+      OUTPUT_CONFIG_FILE: LIDAR-PROD-${{ github.event.inputs.model_id }}.yaml
+      nexus_server: docker-registry.ign.fr
+
+    steps:
+      - name: Log configuration
+        run: |
+          echo "Optimize building validation threshold for a given trained model"
+          echo "Model ID ${{ github.event.inputs.model_id }}"
+          echo "input/output dir: ${{env.IO_DIR}}"
+          echo "data: ${{env.DATA}}"
+          echo "validation input_las_dir: ${{env.IO_DIR}}/preds-valset/"
+          echo "test input_las_dir: ${{env.IO_DIR}}/preds-testset/"
+          echo "output thresholds file: ${{env.IO_DIR}}/${{env.THRESHOLDS_FILE}}"
+          echo "output config file: ${{env.IO_DIR}}/${{env.OUTPUT_CONFIG_FILE}}"
+
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      # get version number, to retrieve the docker image corresponding to the current version
+      - name: Get version number
+        run: |
+          echo "VERSION=$(docker run lidar_prod python -m lidar_prod.version)" >> $GITHUB_ENV
+
+      - name: pull docker image tagged with current version
+        run: |
+          docker pull ${{ env.nexus_server }}/lidar_hd/lidar_prod:${{ env.VERSION }}
+
+      - name: Optimization and evaluation on validation dataset
+        run: >
+          docker run --network host
+          -v ${{env.IO_DIR}}:/io_dir
+          ${{ env.nexus_server }}/lidar_hd/lidar_prod:${{ env.VERSION }}
+          python lidar_prod/run.py
+          ++task=optimize_building
+          building_validation.optimization.todo='prepare+optimize+evaluate+update'
+          building_validation.optimization.paths.input_las_dir=/io_dir/preds-valset/
+          building_validation.optimization.paths.results_output_dir=/io_dir/valset-opti-results/
+          building_validation.optimization.paths.output_optimized_config=/io_dir/${{env.OUTPUT_CONFIG_FILE}}
+          hydra.run.dir=/io_dir/valset-opti-results/
+
+      - name: Evaluation on test dataset
+        run: >
+          docker run --network=host
+          -v ${{env.IO_DIR}}:/io_dir
+          ${{ env.nexus_server }}/lidar_hd/lidar_prod:${{ env.VERSION }}
+          python lidar_prod/run.py
+          ++task=optimize_building
+          building_validation.optimization.todo='prepare+evaluate+update'
+          building_validation.optimization.paths.input_las_dir=/io_dir/preds-testset/
+          building_validation.optimization.paths.results_output_dir=/io_dir/testset-opti-results/
+          building_validation.optimization.paths.building_validation_thresholds=/io_dir/${{env.THRESHOLDS_FILE}}
+          hydra.run.dir=/io_dir/testset-opti-results/
