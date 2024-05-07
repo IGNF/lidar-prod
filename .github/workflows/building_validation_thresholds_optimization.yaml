@@ -43,6 +43,7 @@ jobs:
           echo "test input_las_dir: ${{env.IO_DIR}}/preds-testset/"
           echo "output thresholds file: ${{env.IO_DIR}}/${{env.THRESHOLDS_FILE}}"
           echo "output config file: ${{env.IO_DIR}}/${{env.OUTPUT_CONFIG_FILE}}"
+          echo "evaluation metrics (on test dataset): ${{env.IO_DIR}}/preds-testset/evaluation.yaml"
 
       - name: Checkout branch
         uses: actions/checkout@v4
@@ -80,4 +81,12 @@ jobs:
           building_validation.optimization.paths.input_las_dir=/io_dir/preds-testset/
           building_validation.optimization.paths.results_output_dir=/io_dir/testset-opti-results/
           building_validation.optimization.paths.building_validation_thresholds=/io_dir/${{env.THRESHOLDS_FILE}}
+          building_validation.optimization.paths.evaluation_results_yaml=/io_dir/preds-testset/evaluation.yaml
           hydra.run.dir=/io_dir/testset-opti-results/
+
+      - name: Log evaluation results on test dataset
+        run: |
+          echo "Evaluation results on the test dataset"
+          echo "The most important metric to inspect is: p_auto (automation proportion)"
+          echo ""
+          cat ${{env.IO_DIR}}/preds-testset/evaluation.yaml

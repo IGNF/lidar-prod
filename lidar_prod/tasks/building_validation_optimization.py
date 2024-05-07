@@ -10,6 +10,7 @@ from typing import Any, Dict, List
 
 import numpy as np
 import optuna
+import yaml
 from omegaconf import DictConfig, OmegaConf
 from sklearn.metrics import confusion_matrix
 from tqdm import tqdm
@@ -191,6 +192,8 @@ class BuildingValidationOptimizer:
         mts_gt = np.array([c.target for c in clusters])
         metrics_dict = self.evaluate_decisions(mts_gt, decisions)
         log.info(f"\n Results:\n{self._get_results_logs_str(metrics_dict)}")
+        self._save_results_to_yaml(metrics_dict)
+
         return metrics_dict
 
     def _set_thresholds_from_file_if_available(self):
@@ -527,6 +530,18 @@ class BuildingValidationOptimizer:
             + str(metrics_dict[self.design.metrics.confusion_matrix_norm].round(3))
         )
         return results_logs
+
+    def _save_results_to_yaml(self, metrics_dict: dict):
+        out_dict = metrics_dict.copy()
+        for k, v in out_dict.items():
+            if isinstance(v, np.ndarray):
+                out_dict[k] = v.tolist()
+            elif isinstance(v, np.float64):
+                out_dict[k] = float(v)
+
+        if self.paths.evaluation_results_yaml:
+            with open(self.paths.evaluation_results_yaml, "w") as f:
+                yaml.safe_dump(out_dict, f)
 
     def save_config_with_optimized_thresolds(self, config: DictConfig):
         """Save config the thresholds in the building_validation.application

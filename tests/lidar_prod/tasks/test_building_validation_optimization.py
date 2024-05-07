@@ -6,6 +6,7 @@ from pathlib import Path
 import hydra
 import numpy as np
 import pytest
+import yaml
 
 from lidar_prod.tasks.building_validation import thresholds
 from lidar_prod.tasks.building_validation_optimization import (
@@ -26,6 +27,14 @@ This is to enable a shallower run of these tests without the file.
 """
 
 TMP_DIR = Path("tmp/lidar_prod/tasks/building_validation_optimization")
+
+
+def setup_module(module):
+    try:
+        shutil.rmtree(TMP_DIR)
+    except FileNotFoundError:
+        pass
+    TMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # Small LAS, for which we optimize thresholds and reach perfect validation,
@@ -100,6 +109,17 @@ def test_BVOptimization_on_subset(hydra_cfg):
     # prepared data and the threshold from previous run
     metrics_dict = bvo.evaluate()
     print(metrics_dict)
+
+    # Check that metrics are correctly saved to file
+    assert os.path.isfile(bvo.paths.evaluation_results_yaml)
+    with open(bvo.paths.evaluation_results_yaml, "r") as f:
+        saved_metrics_dict = yaml.safe_load(f)
+        for k, v in metrics_dict.items():
+            if isinstance(v, np.ndarray):
+                assert saved_metrics_dict[k] == v.tolist()
+            else:
+                assert saved_metrics_dict[k] == v
+
     # Assert inclusion
     assert SUBSET_EXPECTED_METRICS["exact"].items() <= metrics_dict.items()
     # Assert <= with a relative tolerance

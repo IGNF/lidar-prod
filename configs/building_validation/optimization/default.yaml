@@ -13,6 +13,7 @@ paths:
   group_info_pickle_path: ${.results_output_dir}/group_info.pickle
   prepared_las_dir: ${.results_output_dir}/prepared/
   updated_las_dir: ${.results_output_dir}/updated/
+  evaluation_results_yaml: ${.results_output_dir}/evaluation.yaml
   building_validation_thresholds: ${.results_output_dir}/optimized_thresholds.yaml
   output_optimized_config: ${.results_output_dir}/config_with_optimized_thresholds.yaml
 
