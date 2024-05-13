@@ -1,6 +1,8 @@
 # main
 
-Save optimized thresholds as yaml instead of pickle to make it easier to read
+### 1.10.3
+- Save optimized thresholds as yaml instead of pickle to make it easier to read
+- Save updated config file during building validation thresholds optimization
 
 ### 1.10.2
 - Add support for metadata propagation through compound pdal pipelines:

@@ -26,6 +26,8 @@ def optimize_building(
         config (DictConfig): Hydra config passed from run.py
 
     """
+    # Copy config before resolving it to be able so save it unresolved
+    config_to_save = config.copy()
     commons.extras(config)
 
     bvo: BuildingValidationOptimizer = hydra.utils.instantiate(
@@ -36,6 +38,9 @@ def optimize_building(
     )
     bvo.bv.bd_uni_connection_params = bd_uni_connection_params
     bvo.run()
+
+    # Save output config with updated thresholds
+    bvo.save_config_with_optimized_thresolds(config_to_save)
 
 
 def optimize_vegetation(
