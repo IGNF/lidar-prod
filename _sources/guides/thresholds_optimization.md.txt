@@ -48,7 +48,8 @@ python lidar_prod/run.py \
 building_validation.optimization.todo='prepare+evaluate+update' \
 building_validation.optimization.paths.input_las_dir=[path/to/labelled/test/dataset/] \
 building_validation.optimization.paths.results_output_dir=[path/to/save/results] \
-building_validation.optimization.paths.building_validation_thresholds=[path/to/optimized_thresholds.yaml]
+building_validation.optimization.paths.building_validation_thresholds=[path/to/optimized_thresholds.yaml] \
+building_validation.optimization.paths.evaluation_results_yaml=[path/to/saved/metrics.yaml]
 ```
 
 ### Utils
