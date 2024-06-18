@@ -1,5 +1,8 @@
 # main
 
+### 1.10.4
+- Update default bduni alias to bduni_consult.ign.fr
+
 ### 1.10.3
 - Save optimized thresholds as yaml instead of pickle to make it easier to read
 - Save updated config file during building validation thresholds optimization
