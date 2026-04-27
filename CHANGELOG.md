@@ -1,5 +1,8 @@
 # main
 
+### 1.10.5
+- Update environment: use pdal 2.10 to support new spatial references
+
 ### 1.10.4
 - Update default bduni alias to bduni_consult.ign.fr
 
