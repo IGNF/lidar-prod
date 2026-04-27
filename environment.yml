@@ -2,7 +2,7 @@ name: lidar_prod
 channels:
   - conda-forge
 dependencies:
-  - python==3.10.*
+  - python==3.12.*
   - pip
   # --------- linters --------- #
   - pre-commit # hooks for applying linters on commit
@@ -11,32 +11,32 @@ dependencies:
   - flake8 # code analysis
   - rstcheck==3.3.*
   # --------- geo --------- #
-  - conda-forge:python-pdal==3.2.*
-  - conda-forge:pdal==2.6.*
+  - conda-forge:python-pdal==3.5.*
+  - conda-forge:pdal==2.10.*
   - numpy
   - scikit-learn
+  - gdal
   - geopandas
   - pyproj
   - laspy
   # --------- others --------- #
   - psycopg2 # database interaction
+  - postgis
   - jupyterlab # better jupyter notebooks
   - pudb # debugger
   - rich==11.2.* # rich text formatting
   - pytest>=7.1.2 # tests
   - pytest-cov==3.0.*
-    # --------- documentation --------- #
+  # --------- documentation --------- #
   - sphinx==7.2.*
   - recommonmark==0.7.*
   - sphinx_rtd_theme==2.0.*
   - docutils==0.20.*
+  # --------- hydra --------- #
+  - hydra-core==1.3.*
+  - hydra-colorlog==1.2.*
+  - optuna #==4.8.*
   - pip:
-      # --------- postgis-toolkit --------- #
-      # - postgis-toolkit
-      # --------- hydra --------- #
-      - hydra-core==1.1.*
-      - hydra-colorlog==1.1.*
-      - optuna==2.10.*
       # --------- Documentation --------- #
       - myst_parser==2.0.*
       - sphinx_paramlinks==0.6.*
