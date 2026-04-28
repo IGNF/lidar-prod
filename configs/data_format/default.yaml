@@ -7,8 +7,8 @@ las_dimensions:
   classification: Classification # las format
   terrascan_normal: Normal
   terrascan_distance: Distance
-  terrascan_deviation: Deviation
-  terrascan_reliability: confidence # Appears as "Reliability" in TerraScan. Unsigned char according to LASinfo.
+  terrascan_occupation_sol: PredictionOccupationSol
+  terrascan_classification_myriad: ClassificationMyria3d
 
   # Extra dims
   # ATTENTION: If extra dimensions are added, you may want to add them in cleaning.in parameter as well.
@@ -94,8 +94,8 @@ cleaning:
       - "${data_format.las_dimensions.entropy}=float"
       - "${data_format.las_dimensions.terrascan_normal}=uint"
       - "${data_format.las_dimensions.terrascan_distance}=int"
-      - "${data_format.las_dimensions.terrascan_deviation}=ushort"
-      - "${data_format.las_dimensions.terrascan_reliability}=uchar"
+      - "${data_format.las_dimensions.terrascan_occupation_sol}:=ushort"
+      - "${data_format.las_dimensions.terrascan_classification_myriad}=uchar"
       # - "${data_format.las_dimensions.ai_vegetation_proba}=float"
       # - "${data_format.las_dimensions.ai_unclassified_proba}=float"
   output_building:
@@ -109,8 +109,8 @@ cleaning:
       - "${data_format.las_dimensions.ai_building_identified}=uint"
       - "${data_format.las_dimensions.terrascan_normal}=uint"
       - "${data_format.las_dimensions.terrascan_distance}=int"
-      - "${data_format.las_dimensions.terrascan_deviation}=ushort"
-      - "${data_format.las_dimensions.terrascan_reliability}=uchar"
+      - "${data_format.las_dimensions.terrascan_occupation_sol}:=ushort"
+      - "${data_format.las_dimensions.terrascan_classification_myriad}=uchar"
       # - "${data_format.las_dimensions.ai_vegetation_unclassified_groups}=uint"
   input_vegetation_unclassified:
     # Extra dims added for storing the result of the vegetation/unclassified detection.
