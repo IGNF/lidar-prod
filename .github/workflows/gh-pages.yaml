@@ -19,13 +19,13 @@ jobs:
     steps:
       # Checkout the repository
       - name: "Checkout"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # See https://github.com/conda-incubator/setup-miniconda#caching-environments
 
       # See https://github.com/marketplace/actions/setup-micromamba
       - name: install
-        uses: mamba-org/setup-micromamba@v1.4.3
+        uses: mamba-org/setup-micromamba@v3.0.0
         with:
           environment-file: environment.yml
           environment-name: lidar_prod # activate the environment
@@ -44,7 +44,7 @@ jobs:
       # 3. Déploiement sur les Github Pages
 
       - name: "Deploy Github Pages"
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4.8.0
         with:
           BRANCH: gh-pages # <- Branch where generated doc files will be commited
           FOLDER: ./docs/build/html/ # <- Dir where .nojekyll is created and from which to deploy github pages.

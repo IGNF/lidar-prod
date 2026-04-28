@@ -1,4 +1,5 @@
 # main
+- fix cicd (update registered actions to support node.js 24)
 
 ### 1.10.5
 - Update environment: use pdal 2.10 to support new spatial references
