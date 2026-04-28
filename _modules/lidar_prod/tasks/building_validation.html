@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod V1.10.4 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+  <title>lidar_prod.tasks.building_validation &mdash; lidar_prod V1.10.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_paramlinks.css" />
 
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=2f4b31cb"></script>
+        <script src="../../../_static/documentation_options.js?v=8b33b5d2"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
@@ -144,21 +144,21 @@
            <div itemprop="articleBody">
              
   <h1>Source code for lidar_prod.tasks.building_validation</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span><span class="p">,</span> <span class="n">mkdtemp</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">osp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tempfile</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemporaryDirectory</span><span class="p">,</span> <span class="n">mkdtemp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">geopandas</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pdal</span>
-<span class="kn">import</span> <span class="nn">yaml</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pdal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">lidar_prod.tasks.utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lidar_prod.tasks.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_integer_bbox</span><span class="p">,</span>
     <span class="n">get_pdal_writer</span><span class="p">,</span>
     <span class="n">get_pipeline</span><span class="p">,</span>
@@ -172,7 +172,7 @@
 <div class="viewcode-block" id="BuildingValidationClusterInfo">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidationClusterInfo">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">BuildingValidationClusterInfo</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BuildingValidationClusterInfo</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Elements needed to confirm, refute, or be uncertain about a cluster</span>
 <span class="sd">    of candidate building points.&quot;&quot;&quot;</span>
 
@@ -187,7 +187,7 @@
 
 <div class="viewcode-block" id="BuildingValidator">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidator">[docs]</a>
-<span class="k">class</span> <span class="nc">BuildingValidator</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BuildingValidator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Logic of building validation.</span>
 
 <span class="sd">    The candidate building points identified with a rule-based algorithm are cluster together.</span>
@@ -199,7 +199,7 @@
 <span class="sd">    See `README.md` for the detailed process.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">shp_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">bd_uni_connection_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -224,7 +224,7 @@
 
 <div class="viewcode-block" id="BuildingValidator.setup">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidator.setup">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup. Defines useful variables.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">detailed_to_final_map</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
@@ -234,7 +234,7 @@
 
 <div class="viewcode-block" id="BuildingValidator.run">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidator.run">[docs]</a>
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">],</span>
         <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -274,7 +274,7 @@
 
 <div class="viewcode-block" id="BuildingValidator.prepare">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidator.prepare">[docs]</a>
-    <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">],</span>
         <span class="n">prepared_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -387,7 +387,7 @@
 
 <div class="viewcode-block" id="BuildingValidator.update">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.BuildingValidator.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">las_metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Updates point cloud classification channel.&quot;&quot;&quot;</span>
@@ -435,7 +435,7 @@
         <span class="k">return</span> <span class="n">las_metadata</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_extract_cluster_info_by_idx</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_cluster_info_by_idx</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">las</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pts_idx</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BuildingValidationClusterInfo</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts all necessary information to make a decision based on points indices.</span>
@@ -455,7 +455,7 @@
         <span class="n">targets</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_format</span><span class="o">.</span><span class="n">las_dimensions</span><span class="o">.</span><span class="n">classification</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">BuildingValidationClusterInfo</span><span class="p">(</span><span class="n">probabilities</span><span class="p">,</span> <span class="n">overlays</span><span class="p">,</span> <span class="n">entropies</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_make_group_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_group_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Wrapper to simplify decision codes during LAS update.</span>
 <span class="s2">        Signature follows the one of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_detailed_group_decision</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span>
 <span class="s2">        Returns:</span>
@@ -464,7 +464,7 @@
         <span class="n">detailed_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_detailed_group_decision</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">detailed_to_final_map</span><span class="p">[</span><span class="n">detailed_code</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_make_detailed_group_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infos</span><span class="p">:</span> <span class="n">BuildingValidationClusterInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_detailed_group_decision</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infos</span><span class="p">:</span> <span class="n">BuildingValidationClusterInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Decision process at the cluster level.</span>
 
 <span class="sd">        Confirm or refute candidate building groups based on fraction of confirmed/refuted points</span>
@@ -534,7 +534,7 @@
 <div class="viewcode-block" id="thresholds">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.thresholds">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">thresholds</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">thresholds</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The decision thresholds for a cluser-level decisions.&quot;&quot;&quot;</span>
 
     <span class="n">min_confidence_confirmation</span><span class="p">:</span> <span class="nb">float</span>
@@ -548,7 +548,7 @@
 
 <div class="viewcode-block" id="thresholds.dump">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.thresholds.dump">[docs]</a>
-    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
 
@@ -556,7 +556,7 @@
 <div class="viewcode-block" id="thresholds.load">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_validation.thresholds.load">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 

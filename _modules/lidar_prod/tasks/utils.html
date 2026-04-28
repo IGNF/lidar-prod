@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.utils &mdash; lidar_prod V1.10.4 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+  <title>lidar_prod.tasks.utils &mdash; lidar_prod V1.10.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_paramlinks.css" />
 
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=2f4b31cb"></script>
+        <script src="../../../_static/documentation_options.js?v=8b33b5d2"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
@@ -144,20 +144,20 @@
            <div itemprop="articleBody">
              
   <h1>Source code for lidar_prod.tasks.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Number</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Number</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span>
 
-<span class="kn">import</span> <span class="nn">geopandas</span>
-<span class="kn">import</span> <span class="nn">laspy</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pdal</span>
-<span class="kn">import</span> <span class="nn">psycopg2</span>
-<span class="kn">import</span> <span class="nn">pyproj</span>
-<span class="kn">from</span> <span class="nn">pdaltools.las_info</span> <span class="kn">import</span> <span class="n">get_writer_parameters_from_reader_metadata</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">laspy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pdal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg2</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyproj</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pdaltools.las_info</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_writer_parameters_from_reader_metadata</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -165,7 +165,7 @@
 <div class="viewcode-block" id="BDUniConnectionParams">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.BDUniConnectionParams">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">BDUniConnectionParams</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BDUniConnectionParams</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;URL and public credentials to connect to a database - typically the BDUni&quot;&quot;&quot;</span>
 
     <span class="n">host</span><span class="p">:</span> <span class="nb">str</span>
@@ -177,7 +177,7 @@
 
 <div class="viewcode-block" id="split_idx_by_dim">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.split_idx_by_dim">[docs]</a>
-<span class="k">def</span> <span class="nf">split_idx_by_dim</span><span class="p">(</span><span class="n">dim_array</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">split_idx_by_dim</span><span class="p">(</span><span class="n">dim_array</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a sequence of arrays of indices of elements sharing the same value in dim_array</span>
 <span class="sd">    Groups are ordered by ascending value.</span>
@@ -191,7 +191,7 @@
 
 <div class="viewcode-block" id="get_pipeline">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pipeline">[docs]</a>
-<span class="k">def</span> <span class="nf">get_pipeline</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_pipeline</span><span class="p">(</span>
     <span class="n">input_value</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">las_metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;If the input value is a pipeline, returns it, if it&#39;s a las path return the corresponding</span>
@@ -221,7 +221,7 @@
 
 <div class="viewcode-block" id="get_input_las_metadata">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_input_las_metadata">[docs]</a>
-<span class="k">def</span> <span class="nf">get_input_las_metadata</span><span class="p">(</span><span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_input_las_metadata</span><span class="p">(</span><span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get las reader metadata from the input pipeline&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">][</span><span class="s2">&quot;readers.las&quot;</span><span class="p">]</span></div>
 
@@ -229,7 +229,7 @@
 
 <div class="viewcode-block" id="get_integer_bbox">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_integer_bbox">[docs]</a>
-<span class="k">def</span> <span class="nf">get_integer_bbox</span><span class="p">(</span><span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">,</span> <span class="n">buffer</span><span class="p">:</span> <span class="n">Number</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_integer_bbox</span><span class="p">(</span><span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">,</span> <span class="n">buffer</span><span class="p">:</span> <span class="n">Number</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get XY bounding box of the las input of a pipeline, cast x/y min/max to integers.</span>
 
 <span class="sd">    Args:</span>
@@ -253,7 +253,7 @@
 
 <div class="viewcode-block" id="get_pdal_reader">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pdal_reader">[docs]</a>
-<span class="k">def</span> <span class="nf">get_pdal_reader</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Reader</span><span class="o">.</span><span class="n">las</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_pdal_reader</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Reader</span><span class="o">.</span><span class="n">las</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Standard Reader which imposes Lamber 93 SRS.</span>
 
 <span class="sd">    Args:</span>
@@ -282,7 +282,7 @@
 
 <div class="viewcode-block" id="get_las_data_from_las">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_las_data_from_las">[docs]</a>
-<span class="k">def</span> <span class="nf">get_las_data_from_las</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">epsg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_las_data_from_las</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">epsg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load las data from a las file&quot;&quot;&quot;</span>
     <span class="n">las</span> <span class="o">=</span> <span class="n">laspy</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">las_path</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">las</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">parse_crs</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">epsg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -293,7 +293,7 @@
 
 <div class="viewcode-block" id="get_pdal_writer">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_pdal_writer">[docs]</a>
-<span class="k">def</span> <span class="nf">get_pdal_writer</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_pdal_writer</span><span class="p">(</span>
     <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reader_metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span> <span class="n">extra_dims</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pdal</span><span class="o">.</span><span class="n">Writer</span><span class="o">.</span><span class="n">las</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Standard LAS Writer which imposes LAS 1.4 specification and dataformat 8.</span>
@@ -320,7 +320,7 @@
 
 <div class="viewcode-block" id="save_las_data_to_las">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.save_las_data_to_las">[docs]</a>
-<span class="k">def</span> <span class="nf">save_las_data_to_las</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">las_data</span><span class="p">:</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_las_data_to_las</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">las_data</span><span class="p">:</span> <span class="n">laspy</span><span class="o">.</span><span class="n">lasdata</span><span class="o">.</span><span class="n">LasData</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;save las data to a las file&quot;&quot;&quot;</span>
     <span class="n">las_data</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">las_path</span><span class="p">)</span></div>
 
@@ -328,7 +328,7 @@
 
 <div class="viewcode-block" id="get_a_las_to_las_pdal_pipeline">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.get_a_las_to_las_pdal_pipeline">[docs]</a>
-<span class="k">def</span> <span class="nf">get_a_las_to_las_pdal_pipeline</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_a_las_to_las_pdal_pipeline</span><span class="p">(</span>
     <span class="n">src_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ops</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a pdal pipeline, preserving format, forwarding every dimension.</span>
@@ -352,7 +352,7 @@
 
 <div class="viewcode-block" id="pdal_read_las_array">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.pdal_read_las_array">[docs]</a>
-<span class="k">def</span> <span class="nf">pdal_read_las_array</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pdal_read_las_array</span><span class="p">(</span><span class="n">las_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">epsg</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read LAS as a named array.</span>
 
 <span class="sd">    Args:</span>
@@ -374,7 +374,7 @@
 
 <div class="viewcode-block" id="check_bbox_intersects_territoire_with_srid">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.check_bbox_intersects_territoire_with_srid">[docs]</a>
-<span class="k">def</span> <span class="nf">check_bbox_intersects_territoire_with_srid</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_bbox_intersects_territoire_with_srid</span><span class="p">(</span>
     <span class="n">bd_params</span><span class="p">:</span> <span class="n">BDUniConnectionParams</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">epsg_srid</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a bounding box intersects one of the territories from the BDUni database</span>
@@ -420,7 +420,7 @@
 
 <div class="viewcode-block" id="request_bd_uni_for_building_shapefile">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.utils.request_bd_uni_for_building_shapefile">[docs]</a>
-<span class="k">def</span> <span class="nf">request_bd_uni_for_building_shapefile</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">request_bd_uni_for_building_shapefile</span><span class="p">(</span>
     <span class="n">bd_params</span><span class="p">:</span> <span class="n">BDUniConnectionParams</span><span class="p">,</span>
     <span class="n">shapefile_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">bbox</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>

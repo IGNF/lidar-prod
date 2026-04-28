@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.tasks.building_completion &mdash; lidar_prod V1.10.4 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+  <title>lidar_prod.tasks.building_completion &mdash; lidar_prod V1.10.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/sphinx_paramlinks.css" />
 
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=2f4b31cb"></script>
+        <script src="../../../_static/documentation_options.js?v=8b33b5d2"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
@@ -144,20 +144,20 @@
            <div itemprop="articleBody">
              
   <h1>Source code for lidar_prod.tasks.building_completion</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">pdal</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pdal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">lidar_prod.tasks.utils</span> <span class="kn">import</span> <span class="n">get_pipeline</span><span class="p">,</span> <span class="n">split_idx_by_dim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lidar_prod.tasks.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_pipeline</span><span class="p">,</span> <span class="n">split_idx_by_dim</span>
 
 <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="BuildingCompletor">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor">[docs]</a>
-<span class="k">class</span> <span class="nc">BuildingCompletor</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BuildingCompletor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Logic of building completion.</span>
 
 <span class="sd">    The BuildingValidator only considered points that were 1) candidate, and 2) formed clusters</span>
@@ -176,7 +176,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">min_building_proba</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
         <span class="n">cluster</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -189,7 +189,7 @@
 
 <div class="viewcode-block" id="BuildingCompletor.run">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.run">[docs]</a>
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">],</span> <span class="n">las_metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Application.</span>
@@ -220,7 +220,7 @@
 
 <div class="viewcode-block" id="BuildingCompletor.prepare_for_building_completion">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.prepare_for_building_completion">[docs]</a>
-    <span class="k">def</span> <span class="nf">prepare_for_building_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_for_building_completion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">:</span> <span class="n">pdal</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare for building completion.</span>
 
 <span class="sd">        Identify candidates that have high enough probability. Then, cluster them together with</span>
@@ -269,7 +269,7 @@
 
 <div class="viewcode-block" id="BuildingCompletor.update_classification">
 <a class="viewcode-back" href="../../../apidoc/lidar_prod.tasks.html#lidar_prod.tasks.building_completion.BuildingCompletor.update_classification">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_classification</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_classification</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update Classification dimension by completing buildings with high probability points.&quot;&quot;&quot;</span>
 
         <span class="n">points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="o">.</span><span class="n">arrays</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
