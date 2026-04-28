@@ -46,7 +46,7 @@ jobs:
           echo "evaluation metrics (on test dataset): ${{env.IO_DIR}}/preds-testset/evaluation.yaml"
 
       - name: Checkout branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # get version number, to retrieve the docker image corresponding to the current version
       - name: Get version number
