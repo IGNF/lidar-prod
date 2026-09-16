@@ -38,9 +38,12 @@ copyright = data["metadata"]["copyright"]
 
 # -- YAML main to print the config into  ---------------------------------------------------
 # We need to concatenate configs into a single file using hydra
-with initialize(config_path=os.path.join(rel_root_path, "configs/"), job_name="config"):
+with initialize(
+    config_path=os.path.join(rel_root_path, "configs/"),
+    job_name="config",
+    version_base=None,
+):
     cfg = compose(config_name="config")
-    print(OmegaConf.to_yaml(cfg))
     build_dir = "../build"
     os.makedirs(build_dir, exist_ok=True)
     OmegaConf.save(cfg, os.path.join(build_dir, "default_config.yml"), resolve=False)
@@ -63,11 +66,7 @@ extensions = [
     "sphinx.ext.autodoc",  # auto-generates doc fgrom docstrings
     "sphinx.ext.intersphinx",  # link to other docs
     "sphinx.ext.viewcode",  # creates links to view code sources in a new web page
-    "sphinx.ext.githubpages",  # creates .nojekyll file to publish the doc on GitHub Pages.
     "myst_parser",  # supports markdown syntax for doc pages, and link to markdown pages
-    "sphinx_paramlinks",  # allow to reference params, which is done in pytorch_lightning
-    "sphinxnotes.mock",  # ignore third-parties directive suche as "testcode" -
-    # see "mock_directive" args below
     "sphinxcontrib.mermaid",  # enable mermaid schema
 ]
 
@@ -106,14 +105,7 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
-html_theme = "sphinx_rtd_theme"
-
-html_theme_options = {
-    "collapse_navigation": False,
-    "display_version": True,
-    "navigation_depth": 2,
-}
-
+html_theme = "alabaster"
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),
