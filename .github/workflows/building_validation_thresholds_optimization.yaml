@@ -1,4 +1,4 @@
-# Workflow name
+# This workflow is disabled (deprecated since there is no self-hosted runner)
 name: "Building validation thresholds optimization"
 
 on:
@@ -23,7 +23,10 @@ on:
 
 jobs:
   optimize-building-validation-thresholds:
-    runs-on: self-hosted
+    if: false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       WORKDIR: /var/data/LIDAR-PROD-OPTIMIZATION/
       IO_DIR: /var/data/LIDAR-PROD-OPTIMIZATION/${{ github.event.inputs.sampling_name }}/${{ github.event.inputs.model_id }}/
