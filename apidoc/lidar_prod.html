@@ -1,195 +1,84 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" data-content_root="../">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>lidar_prod.run &mdash; lidar_prod V1.10.5 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../_static/sphinx_paramlinks.css" />
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=8b33b5d2"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/js/theme.js"></script>
+    <title>lidar_prod.run &#8212; lidar_prod V1.10.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=8b33b5d2"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="lidar_prod.tasks" href="lidar_prod.tasks.html" />
-    <link rel="prev" title="Developer’s guide" href="../guides/development.html" /> 
-</head>
+    <link rel="prev" title="Developer’s guide" href="../guides/development.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+  
+  
 
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
           
-          
-          <a href="../index.html" class="icon icon-home">
-            lidar_prod
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Background</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../background/overview.html">Overview of the process</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../background/overview.html#schema-of-the-overall-process">schema of the overall process</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../background/production_process.html">Production process used to transform point clouds classification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#a-1-vegetation-detection">A.1) Vegetation detection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#a-2-unclassified-detection">A.2) Unclassified detection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-building-module">B) Building Module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-1-building-validation">B.1) Building Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-2-building-completion">B.2) Building Completion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../background/production_process.html#b-3-building-identification">B.3) Building Identification</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../background/thresholds_optimization_process.html">Strategy to find optimal decision thresholds for Building validation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../background/thresholds_optimization_process.html#motivations">Motivations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../background/thresholds_optimization_process.html#strategy">Strategy</a></li>
-</ul>
-</li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/install.html#set-up-a-virtual-environment">Set up a virtual environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/install.html#install-the-app-as-a-python-module">Install the app as a python module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/install.html#provide-credentials">Provide credentials</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/use.html">Using the app</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-within-a-docker-container">Run within a docker container</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-as-a-python-module">Run as a python module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-from-source-directly">Run from source directly</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/use.html#run-different-tasks">Run Different tasks</a></li>
-</ul>
-</li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../guides/thresholds_optimization.html">How to optimize building validation decision thresholds?</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guides/thresholds_optimization.html#running-thresholds-optimization">Running thresholds optimization</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/development.html">Developer’s guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#code-versionning">Code versionning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#tests">Tests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#continuous-integration-ci">Continuous Integration (CI)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../guides/development.html#continuous-delivery-cd">Continuous Delivery (CD)</a></li>
-</ul>
-</li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">lidar_prod.run</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#lidar_prod.run.POSSIBLE_TASK"><code class="docutils literal notranslate"><span class="pre">POSSIBLE_TASK</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#lidar_prod.run.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="lidar_prod.tasks.html">lidar_prod.tasks</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation">building_validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_validation_optimization">building_validation_optimization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_completion">building_completion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.building_identification">building_identification</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.cleaning">cleaning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lidar_prod.tasks.html#module-lidar_prod.tasks.utils">utils</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="lidar_prod.commons.html">lidar_prod.commons</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="lidar_prod.commons.html#module-lidar_prod.commons.commons">lidar_prod.commons.commons module</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../configs.html">Default configuration</a></li>
-</ul>
 
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">lidar_prod</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">lidar_prod.run</li>
-      <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/apidoc/lidar_prod.rst.txt" rel="nofollow"> View page source</a>
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+          <div class="body" role="main">
+            
   <section id="module-lidar_prod.run">
-<span id="lidar-prod-run"></span><h1>lidar_prod.run<a class="headerlink" href="#module-lidar_prod.run" title="Link to this heading"></a></h1>
+<span id="lidar-prod-run"></span><h1>lidar_prod.run<a class="headerlink" href="#module-lidar_prod.run" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lidar_prod.run.</span></span><span class="sig-name descname"><span class="pre">POSSIBLE_TASK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names=&lt;not</span> <span class="pre">given&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/run.html#POSSIBLE_TASK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">lidar_prod.run.</span></span><span class="sig-name descname"><span class="pre">POSSIBLE_TASK</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/run.html#POSSIBLE_TASK"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.APPLY_BUILDING">
-<span class="sig-name descname"><span class="pre">APPLY_BUILDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'apply_on_building'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.APPLY_BUILDING" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">APPLY_BUILDING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'apply_on_building'</span></span><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.APPLY_BUILDING" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.CLEANING">
-<span class="sig-name descname"><span class="pre">CLEANING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cleaning'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.CLEANING" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">CLEANING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cleaning'</span></span><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.CLEANING" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.GET_SHAPEFILE">
-<span class="sig-name descname"><span class="pre">GET_SHAPEFILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'get_shapefile'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.GET_SHAPEFILE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">GET_SHAPEFILE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'get_shapefile'</span></span><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.GET_SHAPEFILE" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.ID_VEGETATION_UNCLASSIFIED">
-<span class="sig-name descname"><span class="pre">ID_VEGETATION_UNCLASSIFIED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'identify_vegetation_unclassified'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.ID_VEGETATION_UNCLASSIFIED" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ID_VEGETATION_UNCLASSIFIED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'identify_vegetation_unclassified'</span></span><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.ID_VEGETATION_UNCLASSIFIED" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.OPT_BUIlDING">
-<span class="sig-name descname"><span class="pre">OPT_BUIlDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_building'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_BUIlDING" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">OPT_BUIlDING</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_building'</span></span><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_BUIlDING" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.OPT_UNCLASSIFIED">
-<span class="sig-name descname"><span class="pre">OPT_UNCLASSIFIED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_unc_id'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_UNCLASSIFIED" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">OPT_UNCLASSIFIED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_unc_id'</span></span><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_UNCLASSIFIED" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="lidar_prod.run.POSSIBLE_TASK.OPT_VEGETATION">
-<span class="sig-name descname"><span class="pre">OPT_VEGETATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_veg_id'</span></em><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_VEGETATION" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">OPT_VEGETATION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'optimize_veg_id'</span></span><a class="headerlink" href="#lidar_prod.run.POSSIBLE_TASK.OPT_VEGETATION" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="lidar_prod.run.main">
-<span class="sig-prename descclassname"><span class="pre">lidar_prod.run.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/run.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.run.main" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">lidar_prod.run.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lidar_prod/run.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lidar_prod.run.main" title="Link to this definition">¶</a></dt>
 <dd><p>Main entry point to either apply or optimize thresholds.</p>
 <p>Check the configurations files for usage.</p>
 </dd></dl>
@@ -197,34 +86,90 @@
 </section>
 
 
-           </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../guides/development.html" class="btn btn-neutral float-left" title="Developer’s guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="lidar_prod.tasks.html" class="btn btn-neutral float-right" title="lidar_prod.tasks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2022, Institut National de l&#39;Information Géographique et Forestière.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
+          
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">lidar_prod</a></h1>
 
-</body>
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Background</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../background/overview.html">Overview of the process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background/production_process.html">Production process used to transform point clouds classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../background/thresholds_optimization_process.html">Strategy to find optimal decision thresholds for Building validation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/use.html">Using the app</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/thresholds_optimization.html">How to optimize building validation decision thresholds?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/development.html">Developer’s guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Package Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">lidar_prod.run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lidar_prod.tasks.html">lidar_prod.tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lidar_prod.commons.html">lidar_prod.commons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configs.html">Default configuration</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../guides/development.html" title="previous chapter">Developer’s guide</a></li>
+      <li>Next: <a href="lidar_prod.tasks.html" title="next chapter">lidar_prod.tasks</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2022, Institut National de l'Information Géographique et Forestière.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/apidoc/lidar_prod.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
 </html>
