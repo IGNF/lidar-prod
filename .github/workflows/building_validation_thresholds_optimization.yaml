@@ -1,4 +1,4 @@
-# Workflow name
+# This workflow is disabled (deprecated since there is no self-hosted runner)
 name: "Building validation thresholds optimization"
 
 on:
@@ -23,6 +23,7 @@ on:
 
 jobs:
   optimize-building-validation-thresholds:
+    if: false
     runs-on: self-hosted
     env:
       WORKDIR: /var/data/LIDAR-PROD-OPTIMIZATION/
