@@ -1,4 +1,7 @@
 # main
+- refactor ci:
+  - do not run github actions on self-hosted
+  - isolate tests that require a connection to BDUNI and skip them in CI
 - fix cicd (update registered actions to support node.js 24)
 
 ### 1.10.5

@@ -12,3 +12,7 @@ build/
 dist/
 *.egg-info
 *.egg
+
+
+# large file for tests
+tests/files/large/V0.5_792000_6272000.laz

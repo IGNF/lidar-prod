@@ -1,0 +1,2 @@
+tests/files/large/* filter=lfs diff=lfs merge=lfs -text
+tests/files/example_assets_input/* filter=lfs diff=lfs merge=lfs -text
