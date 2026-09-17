@@ -53,7 +53,7 @@ SUBSET_EXPECTED_METRICS = {
 }
 # Large LAS, for which we evaluate performance, to control that there was no regression in terms of
 # automation/precision/recall of building validation.
-LAS_LARGE_FILE = "tests/files/large/V0.5_792000_6272000.las"
+LAS_LARGE_FILE = "tests/files/large/V0.5_792000_6272000.laz"
 LARGE_EXPECTED_METRICS = {
     "exact": {
         "groups_count": 1493,

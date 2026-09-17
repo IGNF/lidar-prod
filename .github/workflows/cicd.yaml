@@ -11,16 +11,26 @@ on:
     branches:
       - main
       - staging-*
+
+    tags:
+      - "**"
+
 env:
-  nexus_server: docker-registry.ign.fr
+  IMAGE_NAME: ${{ github.repository }}
+  REGISTRY: ghcr.io
+  TEST_TAG: ${{ github.repository }}:test
 
 jobs:
-  build_test_deploy:
-    runs-on: self-hosted
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+        with:
+          lfs: true
 
       - name: replace BD_UNI credentials
         run: |
@@ -28,92 +38,118 @@ jobs:
           sed -i '/user:/c\user: invite' configs/bd_uni_connection_params/credentials.yaml
           sed -i '/pwd:/c\pwd: ${{ secrets.PASSWORD_BD_UNI }}' configs/bd_uni_connection_params/credentials.yaml
 
-      - name: build docker image
-        run: docker build --build-arg http_proxy=http://proxy.ign.fr:3128/ --build-arg https_proxy=http://proxy.ign.fr:3128/ -t lidar_prod .
+      - name: Setup micromamba environment
+        uses: mamba-org/setup-micromamba@v3.2.1
+        with:
+          environment-file: environment.yml
+          environment-name: lidar_prod
+          cache-environment: true
+          cache-downloads: true
+          generate-run-shell: true
 
       - name: Check code neatness (linter)
-        run: docker run lidar_prod flake8
+        shell: micromamba-shell {0}
+        run: python -m flake8
 
       - name: Run tests & get coverage - fast ones go first.
-        run: >
-          docker run --network host
-          lidar_prod
-          python -m
-          pytest -rA -vv -m "not slow" --ignore=actions-runner
+        shell: micromamba-shell {0}
+        run: python -m pytest -rA -vv -m "not slow"
 
-      - name: Run slow tests last (evaluation on large file)
-        run: >
-          docker run --network host
-          -v /var/data/cicd/CICD_github_assets/M11.1/inputs/evaluation/:/lidar/tests/files/large/
-          lidar_prod
-          python -m
-          pytest -rA -v -m "slow" --ignore=actions-runner --no-cov
+      - name: Run slow tests last (evaluation on a large file)
+        shell: micromamba-shell {0}
+        run: python -m  pytest -rA -v -m "slow" --no-cov
 
-      - name: Test building module from CLI on a LAS subset.
+  test-deploy-docker:
+    needs: test
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v7
+        with:
+          lfs: false # Test on large file skipped in docker image
+
+      - name: Build the Docker image
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          file: ./Dockerfile
+          load: true
+          tags: ${{ env.TEST_TAG }}
+
+      - name: Run pytest unit tests in docker image (except slow test on a large file)
+        run: >
+          docker run
+          --ipc=host
+          ${{ env.TEST_TAG }}
+          python -m
+          pytest -rA -v -m "not slow"
+
+      - name: Example using building module from CLI on a LAS subset.
         run: >
           docker run --network host
-          -v /var/data/cicd/CICD_github_assets/M11.1/inputs/:/inputs/
-          -v /var/data/cicd/CICD_github_assets/M11.1/outputs/:/outputs/
+          -v ${{ github.workspace }}/test_outputs:/app/tmp
           lidar_prod
           python
           lidar_prod/run.py
           +task=apply_on_building
-          paths.src_las=/inputs/Semis_2021_0937_6537_LA93_IGN69.150mx100m.for_full_building_module.las
-          paths.output_dir=/outputs/
+          paths.src_las=/app/tests/files/example_assets_input/Semis_2021_0937_6537_LA93_IGN69.150mx100m.for_full_building_module.laz
+          paths.output_dir=/app/tmp/apply_on_building
 
       - name: Test vegetation/unclassified detection from CLI on a LAS subset.
         run: >
           docker run
-          -v /var/data/cicd/CICD_github_assets/M11.1/inputs/:/inputs/
-          -v /var/data/cicd/CICD_github_assets/M11.1/outputs/:/outputs/
+          -v ${{ github.workspace }}/test_outputs:/app/tmp
           lidar_prod
           python
           lidar_prod/run.py
           +task=identify_vegetation_unclassified
           data_format=vegetation_unclassified.yaml
-          paths.src_las=/inputs/888000_6614000.subset.las
-          paths.output_dir=/outputs/
+          paths.src_las=/app/tests/files/example_assets_input/888000_6614000.subset.laz
+          paths.output_dir=/app/tmp/identify_vegetation_unclassified
 
-      - name: Tag the docker image with branch name
-        if: github.event_name == 'push'
-        run: |
-          docker tag lidar_prod:latest lidar_prod:${{github.ref_name}}
-          docker run lidar_prod:${{github.ref_name}}  bash  # Dry run image so that is it not prunned
-          # docker save lidar_prod:${{github.ref_name}}  -o /var/data/cicd/CICD_github_assets/CICD_docker_images/lidar_prod_${{github.ref_name}}.tar # This needs writing rights to the mounted path
+      # https://github.com/docker/login-action
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      # get version number and date, to tag the image pushed to nexus
-      - name: Get version number
-        id: tag
-        run: |
-          echo "VERSION=$(docker run lidar_prod python -m lidar_prod.version)" >> $GITHUB_ENV
-          echo "DATE=$(date '+%Y.%m.%d')" >> $GITHUB_ENV
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      # show possible tags, for debugging purpose
-      - name: Print tag
-        run: |
-          echo "${{env.VERSION}}"
-          echo "${{env.DATE}}"
+      # Build an Docker image with Buildx
+      # https://github.com/docker/build-push-action
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
-      - name: push main docker on nexus (tagged with a date)
-        # we push on nexus an image from the main branch when it has been updated (push or accepted pull request)
-        # The version is tagged once with version only to make sure to be able to retrieve the last version without
-        # knowing when it has been published, once with version + date to ensure a unique tag when needed
-        if: ((github.ref_name == 'main') && (github.event_name == 'push'))
-        run: |
-          docker tag lidar_prod $nexus_server/lidar_hd/lidar_prod:${{ env.VERSION }}
-          docker tag lidar_prod $nexus_server/lidar_hd/lidar_prod:${{ env.VERSION }}-${{ env.DATE }}
-          docker login $nexus_server --username svc_lidarhd --password ${{ secrets.PASSWORD_SVC_LIDARHD }}
-          docker push $nexus_server/lidar_hd/lidar_prod:${{ env.VERSION }}
-          docker push $nexus_server/lidar_hd/lidar_prod:${{ env.VERSION }}-${{ env.DATE }}
+      # Create release only if pushing a tag
+      - name: Archive test outputs
+        if: startsWith(github.ref, 'refs/tags/')
+        run: tar -czf test_outputs.tar.gz test_outputs/
 
-      - name: push branch docker on nexus (tagged with the branch name)
-        # we push on nexus an image from a branch when it's pushed
-        if: ((github.event_name == 'push') && (github.ref_name != 'main'))
-        run: |
-          docker tag lidar_prod $nexus_server/lidar_hd/lidar_prod:${{ env.VERSION }}-${{github.ref_name}}
-          docker login $nexus_server --username svc_lidarhd --password ${{ secrets.PASSWORD_SVC_LIDARHD }}
-          docker push $nexus_server/lidar_hd/lidar_prod:${{ env.VERSION }}-${{github.ref_name}}
-
-      - name: Clean dangling docker images
-        if: always() # always do it, even if something failed
-        run: docker system prune --force # remove dangling docker images, without asking user for confirmation
+      - name: Create Release with functional test outputs as assets
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v3
+        with:
+          files: test_outputs.tar.gz
+          generate_release_notes: true
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
