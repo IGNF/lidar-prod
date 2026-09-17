@@ -65,6 +65,7 @@ filterwarnings = [
 
 markers = [
   "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+  "bduni: marks tests that require a bduni connection (deselect with '-m \"not bduni\"')",
 ]
 
 [tool.coverage.run]
