@@ -8,7 +8,7 @@
     <title>Strategy to find optimal decision thresholds for Building validation &#8212; lidar_prod V1.10.5 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=f6a572b4" />
     <script src="../_static/documentation_options.js?v=8b33b5d2"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
@@ -24,43 +24,21 @@
   
 
   </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-            
-  <section id="strategy-to-find-optimal-decision-thresholds-for-building-validation">
-<h1>Strategy to find optimal decision thresholds for Building validation<a class="headerlink" href="#strategy-to-find-optimal-decision-thresholds-for-building-validation" title="Link to this heading">¶</a></h1>
-<section id="motivations">
-<h2>Motivations<a class="headerlink" href="#motivations" title="Link to this heading">¶</a></h2>
-<p>As described in section <a class="reference internal" href="production_process.html"><span class="std std-doc">Building Validation</span></a> of the production process, the decision to validate or not a group of candidate buildings is based on several decision thresholds. Those thresholds represents different levels of confidence, for different sources of data.</p>
-<p>They may depend on the AI model which produces the probabilities as well as on the rule-based classification from which the clusters of candidates are derived. They are highly coupled. For instance, if a lower probability is required at the point level to be confirmed as a building (threshold <code class="docutils literal notranslate"><span class="pre">C1</span></code>), we might require a higher percentage of confirmed points in a cluster of candidates (thresholds <code class="docutils literal notranslate"><span class="pre">C2</span></code>) to validate it. There must therefore be optimized jointly.</p>
-<p>These thresholds define how much we automate decisions, but also the quantity of errors we may introduce: there is a balance to be found between <code class="docutils literal notranslate"><span class="pre">recall</span></code> (proportion of buildings group that were confirmed), <code class="docutils literal notranslate"><span class="pre">precision</span></code> (proportion of buildings among confirmed groups), and <code class="docutils literal notranslate"><span class="pre">automation</span></code> (proportion of groups for which a decision was made i.e. that are not flagged as “unsure”).</p>
-</section>
-<section id="strategy">
-<h2>Strategy<a class="headerlink" href="#strategy" title="Link to this heading">¶</a></h2>
-<p>We approach the choice of decisions thresholds as a constrained multi-objectives hyperparameters optimization.
-We use the <a class="reference external" href="https://doi.org/10.1109/4235.996017">NSGA-II</a> algorithm from the optuna optimization library.</p>
-<p>The constraints are defined empirically: recall&gt;=98% and precision&gt;=98%. The genetic algorithms search two maximize the three objectives, but focuses the search to solutions that meet these criteria.</p>
-<p>After a chosen number of generations, the genetic algorithms outputs the <a class="reference external" href="https://en.wikipedia.org/wiki/Pareto_front">Pareto front</a> i.e. the set of Pareto efficient solutions for which no objective criterion could be increased without another one being reduced. Among Pareto-efficient solutions compliant with the constraint, the final solution is the set of thresholds that maximizes the production of precision, recall, and automation.</p>
-</section>
-</section>
-
-
-          </div>
-          
-        </div>
-      </div>
+  <div class="document">
+    
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="../index.html">lidar_prod</a></h1>
 
 
 
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=IGNF&repo=lidar-prod&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
 
 
 
@@ -119,8 +97,36 @@ We use the <a class="reference external" href="https://doi.org/10.1109/4235.9960
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="strategy-to-find-optimal-decision-thresholds-for-building-validation">
+<h1>Strategy to find optimal decision thresholds for Building validation<a class="headerlink" href="#strategy-to-find-optimal-decision-thresholds-for-building-validation" title="Link to this heading">¶</a></h1>
+<section id="motivations">
+<h2>Motivations<a class="headerlink" href="#motivations" title="Link to this heading">¶</a></h2>
+<p>As described in section <a class="reference internal" href="production_process.html"><span class="std std-doc">Building Validation</span></a> of the production process, the decision to validate or not a group of candidate buildings is based on several decision thresholds. Those thresholds represents different levels of confidence, for different sources of data.</p>
+<p>They may depend on the AI model which produces the probabilities as well as on the rule-based classification from which the clusters of candidates are derived. They are highly coupled. For instance, if a lower probability is required at the point level to be confirmed as a building (threshold <code class="docutils literal notranslate"><span class="pre">C1</span></code>), we might require a higher percentage of confirmed points in a cluster of candidates (thresholds <code class="docutils literal notranslate"><span class="pre">C2</span></code>) to validate it. There must therefore be optimized jointly.</p>
+<p>These thresholds define how much we automate decisions, but also the quantity of errors we may introduce: there is a balance to be found between <code class="docutils literal notranslate"><span class="pre">recall</span></code> (proportion of buildings group that were confirmed), <code class="docutils literal notranslate"><span class="pre">precision</span></code> (proportion of buildings among confirmed groups), and <code class="docutils literal notranslate"><span class="pre">automation</span></code> (proportion of groups for which a decision was made i.e. that are not flagged as “unsure”).</p>
+</section>
+<section id="strategy">
+<h2>Strategy<a class="headerlink" href="#strategy" title="Link to this heading">¶</a></h2>
+<p>We approach the choice of decisions thresholds as a constrained multi-objectives hyperparameters optimization.
+We use the <a class="reference external" href="https://doi.org/10.1109/4235.996017">NSGA-II</a> algorithm from the optuna optimization library.</p>
+<p>The constraints are defined empirically: recall&gt;=98% and precision&gt;=98%. The genetic algorithms search two maximize the three objectives, but focuses the search to solutions that meet these criteria.</p>
+<p>After a chosen number of generations, the genetic algorithms outputs the <a class="reference external" href="https://en.wikipedia.org/wiki/Pareto_front">Pareto front</a> i.e. the set of Pareto efficient solutions for which no objective criterion could be increased without another one being reduced. Among Pareto-efficient solutions compliant with the constraint, the final solution is the set of thresholds that maximizes the production of precision, recall, and automation.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
     <div class="footer">
       &#169;2022, Institut National de l'Information Géographique et Forestière.
       
@@ -133,6 +139,10 @@ We use the <a class="reference external" href="https://doi.org/10.1109/4235.9960
           rel="nofollow">Page source</a>
     </div>
 
+    
+    <a href="https://github.com/IGNF/lidar-prod" class="github">
+        <img src="../_static/github-banner.svg" alt="Fork me on GitHub" class="github"/>
+    </a>
     
 
     

@@ -8,7 +8,7 @@
     <title>&lt;no title&gt; &#8212; lidar_prod V1.10.5 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=f6a572b4" />
     <script src="_static/documentation_options.js?v=8b33b5d2"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
@@ -22,34 +22,21 @@
   
 
   </head><body>
-  
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
-
-          <div class="body" role="main">
-            
-  <p>Lidar-Prod is a production library which aims at augmenting rule- based semantic segmentation algorithms with deep learning neural network predictions (probabilities) and a public building vector database (BDUni). Its main entry-points are:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">application.py</span></code>: The application takes a point cloud and update its Classification dimension based on its deep learning predictions and a public geographic database.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">optimization.py</span></code>: The right balance between automation of decision and error is found via a multi-objective optimization of of the decision thresholds, by means of a simple genetic algorithm.</p></li>
-</ul>
-<p>Our strategy is to fuse together different sources of informations (rule- based classification, deep learning predictions, databases), so that we can ensure a high-quality classification while minimizing the need for human correction. Deep learning probabilities might also be used to highlight area of uncertainty, or to spot elements that were missed by the other approaches.</p>
-<p>Right now, the class <code class="docutils literal notranslate"><span class="pre">building</span></code> is the only one that is addressed. The extension to other classes is dependent on the training of multiclass AI model, which requires high quality training datasets that are currently being produced.</p>
-
-
-          </div>
-          
-        </div>
-      </div>
+  <div class="document">
+    
       <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="index.html">lidar_prod</a></h1>
 
 
 
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=IGNF&repo=lidar-prod&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
 
 
 
@@ -106,8 +93,27 @@
 
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <p>Lidar-Prod is a production library which aims at augmenting rule- based semantic segmentation algorithms with deep learning neural network predictions (probabilities) and a public building vector database (BDUni). Its main entry-points are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">application.py</span></code>: The application takes a point cloud and update its Classification dimension based on its deep learning predictions and a public geographic database.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimization.py</span></code>: The right balance between automation of decision and error is found via a multi-objective optimization of of the decision thresholds, by means of a simple genetic algorithm.</p></li>
+</ul>
+<p>Our strategy is to fuse together different sources of informations (rule- based classification, deep learning predictions, databases), so that we can ensure a high-quality classification while minimizing the need for human correction. Deep learning probabilities might also be used to highlight area of uncertainty, or to spot elements that were missed by the other approaches.</p>
+<p>Right now, the class <code class="docutils literal notranslate"><span class="pre">building</span></code> is the only one that is addressed. The extension to other classes is dependent on the training of multiclass AI model, which requires high quality training datasets that are currently being produced.</p>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
     <div class="footer">
       &#169;2022, Institut National de l'Information Géographique et Forestière.
       
@@ -120,6 +126,10 @@
           rel="nofollow">Page source</a>
     </div>
 
+    
+    <a href="https://github.com/IGNF/lidar-prod" class="github">
+        <img src="_static/github-banner.svg" alt="Fork me on GitHub" class="github"/>
+    </a>
     
 
     
