@@ -12,6 +12,7 @@
 
 import os
 import sys
+from urllib.parse import urlparse
 
 import tomli
 from hydra import compose, initialize
@@ -34,7 +35,12 @@ with open(os.path.join(abs_root_path, "pyproject.toml"), "rb") as f:
 release = __version__
 project = data["project"]["name"]
 author = ", ".join([a["name"] for a in data["project"]["authors"]])
-copyright = data["metadata"]["copyright"]
+copyright = data["tool"]["lidar_prod"]["copyright"]
+repository_url = data["project"]["urls"]["Repository"]
+repository_parsed = urlparse(repository_url)
+repository_path = repository_parsed.path.strip("/").split("/")
+github_user = repository_path[0] if len(repository_path) >= 2 else ""
+github_repo = repository_path[1] if len(repository_path) >= 2 else ""
 
 # -- YAML main to print the config into  ---------------------------------------------------
 # We need to concatenate configs into a single file using hydra
@@ -106,6 +112,20 @@ exclude_patterns = []
 # a list of builtin themes.
 
 html_theme = "alabaster"
+html_theme_options = {
+    "github_user": github_user,
+    "github_repo": github_repo,
+    "github_button": True,
+    "github_banner": True,
+    "fixed_sidebar": True,
+}
+html_context = {
+    "display_github": True,
+    "github_user": github_user,
+    "github_repo": github_repo,
+    "github_version": release,
+    "source_suffix": ".rst",
+}
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),
