@@ -53,7 +53,7 @@ jobs:
 
       - name: Run tests & get coverage - fast ones go first.
         shell: micromamba-shell {0}
-        run: python -m pytest -rA -vv -m "not slow"
+        run: python -m pytest -rA -vv -m "not slow and not bduni"
 
       - name: Run slow tests last (evaluation on a large file)
         shell: micromamba-shell {0}
@@ -86,7 +86,7 @@ jobs:
           --ipc=host
           ${{ env.TEST_TAG }}
           python -m
-          pytest -rA -v -m "not slow"
+          pytest -rA -v -m "not slow and not bduni"
 
       - name: Example using building module from CLI on a LAS subset.
         run: >

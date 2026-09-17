@@ -24,6 +24,7 @@ def setup_module(module):
     TMP_DIR.mkdir(parents=True, exist_ok=True)
 
 
+@pytest.mark.bduni()
 def test_shapefile_overlay_in_building_module(hydra_cfg):
     """Check that that the prepare function does not add any presence data if the laz geometry
     does not intersect the BDUni territoire corresponding with the configured epsg"""
@@ -57,6 +58,7 @@ def test_shapefile_overlay_in_building_module(hydra_cfg):
     assert np.any(overlay == 0)  # assert not all points are marked
 
 
+@pytest.mark.bduni()
 def test_shapefile_overlay_in_building_module_fail(hydra_cfg):
     """Check that that the prepare function fails if the laz geometry does not intersect the
     BDUni territoire corresponding with the configured epsg"""
@@ -94,6 +96,7 @@ def test_shapefile_overlay_in_building_module_fail(hydra_cfg):
 # Normal execution on subset of LAZ lasts ~ 3sec.
 # If a regression occurs, the pdal execution will hang and a timeout would make it more apparent.
 # However, pytest-timeout does not stop pdal for some reasons. For now this should be sufficient.
+@pytest.mark.bduni()
 def test_shapefile_overlay_in_building_module_invalid_overlay(hydra_cfg):
     """We test the application against a LAS subset for which the BDUni shapefile shows overlapping
     vectors.
