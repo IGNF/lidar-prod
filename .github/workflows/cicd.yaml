@@ -70,12 +70,19 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v7
         with:
-          lfs: false # Test on large file skipped in docker image
+          lfs: true
+
+      - name: replace BD_UNI credentials
+        run: |
+          cp configs/bd_uni_connection_params/credentials_template.yaml configs/bd_uni_connection_params/credentials.yaml
+          sed -i '/user:/c\user: invite' configs/bd_uni_connection_params/credentials.yaml
+          sed -i '/pwd:/c\pwd: ${{ secrets.PASSWORD_BD_UNI }}' configs/bd_uni_connection_params/credentials.yaml
 
       - name: Build the Docker image
         id: build
         uses: docker/build-push-action@v7
         with:
+          context: . # Make sure the current folder (with credentials file) is used
           file: ./Dockerfile
           load: true
           tags: ${{ env.TEST_TAG }}
@@ -91,24 +98,27 @@ jobs:
       - name: Example using building module from CLI on a LAS subset.
         run: >
           docker run --network host
-          -v ${{ github.workspace }}/test_outputs:/app/tmp
-          lidar_prod
+          -v ${{ github.workspace }}/test_outputs/apply_on_building:/app/tmp/apply_on_building
+          -v ${{ github.workspace }}/tests/files:/input
+          ${{ env.TEST_TAG }}
           python
           lidar_prod/run.py
           +task=apply_on_building
-          paths.src_las=/app/tests/files/example_assets_input/Semis_2021_0937_6537_LA93_IGN69.150mx100m.for_full_building_module.laz
+          paths.src_las=/input/example_assets_input/Semis_2021_0937_6537_LA93_IGN69.150mx100m.for_full_building_module.laz
+          building_validation.application.shp_path=/input/example_assets_input/shp/Semis_2021_0937_6537_LA93_IGN69.150mx100m.for_full_building_module.shp
           paths.output_dir=/app/tmp/apply_on_building
 
       - name: Test vegetation/unclassified detection from CLI on a LAS subset.
         run: >
           docker run
-          -v ${{ github.workspace }}/test_outputs:/app/tmp
-          lidar_prod
+          -v ${{ github.workspace }}/test_outputs/identify_vegetation_unclassified:/app/tmp/identify_vegetation_unclassified
+          -v ${{ github.workspace }}/tests/files:/input
+          ${{ env.TEST_TAG }}
           python
           lidar_prod/run.py
           +task=identify_vegetation_unclassified
           data_format=vegetation_unclassified.yaml
-          paths.src_las=/app/tests/files/example_assets_input/888000_6614000.subset.laz
+          paths.src_las=/input/example_assets_input/888000_6614000.subset.laz
           paths.output_dir=/app/tmp/identify_vegetation_unclassified
 
       # https://github.com/docker/login-action
@@ -150,6 +160,6 @@ jobs:
         with:
           files: test_outputs.tar.gz
           generate_release_notes: true
-          draft: true
+          draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -19,7 +19,7 @@ RUN micromamba create --file /tmp/environment.yml
 
 # Sets the environment name (since it is not named "base")
 # This ensures that env is activated when using "docker run ..."
-ENV ENV_NAME lidar_prod
+ENV ENV_NAME=lidar_prod
 # Make RUN commands here use the environment
 ARG MAMBA_DOCKERFILE_ACTIVATE=1
 # List packages and their version
