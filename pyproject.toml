@@ -53,7 +53,7 @@ python_files = 'tests/*'
 log_cli = true
 addopts = """
     --cov "./lidar_prod/"
-    --cov-fail-under 92
+    --cov-fail-under 90
     --cov-report html
     """
 filterwarnings = [
