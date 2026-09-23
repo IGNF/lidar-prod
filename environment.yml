@@ -30,7 +30,7 @@ dependencies:
   # --------- documentation --------- #
   - sphinx
   - recommonmark
-  - conda_forge:myst-parser
+  - conda-forge:myst-parser
   - conda-forge::sphinxcontrib-mermaid
   # --------- hydra --------- #
   - hydra-core==1.3.*

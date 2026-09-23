@@ -24,7 +24,6 @@ def test_optimize_building_on_subset(hydra_cfg):
     out_dir = str(TMP_DIR / "subset")
     # Optimization output (thresholds and prepared/updated LASfiles) saved to out_dir
     hydra_cfg.building_validation.optimization.paths.results_output_dir = out_dir
-    hydra_cfg.building_validation.optimization
 
     # We isolate the input file in a subdir, and prepare it for optimization
     input_las_dir = osp.join(out_dir, "inputs/")
