@@ -9,6 +9,7 @@ from lidar_prod.optimization import optimize_building
 
 TMP_DIR = Path("tmp/lidar_prod/optimization")
 LAS_SUBSET_FILE = "tests/files/870000_6618000.subset.postIA.corrected.las"
+SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
 
 
 def setup_module(module):
@@ -28,6 +29,7 @@ def test_optimize_building_on_subset(hydra_cfg):
     input_las_dir = osp.join(out_dir, "inputs/")
     hydra_cfg.building_validation.optimization.paths.input_las_dir = input_las_dir
     hydra_cfg.building_validation.application.thresholds = "NO THRESHOLDS"
+    hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
     os.makedirs(input_las_dir, exist_ok=False)
     src_las_copy_path = osp.join(input_las_dir, "copy.las")
     shutil.copy(LAS_SUBSET_FILE, src_las_copy_path)

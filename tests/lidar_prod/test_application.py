@@ -44,30 +44,24 @@ def setup_module(module):
 
 
 @pytest.mark.parametrize(
-    "las_mutation, query_db_Uni, test_name",
+    "las_mutation, test_name",
     [
-        ([], True, "identity"),  # identity
+        ([], "identity"),  # identity
         (
             [pdal.Filter.assign(value="building = 0.0")],
-            True,
             "low_probas",
         ),  # low proba everywhere
         (
             [pdal.Filter.assign(value="Classification = 1")],
-            False,
             "no_candidate",
         ),  # no candidate buildings
         (
             [pdal.Filter.assign(value="Classification = 202")],
-            False,
             "only_candidate",
         ),  # only candidate buildings
     ],
-    # if query_db_Uni = True, will query database to get a shapefile, otherwise use a prebuilt one
 )
-def test_application_data_invariance_and_data_format(
-    hydra_cfg, las_mutation, query_db_Uni, test_name
-):
+def test_application_data_invariance_and_data_format(hydra_cfg, las_mutation, test_name):
     """We test the application against a LAS subset (~2500m²).
 
     Data contains a few buildings, a few classification mistakes, and necessary fields
@@ -101,8 +95,7 @@ def test_application_data_invariance_and_data_format(
     )
     pipeline.execute()
     hydra_cfg.paths.src_las = mutated_copy
-    if not query_db_Uni:  # we don't request db_uni, we use a shapefile instead
-        hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
+    hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
     updated_las_path_list = apply(hydra_cfg, apply_building_module)
     # Check output
     check_las_invariance(mutated_copy, updated_las_path_list[0], hydra_cfg.data_format.epsg)
@@ -196,6 +189,7 @@ def test_applying(vegetation_unclassifed_hydra_cfg, path, expected):
     apply(vegetation_unclassifed_hydra_cfg, dummy_method)
 
 
+@pytest.mark.bduni()
 def test_get_shapefile(hydra_cfg):
     destination_path = tempfile.NamedTemporaryFile().name
     get_shapefile(hydra_cfg, LAS_SUBSET_FILE_BUILDING, destination_path)
@@ -208,6 +202,7 @@ def test_get_shapefile(hydra_cfg):
     assert len(gdf.index > 0)
 
 
+@pytest.mark.bduni()
 def test_get_shapefile_epsg_5490(hydra_cfg):
     # Update EPSG in configuration for this test only
     hydra_cfg_local = hydra_cfg.copy()

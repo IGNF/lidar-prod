@@ -12,6 +12,7 @@
 
 import os
 import sys
+from urllib.parse import urlparse
 
 import tomli
 from hydra import compose, initialize
@@ -34,13 +35,21 @@ with open(os.path.join(abs_root_path, "pyproject.toml"), "rb") as f:
 release = __version__
 project = data["project"]["name"]
 author = ", ".join([a["name"] for a in data["project"]["authors"]])
-copyright = data["metadata"]["copyright"]
+copyright = data["tool"]["lidar_prod"]["copyright"]
+repository_url = data["project"]["urls"]["Repository"]
+repository_parsed = urlparse(repository_url)
+repository_path = repository_parsed.path.strip("/").split("/")
+github_user = repository_path[0] if len(repository_path) >= 2 else ""
+github_repo = repository_path[1] if len(repository_path) >= 2 else ""
 
 # -- YAML main to print the config into  ---------------------------------------------------
 # We need to concatenate configs into a single file using hydra
-with initialize(config_path=os.path.join(rel_root_path, "configs/"), job_name="config"):
+with initialize(
+    config_path=os.path.join(rel_root_path, "configs/"),
+    job_name="config",
+    version_base=None,
+):
     cfg = compose(config_name="config")
-    print(OmegaConf.to_yaml(cfg))
     build_dir = "../build"
     os.makedirs(build_dir, exist_ok=True)
     OmegaConf.save(cfg, os.path.join(build_dir, "default_config.yml"), resolve=False)
@@ -63,11 +72,7 @@ extensions = [
     "sphinx.ext.autodoc",  # auto-generates doc fgrom docstrings
     "sphinx.ext.intersphinx",  # link to other docs
     "sphinx.ext.viewcode",  # creates links to view code sources in a new web page
-    "sphinx.ext.githubpages",  # creates .nojekyll file to publish the doc on GitHub Pages.
     "myst_parser",  # supports markdown syntax for doc pages, and link to markdown pages
-    "sphinx_paramlinks",  # allow to reference params, which is done in pytorch_lightning
-    "sphinxnotes.mock",  # ignore third-parties directive suche as "testcode" -
-    # see "mock_directive" args below
     "sphinxcontrib.mermaid",  # enable mermaid schema
 ]
 
@@ -106,14 +111,21 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
-html_theme = "sphinx_rtd_theme"
-
+html_theme = "alabaster"
 html_theme_options = {
-    "collapse_navigation": False,
-    "display_version": True,
-    "navigation_depth": 2,
+    "github_user": github_user,
+    "github_repo": github_repo,
+    "github_button": True,
+    "github_banner": True,
+    "fixed_sidebar": True,
 }
-
+html_context = {
+    "display_github": True,
+    "github_user": github_user,
+    "github_repo": github_repo,
+    "github_version": release,
+    "source_suffix": ".rst",
+}
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),

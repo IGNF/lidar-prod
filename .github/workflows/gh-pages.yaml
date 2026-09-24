@@ -7,9 +7,17 @@ on:
     branches:
       - main # <- only on main branch
 
+  # # UNCOMMENT TO DEBUG DOCUMENTATION
+  # pull_request:
+  #   branches:
+  #     - main
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
 
     # Use bash instead of sh for conda activation
     defaults:
@@ -19,13 +27,13 @@ jobs:
     steps:
       # Checkout the repository
       - name: "Checkout"
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # See https://github.com/conda-incubator/setup-miniconda#caching-environments
 
       # See https://github.com/marketplace/actions/setup-micromamba
       - name: install
-        uses: mamba-org/setup-micromamba@v3.0.0
+        uses: mamba-org/setup-micromamba@v3.2.1
         with:
           environment-file: environment.yml
           environment-name: lidar_prod # activate the environment
@@ -44,7 +52,7 @@ jobs:
       # 3. Déploiement sur les Github Pages
 
       - name: "Deploy Github Pages"
-        uses: JamesIves/github-pages-deploy-action@v4.8.0
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           BRANCH: gh-pages # <- Branch where generated doc files will be commited
           FOLDER: ./docs/build/html/ # <- Dir where .nojekyll is created and from which to deploy github pages.

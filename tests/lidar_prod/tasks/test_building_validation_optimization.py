@@ -40,6 +40,7 @@ def setup_module(module):
 # Small LAS, for which we optimize thresholds and reach perfect validation,
 # to quickly check optimization logic.
 LAS_SUBSET_FILE = "tests/files/870000_6618000.subset.postIA.corrected.las"
+SHAPE_FILE = "tests/files/870000_6618000.subset.postIA.shp"
 SUBSET_EXPECTED_METRICS = {
     "exact": {
         "groups_count": 15,
@@ -53,7 +54,7 @@ SUBSET_EXPECTED_METRICS = {
 }
 # Large LAS, for which we evaluate performance, to control that there was no regression in terms of
 # automation/precision/recall of building validation.
-LAS_LARGE_FILE = "tests/files/large/V0.5_792000_6272000.las"
+LAS_LARGE_FILE = "tests/files/large/V0.5_792000_6272000.laz"
 LARGE_EXPECTED_METRICS = {
     "exact": {
         "groups_count": 1493,
@@ -80,6 +81,7 @@ def test_BVOptimization_on_subset(hydra_cfg):
     # We isolate the input file in a subdir, and prepare it for optimization
     input_las_dir = osp.join(out_dir, "inputs/")
     hydra_cfg.building_validation.optimization.paths.input_las_dir = input_las_dir
+    hydra_cfg.building_validation.application.shp_path = SHAPE_FILE
     os.makedirs(input_las_dir, exist_ok=False)
     src_las_copy_path = osp.join(input_las_dir, "copy.las")
     shutil.copy(LAS_SUBSET_FILE, src_las_copy_path)
@@ -154,6 +156,9 @@ def test_BVOptimization_on_large_file(hydra_cfg):
 
     # Optimization output (thresholds and prepared/updated LASfiles) saved to td
     hydra_cfg.building_validation.optimization.paths.results_output_dir = out_dir
+    hydra_cfg.building_validation.application.shp_path = (
+        "tests/files/shp_large/bduni_V0.5_792000_6272000.shp"
+    )
 
     # We isolate the input file in a subdir, and prepare it for optimization
     input_las_dir = osp.join(out_dir, "inputs/")

@@ -97,6 +97,7 @@ def test_split_idx_by_dim_unordered():
         ),
     ],
 )
+@pytest.mark.bduni()
 def test_check_bbox_intersects_territoire_with_srid(hydra_cfg, bbox, srid, expected_result):
 
     res = check_bbox_intersects_territoire_with_srid(
@@ -107,6 +108,7 @@ def test_check_bbox_intersects_territoire_with_srid(hydra_cfg, bbox, srid, expec
     assert res == expected_result
 
 
+@pytest.mark.bduni()
 @pytest.mark.parametrize(
     "bbox,epsg,out_shp,is_empty",
     [
@@ -146,6 +148,7 @@ def test_request_bd_uni_for_building_shapefile(hydra_cfg, bbox, epsg, out_shp, i
     assert bool(len(gdf.index)) != is_empty
 
 
+@pytest.mark.bduni()
 def test_request_bd_uni_for_building_shapefile_fail(hydra_cfg):
     with pytest.raises(ValueError):
         out_path = (TMP_DIR / "st_barth_nok.shp",)

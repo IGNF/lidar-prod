@@ -12,3 +12,8 @@ build/
 dist/
 *.egg-info
 *.egg
+
+
+# large file for tests
+tests/files/large/**
+tests/files/example_assets_input/**
