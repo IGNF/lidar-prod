@@ -5,6 +5,7 @@ from typing import Callable
 
 import hydra
 from omegaconf import DictConfig
+from pdaltools.check_las import check_pdal_can_open_file_with_retry
 
 from lidar_prod.commons import commons
 from lidar_prod.tasks.basic_identification import BasicIdentifier
@@ -30,6 +31,9 @@ def apply(config: DictConfig, logic: Callable):
     for src_las_path in get_list_las_path_from_src(config.paths.src_las):
         target_las_path = os.path.join(config.paths.output_dir, os.path.basename(src_las_path))
         logic(config, src_las_path, target_las_path)
+        success = check_pdal_can_open_file_with_retry(target_las_path, delay=10)
+        if not success:
+            raise RuntimeError(f"Failed to open output file: {target_las_path}")
         applied_file_list.append(target_las_path)
     return applied_file_list
 
@@ -46,7 +50,7 @@ def get_list_las_path_from_src(src_path: str):
     src_las_path = []
     for path in os.scandir(src_path):
         if os.path.isfile(path) and os.path.splitext(path)[1] in [".las", ".laz"]:
-            src_las_path.append(os.path.join(src_path, path))
+            src_las_path.append(path.path)
     return src_las_path
 
 

@@ -38,4 +38,4 @@ dependencies:
   - optuna #==4.8.*
   - pip:
       - build
-      - ign-pdal-tools>=1.5.2
+      - ign-pdal-tools>=1.18.1

@@ -178,15 +178,17 @@ def test_applying(vegetation_unclassifed_hydra_cfg, path, expected):
     def dummy_method(config, src_las_path, target_las_path):
         assert os.path.basename(src_las_path) in config.expected
         assert os.path.basename(target_las_path) in config.expected
+        shutil.copy2(src_las_path, target_las_path)
 
+    print("PATH", path)
     vegetation_unclassifed_hydra_cfg.paths.src_las = path
     with tempfile.TemporaryDirectory() as td:
         vegetation_unclassifed_hydra_cfg.paths.output_dir = td
-    with open_dict(
-        vegetation_unclassifed_hydra_cfg
-    ):  # needed to open the config dict and add elements
-        vegetation_unclassifed_hydra_cfg.expected = expected
-    apply(vegetation_unclassifed_hydra_cfg, dummy_method)
+        with open_dict(
+            vegetation_unclassifed_hydra_cfg
+        ):  # needed to open the config dict and add elements
+            vegetation_unclassifed_hydra_cfg.expected = expected
+        apply(vegetation_unclassifed_hydra_cfg, dummy_method)
 
 
 @pytest.mark.bduni()
