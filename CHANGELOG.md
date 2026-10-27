@@ -1,5 +1,9 @@
 # main
 
+### not yet released
+- Check that las/laz output can be read by pdal when running application
+- Fix input paths when applying on a folder
+
 ### 1.10.6
 - refactor ci:
   - do not run github actions on self-hosted
