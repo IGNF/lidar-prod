@@ -1,6 +1,6 @@
 # main
 
-### not yet released
+### 1.10.7
 - Check that las/laz output can be read by pdal when running application
 - Fix input paths when applying on a folder
 
