@@ -1,4 +1,5 @@
 # main
+- Fix check output laz/las file. No check for task that are not supposed to create a laz file (ex get_shapefile).
 
 ### 1.10.7
 - Check that las/laz output can be read by pdal when running application
