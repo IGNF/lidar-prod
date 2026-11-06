@@ -25,15 +25,18 @@ from lidar_prod.tasks.utils import (
 log = logging.getLogger(__name__)
 
 
+def check_file_with_pdal(file_path: str):
+    success = check_pdal_can_open_file_with_retry(file_path, delay=10)
+    if not success:
+        raise RuntimeError(f"Failed to open output file: {file_path}")
+
+
 @commons.eval_time
 def apply(config: DictConfig, logic: Callable):
     applied_file_list = []
     for src_las_path in get_list_las_path_from_src(config.paths.src_las):
         target_las_path = os.path.join(config.paths.output_dir, os.path.basename(src_las_path))
         logic(config, src_las_path, target_las_path)
-        success = check_pdal_can_open_file_with_retry(target_las_path, delay=10)
-        if not success:
-            raise RuntimeError(f"Failed to open output file: {target_las_path}")
         applied_file_list.append(target_las_path)
     return applied_file_list
 
@@ -88,6 +91,8 @@ def identify_vegetation_unclassified(config, src_las_path: str, dest_las_path: s
 
     save_las_data_to_las(dest_las_path, las_data)
 
+    check_file_with_pdal(dest_las_path)
+
 
 @commons.eval_time
 def just_clean(config, src_las_path: str, dest_las_path: str):
@@ -103,6 +108,8 @@ def just_clean(config, src_las_path: str, dest_las_path: str):
 
     # save points array to the target
     save_las_data_to_las(dest_las_path, las_data)
+
+    check_file_with_pdal(dest_las_path)
 
 
 @commons.eval_time
@@ -148,6 +155,8 @@ def apply_building_module(config: DictConfig, src_las_path: str, dest_las_path: 
         # Remove unnecessary intermediary dimensions
         cl: Cleaner = hydra.utils.instantiate(config.data_format.cleaning.output_building)
         cl.run(tmp_las_path, dest_las_path, config.data_format.epsg)
+
+    check_file_with_pdal(dest_las_path)
 
     return dest_las_path
 
